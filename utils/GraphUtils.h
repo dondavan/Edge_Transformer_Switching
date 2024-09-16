@@ -493,46 +493,6 @@ get_weights_accessor(const std::string &path, const std::string &data_file, Data
     }
 }
 
-/** Generates appropriate input accessor according to the specified graph parameters
- *
- * @param[in] graph_parameters Graph parameters
- * @param[in] preprocessor     (Optional) Preproccessor object
- * @param[in] bgr              (Optional) Fill the first plane with blue channel (default = true)
- *
- * @return An appropriate tensor accessor
- */
-inline std::unique_ptr<graph::ITensorAccessor>
-get_input_accessor(const arm_compute::utils::CommonGraphParams &graph_parameters,
-                   std::unique_ptr<IPreprocessor>               preprocessor = nullptr,
-                   bool                                         bgr          = true)
-{
-    if (!graph_parameters.validation_file.empty())
-    {
-        return std::make_unique<ValidationInputAccessor>(
-            graph_parameters.validation_file, graph_parameters.validation_path, std::move(preprocessor), bgr,
-            graph_parameters.validation_range_start, graph_parameters.validation_range_end);
-    }
-    else
-    {
-        const std::string &image_file       = graph_parameters.image;
-        const std::string &image_file_lower = lower_string(image_file);
-        if (arm_compute::utility::endswith(image_file_lower, ".npy"))
-        {
-            return std::make_unique<NumPyBinLoader>(image_file, graph_parameters.data_layout);
-        }
-        else if (arm_compute::utility::endswith(image_file_lower, ".jpeg") ||
-                 arm_compute::utility::endswith(image_file_lower, ".jpg") ||
-                 arm_compute::utility::endswith(image_file_lower, ".ppm"))
-        {
-            return std::make_unique<ImageAccessor>(image_file, bgr, std::move(preprocessor));
-        }
-        else
-        {
-            return std::make_unique<DummyAccessor>();
-        }
-    }
-}
-
 /** Generates appropriate output accessor according to the specified graph parameters
  *
  * @note If the output accessor is requested to validate the graph then ValidationOutputAccessor is generated
@@ -805,6 +765,51 @@ get_segment_accessor(const std::string &path_to_file,
     }
 }
 
+/** Generates appropriate input accessor according to the specified graph parameters
+ *
+ * @param[in] graph_parameters Graph parameters
+ * @param[in] preprocessor     (Optional) Preproccessor object
+ * @param[in] bgr              (Optional) Fill the first plane with blue channel (default = true)
+ *
+ * @return An appropriate tensor accessor
+ */
+inline std::unique_ptr<graph::ITensorAccessor>
+get_input_accessor(const arm_compute::utils::CommonGraphParams &graph_parameters,
+                   std::unique_ptr<IPreprocessor>               preprocessor = nullptr,
+                   bool                                         bgr          = true)
+{
+    if (!graph_parameters.validation_file.empty())
+    {
+        return std::make_unique<ValidationInputAccessor>(
+            graph_parameters.validation_file, graph_parameters.validation_path, std::move(preprocessor), bgr,
+            graph_parameters.validation_range_start, graph_parameters.validation_range_end);
+    }
+    else
+    {
+        const std::string &image_file       = graph_parameters.image;
+        const std::string &image_file_lower = lower_string(image_file);
+        const std::string &text_file            = graph_parameters.text;
+        const std::string &text_file_lower      = lower_string(text_file);
+        if (arm_compute::utility::endswith(image_file_lower, ".npy"))
+        {
+            return std::make_unique<NumPyBinLoader>(image_file, graph_parameters.data_layout);
+        }
+        else if (arm_compute::utility::endswith(image_file_lower, ".jpeg") ||
+                 arm_compute::utility::endswith(image_file_lower, ".jpg") ||
+                 arm_compute::utility::endswith(image_file_lower, ".ppm"))
+        {
+            return std::make_unique<ImageAccessor>(image_file, bgr, std::move(preprocessor));
+        }
+        else if (arm_compute::utility::endswith(text_file_lower, ".txt"))
+        {
+            return std::make_unique<TextAccessor>(text_file, std::move(preprocessor));
+        }
+        else
+        {
+            return std::make_unique<DummyAccessor>();
+        }
+    }
+}
 
 
 } // namespace graph_utils
