@@ -176,13 +176,13 @@ class GraphVanillaTransformerExample : public Example
 
         with_attention
             /* Self Attention */
-            << MultiHeadLinearLayer(LinearLayerInfo(d_model), get_weights_accessor(data_path+layer_path, "query_weight.npy"),
-                                    get_weights_accessor(data_path+layer_path, "query_bias.npy"),
-                                    get_weights_accessor(data_path+layer_path, "key_weight.npy"),
-                                    get_weights_accessor(data_path+layer_path, "key_bias.npy"),
-                                    get_weights_accessor(data_path+layer_path, "value_weight.npy"),
-                                    get_weights_accessor(data_path+layer_path, "value_bias.npy"))
-            << MultiHeadAttentionLayer(MultiHeadAttentionLayerInfo(d_model, h)).set_name("mha1");
+            << AttentionLinearLayer(LinearLayerInfo(d_model), get_weights_accessor(data_path + layer_path, "query_weight.npy"),
+                                    get_weights_accessor(data_path + layer_path, "query_bias.npy"),
+                                    get_weights_accessor(data_path + layer_path, "key_weight.npy"),
+                                    get_weights_accessor(data_path + layer_path, "key_bias.npy"),
+                                    get_weights_accessor(data_path + layer_path, "value_weight.npy"),
+                                    get_weights_accessor(data_path + layer_path, "value_bias.npy"))
+            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1");
 
         graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention");
 
