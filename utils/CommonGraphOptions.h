@@ -111,6 +111,12 @@ struct CommonGraphParams
     std::string                      mlgo_file{};
     unsigned int                     validation_range_start{0};
     unsigned int                     validation_range_end{std::numeric_limits<unsigned int>::max()};
+
+    int                              input_len{};
+    std::string                      text{};
+    std::string                      segment{};
+    std::string                      vocabulary{};
+    bool                             raw_output{false};
 };
 
 /** Formatted output of the CommonGraphParams type
@@ -168,6 +174,12 @@ public:
     SimpleOption<std::string>              *validation_range; /**< Validation range */
     SimpleOption<std::string>              *tuner_file;       /**< File to load/store the tuner's values from */
     SimpleOption<std::string>              *mlgo_file;        /**< File to load the MLGO heuristics from */
+
+    ToggleOption                           *raw_output;       /**< Output raw data */
+    SimpleOption<int>                      *input_len;        /**< Input length */
+    SimpleOption<std::string>              *text;             /**< Text */
+    SimpleOption<std::string>              *segment;          /**< segment */
+    SimpleOption<std::string>              *vocabulary;       /**< Vocabulary */
 };
 
 /** Consumes the common graph options and creates a structure containing any information

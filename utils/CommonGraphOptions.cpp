@@ -113,6 +113,18 @@ namespace utils
         }
     }
 
+    if(!common_params.text.empty())
+    {
+        os << "Text file : " << common_params.text << std::endl;
+    }
+    if(!common_params.segment.empty())
+    {
+        os << "Segment file : " << common_params.segment << std::endl;
+    }
+    if(!common_params.vocabulary.empty())
+    {
+        os << "Vocabulary file : " << common_params.vocabulary << std::endl;
+    }
     return os;
 }
 
@@ -134,7 +146,13 @@ CommonGraphOptions::CommonGraphOptions(CommandLineParser &parser)
       validation_path(parser.add_option<SimpleOption<std::string>>("validation-path")),
       validation_range(parser.add_option<SimpleOption<std::string>>("validation-range")),
       tuner_file(parser.add_option<SimpleOption<std::string>>("tuner-file")),
-      mlgo_file(parser.add_option<SimpleOption<std::string>>("mlgo-file"))
+      mlgo_file(parser.add_option<SimpleOption<std::string>>("mlgo-file")),
+
+      raw_output(parser.add_option<ToggleOption>("raw-output")),
+      input_len(parser.add_option<SimpleOption<int>>("input_len")),
+      text(parser.add_option<SimpleOption<std::string>>("text")),
+      segment(parser.add_option<SimpleOption<std::string>>("segment")),
+      vocabulary(parser.add_option<SimpleOption<std::string>>("vocabulary"))
 {
     std::set<arm_compute::graph::Target> supported_targets{
         Target::NEON,
@@ -182,6 +200,12 @@ CommonGraphOptions::CommonGraphOptions(CommandLineParser &parser)
     validation_range->set_help("Range of the images to validate for (Format : start,end)");
     tuner_file->set_help("File to load/save CLTuner values");
     mlgo_file->set_help("File to load MLGO heuristics");
+
+    raw_output->set_help("Output raw data on output layer");
+    input_len->set_help("Sentence token input length");
+    text->set_help("Input text for the graph");
+    segment->set_help("Input sentence segmentation");
+    vocabulary->set_help("Path to vocabulary file for tex tokenization");
 }
 
 CommonGraphParams consume_common_graph_parameters(CommonGraphOptions &options)
@@ -215,6 +239,12 @@ CommonGraphParams consume_common_graph_parameters(CommonGraphOptions &options)
     common_params.validation_range_end   = validation_range.second;
     common_params.tuner_file             = options.tuner_file->value();
     common_params.mlgo_file              = options.mlgo_file->value();
+
+    common_params.raw_output             = options.raw_output->is_set() ? options.raw_output->value() : false;
+    common_params.input_len              = options.input_len->value();
+    common_params.text                   = options.text->value();
+    common_params.segment                = options.segment->value();
+    common_params.vocabulary             = options.vocabulary->value();
 
     return common_params;
 }

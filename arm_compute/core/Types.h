@@ -143,7 +143,8 @@ enum class ComparisonOperation
 struct ValidRegion
 {
     /** Default constructor */
-    ValidRegion() : anchor{}, shape{}
+    ValidRegion()
+        : anchor{}, shape{}
     {
     }
 
@@ -164,7 +165,8 @@ struct ValidRegion
      * @param[in] a_shape   Shape of the valid region.
      *
      */
-    ValidRegion(const Coordinates &an_anchor, const TensorShape &a_shape) : anchor{an_anchor}, shape{a_shape}
+    ValidRegion(const Coordinates &an_anchor, const TensorShape &a_shape)
+        : anchor{ an_anchor }, shape{ a_shape }
     {
         anchor.set_num_dimensions(std::max(anchor.num_dimensions(), shape.num_dimensions()));
     }
@@ -177,7 +179,7 @@ struct ValidRegion
      *
      */
     ValidRegion(const Coordinates &an_anchor, const TensorShape &a_shape, size_t num_dimensions)
-        : anchor{an_anchor}, shape{a_shape}
+        : anchor{ an_anchor }, shape{ a_shape }
     {
         ARM_COMPUTE_ERROR_ON(num_dimensions < std::max(anchor.num_dimensions(), shape.num_dimensions()));
         anchor.set_num_dimensions(num_dimensions);
@@ -239,24 +241,26 @@ enum class BorderMode
 struct BorderSize
 {
     /** Empty border, i.e. no border */
-    constexpr BorderSize() noexcept : top{0}, right{0}, bottom{0}, left{0}
+    constexpr BorderSize() noexcept
+        : top{ 0 }, right{ 0 }, bottom{ 0 }, left{ 0 }
     {
     }
 
     /** Border with equal size around the 2D plane */
-    explicit constexpr BorderSize(unsigned int size) noexcept : top{size}, right{size}, bottom{size}, left{size}
+    explicit constexpr BorderSize(unsigned int size) noexcept
+        : top{ size }, right{ size }, bottom{ size }, left{ size }
     {
     }
 
     /** Border with same size for top/bottom and left/right */
     constexpr BorderSize(unsigned int top_bottom, unsigned int left_right)
-        : top{top_bottom}, right{left_right}, bottom{top_bottom}, left{left_right}
+        : top{ top_bottom }, right{ left_right }, bottom{ top_bottom }, left{ left_right }
     {
     }
 
     /** Border with different sizes */
     constexpr BorderSize(unsigned int top, unsigned int right, unsigned int bottom, unsigned int left)
-        : top{top}, right{right}, bottom{bottom}, left{left}
+        : top{ top }, right{ right }, bottom{ bottom }, left{ left }
     {
     }
 
@@ -361,7 +365,7 @@ enum class InterpolationPolicy
 {
     NEAREST_NEIGHBOR, /**< Output values are defined to match the source pixel whose center is nearest to the sample position */
     BILINEAR,         /**< Output values are defined by bilinear interpolation between the pixels */
-    AREA, /**< Output values are determined by averaging the source pixels whose areas fall under the area of the destination pixel, projected onto the source image */
+    AREA,             /**< Output values are determined by averaging the source pixels whose areas fall under the area of the destination pixel, projected onto the source image */
 };
 
 /** Bilinear Interpolation method used by LKTracker */
@@ -468,12 +472,12 @@ enum class NormType
  */
 struct DetectionWindow
 {
-    uint16_t x{0};         /**< Top-left x coordinate */
-    uint16_t y{0};         /**< Top-left y coordinate */
-    uint16_t width{0};     /**< Width of the detection window */
-    uint16_t height{0};    /**< Height of the detection window */
-    uint16_t idx_class{0}; /**< Index of the class */
-    float    score{0.f};   /**< Confidence value for the detection window */
+    uint16_t x{ 0 };         /**< Top-left x coordinate */
+    uint16_t y{ 0 };         /**< Top-left y coordinate */
+    uint16_t width{ 0 };     /**< Width of the detection window */
+    uint16_t height{ 0 };    /**< Height of the detection window */
+    uint16_t idx_class{ 0 }; /**< Index of the class */
+    float    score{ 0.f };   /**< Confidence value for the detection window */
 };
 
 /** Available pooling types */
@@ -495,7 +499,7 @@ enum class NMSType
 /** BoxWithNonMaximaSuppressionLimit Information class */
 class BoxNMSLimitInfo final
 {
-public:
+    public:
     /** Constructor
      *
      * @param[in] score_thresh             (Optional) Score threshold.
@@ -590,7 +594,7 @@ public:
         return _im_height;
     }
 
-private:
+    private:
     float   _score_thresh;
     float   _nms;
     int     _detections_per_im;
@@ -609,13 +613,14 @@ private:
 struct Padding2D
 {
     Padding2D() = default;
-    Padding2D(size_t left, size_t right, size_t top, size_t bottom) : left(left), right(right), top(top), bottom(bottom)
+    Padding2D(size_t left, size_t right, size_t top, size_t bottom)
+        : left(left), right(right), top(top), bottom(bottom)
     {
     }
-    size_t left   = {0}; /**<  Padding across the width dimension on the left, in elements. */
-    size_t right  = {0}; /**<  Padding across the width dimension on the right, in elements. */
-    size_t top    = {0}; /**<  Padding across the height dimension on the top, in elements. */
-    size_t bottom = {0}; /**<  Padding across the height dimension on the bottom, in elements. */
+    size_t left   = { 0 }; /**<  Padding across the width dimension on the left, in elements. */
+    size_t right  = { 0 }; /**<  Padding across the width dimension on the right, in elements. */
+    size_t top    = { 0 }; /**<  Padding across the height dimension on the top, in elements. */
+    size_t bottom = { 0 }; /**<  Padding across the height dimension on the bottom, in elements. */
 };
 
 /** Padding information for 3D operations like Conv3d */
@@ -635,18 +640,18 @@ struct Padding3D
     {
     }
 
-    size_t left   = {0}; /**<  Padding across the width dimenstion on the left, in elements. */
-    size_t right  = {0}; /**<  Padding across the width dimenstion on the right, in elements. */
-    size_t top    = {0}; /**<  Padding across the height dimenstion  on the top, in elements. */
-    size_t bottom = {0}; /**<  Padding across the height dimenstion on the bottom, in elements. */
-    size_t front  = {0}; /**<  Padding across the depth dimenstion on the front, in elements. */
-    size_t back   = {0}; /**<  Padding across the depth dimenstion on the back, in elements. */
+    size_t left   = { 0 }; /**<  Padding across the width dimenstion on the left, in elements. */
+    size_t right  = { 0 }; /**<  Padding across the width dimenstion on the right, in elements. */
+    size_t top    = { 0 }; /**<  Padding across the height dimenstion  on the top, in elements. */
+    size_t bottom = { 0 }; /**<  Padding across the height dimenstion on the bottom, in elements. */
+    size_t front  = { 0 }; /**<  Padding across the depth dimenstion on the front, in elements. */
+    size_t back   = { 0 }; /**<  Padding across the depth dimenstion on the back, in elements. */
 };
 
 /** PriorBox layer info */
 class PriorBoxLayerInfo final
 {
-public:
+    public:
     /** Default Constructor */
     PriorBoxLayerInfo()
         : _min_sizes(),
@@ -679,8 +684,8 @@ public:
                       bool                        clip          = false,
                       const std::vector<float>   &max_sizes     = {},
                       const std::vector<float>   &aspect_ratios = {},
-                      const Coordinates2D        &img_size      = Coordinates2D{0, 0},
-                      const std::array<float, 2> &steps         = {{0.f, 0.f}})
+                      const Coordinates2D        &img_size      = Coordinates2D{ 0, 0 },
+                      const std::array<float, 2> &steps         = { { 0.f, 0.f } })
         : _min_sizes(min_sizes),
           _variances(variances),
           _offset(offset),
@@ -692,22 +697,22 @@ public:
           _steps(steps)
     {
         _aspect_ratios.push_back(1.);
-        for (unsigned int i = 0; i < aspect_ratios.size(); ++i)
+        for(unsigned int i = 0; i < aspect_ratios.size(); ++i)
         {
             float ar            = aspect_ratios[i];
             bool  already_exist = false;
-            for (auto ar_new : _aspect_ratios)
+            for(auto ar_new : _aspect_ratios)
             {
-                if (fabs(ar - ar_new) < 1e-6)
+                if(fabs(ar - ar_new) < 1e-6)
                 {
                     already_exist = true;
                     break;
                 }
             }
-            if (!already_exist)
+            if(!already_exist)
             {
                 _aspect_ratios.push_back(ar);
-                if (flip)
+                if(flip)
                 {
                     _aspect_ratios.push_back(1.f / ar);
                 }
@@ -760,7 +765,7 @@ public:
         return _aspect_ratios;
     }
 
-private:
+    private:
     std::vector<float>   _min_sizes;
     std::vector<float>   _variances;
     float                _offset;
@@ -789,7 +794,7 @@ enum class DetectionOutputLayerCodeType
 /** Detection Output layer info */
 class DetectionOutputLayerInfo final
 {
-public:
+    public:
     /** Default Constructor */
     DetectionOutputLayerInfo()
         : _num_classes(),
@@ -824,9 +829,9 @@ public:
                              DetectionOutputLayerCodeType code_type,
                              int                          keep_top_k,
                              float                        nms_threshold,
-                             int                          top_k                = -1,
-                             int                          background_label_id  = -1,
-                             float                        confidence_threshold = std::numeric_limits<float>::lowest(),
+                             int                          top_k                      = -1,
+                             int                          background_label_id        = -1,
+                             float                        confidence_threshold       = std::numeric_limits<float>::lowest(),
                              bool                         variance_encoded_in_target = false,
                              float                        eta                        = 1)
         : _num_classes(num_classes),
@@ -899,7 +904,7 @@ public:
         return _num_loc_classes;
     }
 
-private:
+    private:
     int                          _num_classes;
     bool                         _share_location;
     DetectionOutputLayerCodeType _code_type;
@@ -916,7 +921,7 @@ private:
 /** Detection Output layer info */
 class DetectionPostProcessLayerInfo final
 {
-public:
+    public:
     /** Default Constructor */
     DetectionPostProcessLayerInfo()
         : _max_detections(),
@@ -1027,7 +1032,7 @@ public:
         return _dequantize_scores;
     }
 
-private:
+    private:
     unsigned int         _max_detections;
     unsigned int         _max_classes_per_detection;
     float                _nms_score_threshold;
@@ -1258,7 +1263,7 @@ struct Pooling3dLayerInfo
 /** ROI Pooling Layer Information class */
 class ROIPoolingLayerInfo final
 {
-public:
+    public:
     /** Constructor
      *
      * @param[in] pooled_width   Pooled width of the layer.
@@ -1297,7 +1302,7 @@ public:
         return _sampling_ratio;
     }
 
-private:
+    private:
     unsigned int _pooled_width;
     unsigned int _pooled_height;
     float        _spatial_scale;
@@ -1307,7 +1312,7 @@ private:
 /** Generate Proposals Information class */
 class GenerateProposalsInfo
 {
-public:
+    public:
     /** Constructor
      *
      * @param[in] im_width       Width of the original image
@@ -1387,7 +1392,7 @@ public:
         return _values_per_roi;
     }
 
-private:
+    private:
     float  _im_height;
     float  _im_width;
     float  _im_scale;
@@ -1402,7 +1407,7 @@ private:
 /** ComputeAnchors information class */
 class ComputeAnchorsInfo
 {
-public:
+    public:
     /** Constructor
      *
      * @param[in] feat_width     Feature map width
@@ -1442,7 +1447,7 @@ public:
         return _values_per_roi;
     }
 
-private:
+    private:
     float  _feat_height;
     float  _feat_width;
     float  _spatial_scale;
@@ -1452,7 +1457,7 @@ private:
 /** Bounding Box Transform information class */
 class BoundingBoxTransformInfo final
 {
-public:
+    public:
     /** Constructor
      *
      * @param[in] img_width                Width of the original image
@@ -1467,7 +1472,7 @@ public:
                              float                      img_height,
                              float                      scale,
                              bool                       apply_scale              = false,
-                             const std::array<float, 4> weights                  = {{1.f, 1.f, 1.f, 1.f}},
+                             const std::array<float, 4> weights                  = { { 1.f, 1.f, 1.f, 1.f } },
                              bool                       correct_transform_coords = false,
                              float                      bbox_xform_clip          = 4.135166556742356f)
         : _img_width(img_width),
@@ -1515,7 +1520,7 @@ public:
         return _correct_transform_coords;
     }
 
-private:
+    private:
     float                _img_width;
     float                _img_height;
     float                _scale;
@@ -1528,7 +1533,7 @@ private:
 /** Normalization Layer Information class */
 class NormalizationLayerInfo
 {
-public:
+    public:
     /** Default Constructor
      *
      * @param[in] type      The normalization type. Can be @ref NormType::IN_MAP_1D, @ref NormType::IN_MAP_2D or @ref NormType::CROSS_MAP
@@ -1601,7 +1606,7 @@ public:
         return (_is_scaled) ? (_alpha / size) : _alpha;
     }
 
-private:
+    private:
     NormType _type;
     uint32_t _norm_size;
     float    _alpha;
@@ -1612,7 +1617,7 @@ private:
 
 class StridedSliceLayerInfo
 {
-public:
+    public:
     /** Default Constructor
      *
      * @param[in] begin_mask       (Optional) If the ith bit of begin_mask is set, starts[i] is ignored and the fullest possible range in that dimension is used instead.
@@ -1642,7 +1647,7 @@ public:
         return _shrink_axis_mask;
     }
 
-private:
+    private:
     int32_t _begin_mask;
     int32_t _end_mask;
     int32_t _shrink_axis_mask;
@@ -1669,7 +1674,7 @@ inline bool is_fixed_format_fast_math(const WeightFormat &wf)
 /** Convolution Layer Weights Information class. This class stores the necessary information to compute convolution layer when the weights are already reshaped */
 class WeightsInfo
 {
-public:
+    public:
     /** Default constructor */
     WeightsInfo()
         : _are_reshaped(false),
@@ -1749,7 +1754,7 @@ public:
         return _kernel_height;
     }
 
-private:
+    private:
     bool                      _are_reshaped;
     unsigned int              _kernel_width;
     unsigned int              _kernel_height;
@@ -1769,7 +1774,7 @@ private:
  */
 class GEMMReshapeInfo final
 {
-public:
+    public:
     /** Default constructor */
     GEMMReshapeInfo()
         : _m(1),
@@ -1881,7 +1886,7 @@ public:
         return _broadcast_bias;
     };
 
-private:
+    private:
     int  _m;
     int  _n;
     int  _k;
@@ -1900,11 +1905,11 @@ struct GEMMLHSMatrixInfo
         : m0(m), k0(k), v0(v), transpose(trans), interleave(inter)
     {
     }
-    unsigned int m0{1};            /**< Number of rows processed by the matrix multiplication */
-    unsigned int k0{1};            /**< Number of partial accumulations performed by the matrix multiplication */
-    unsigned int v0{1};            /**< Number of vertical blocks of size (m0xk0) stored on the same output row */
-    bool         transpose{true};  /**< True if the (m0xk0) block has to be transposed before been stored */
-    bool         interleave{true}; /**< True if the v0 (m0xk0) blocks have to be interleaved in the output row */
+    unsigned int m0{ 1 };            /**< Number of rows processed by the matrix multiplication */
+    unsigned int k0{ 1 };            /**< Number of partial accumulations performed by the matrix multiplication */
+    unsigned int v0{ 1 };            /**< Number of vertical blocks of size (m0xk0) stored on the same output row */
+    bool         transpose{ true };  /**< True if the (m0xk0) block has to be transposed before been stored */
+    bool         interleave{ true }; /**< True if the v0 (m0xk0) blocks have to be interleaved in the output row */
 };
 
 /** GEMM RHS (Right Hand Side) matrix information */
@@ -1915,13 +1920,14 @@ struct GEMMRHSMatrixInfo
         : n0(n), k0(k), h0(h), transpose(trans), interleave(inter), export_to_cl_image(export_to_cl_img)
     {
     }
-    unsigned int n0{1};            /**< Number of columns processed by the matrix multiplication */
-    unsigned int k0{1};            /**< Number of partial accumulations performed by the matrix multiplication */
-    unsigned int h0{1};            /**< Number of horizontal blocks of size (k0xn0) stored on the same output row */
-    bool         transpose{true};  /**< True if the (k0xn0) block has to be transposed before been stored */
-    bool         interleave{true}; /**< True if the h0 (k0xn0) blocks have to be interleaved in the output row */
+    unsigned int n0{ 1 };            /**< Number of columns processed by the matrix multiplication */
+    unsigned int k0{ 1 };            /**< Number of partial accumulations performed by the matrix multiplication */
+    unsigned int h0{ 1 };            /**< Number of horizontal blocks of size (k0xn0) stored on the same output row */
+    bool         transpose{ true };  /**< True if the (k0xn0) block has to be transposed before been stored */
+    bool         interleave{ true }; /**< True if the h0 (k0xn0) blocks have to be interleaved in the output row */
     bool         export_to_cl_image{
-        false}; /**< True if the reshaped rhs has to be exported to cl_image. n0 must be equal to 4 */
+        false
+    }; /**< True if the reshaped rhs has to be exported to cl_image. n0 must be equal to 4 */
 };
 
 class ITensorInfo;
@@ -1953,7 +1959,8 @@ struct WinogradInfo
     PadStrideInfo convolution_info{}; /**< Convolution info (Pads, strides,...) */
     DataLayout    output_data_layout{
         DataLayout::
-            NCHW}; /**< Data layout to use for the output tensor once the convolution has been applied (NCHW or NHWC) */
+            NCHW
+    }; /**< Data layout to use for the output tensor once the convolution has been applied (NCHW or NHWC) */
 };
 
 /** IO formatting information class*/
@@ -2015,5 +2022,194 @@ struct IOFormatInfo
 
 /** Class for holding information related to cropping */
 using CropInfo = Padding2D;
+
+/** Embedding Layer Information Class */
+class EmbeddingLayerInfo final
+{
+    public:
+    /** Constructor
+     *
+     * @param[in] d_model       Model dimesion
+     * @param[in] d_vocab       Vocabulary size
+     * @param[in] d_segment     Sentence segmentation size
+     * @param[in] d_position    Maximum sentence postion encoding length
+     * @param[in] pretrained    If use pretained positional encoding
+     * 
+     */
+    EmbeddingLayerInfo(unsigned int  d_model    = 512U,
+                       unsigned int  d_vocab    = 30522U,
+                       unsigned int  d_segment  = 2U,
+                       unsigned int  d_position = 512U,
+                       bool          pretrained = false,
+                       ConvertPolicy c_policy   = ConvertPolicy::SATURATE)
+        : _d_model(d_model),
+          _d_vocab(d_vocab),
+          _d_segment(d_segment),
+          _d_position(d_position),
+          _pretrained(pretrained),
+          _c_policy(c_policy)
+    {
+    }
+
+    /* Get Model dimesion */
+    unsigned int d_model() const
+    {
+        return _d_model;
+    }
+
+    /* Get vocabulary size */
+    unsigned int d_vocab() const
+    {
+        return _d_vocab;
+    }
+
+    /* Get sentence segmentation size */
+    unsigned int d_segment() const
+    {
+        return _d_segment;
+    }
+
+    /* Get maximium sentence postion encoding length */
+    unsigned int d_position() const
+    {
+        return _d_position;
+    }
+
+    /* Get convert policy */
+    ConvertPolicy c_policy() const
+    {
+        return _c_policy;
+    }
+
+    private:
+    unsigned int  _d_model;
+    unsigned int  _d_vocab;
+    unsigned int  _d_segment;
+    unsigned int  _d_position;
+    bool          _pretrained;
+    ConvertPolicy _c_policy;
+};
+
+/** Linear Layer Information Class */
+class LinearLayerInfo final
+{
+    public:
+    /** Constructor
+     * 
+     * @param[in] d_d_linear_hidden Linear layer hidden depth
+     */
+    LinearLayerInfo(unsigned int d_linear_hidden = 2048U,
+                    TensorShape  w_shape         = TensorShape(),
+                    TensorShape  b_shape         = TensorShape())
+        : _d_linear_hidden(d_linear_hidden),
+          _w_shape(w_shape),
+          _b_shape(b_shape)
+    {
+    }
+
+    /** Get d_model */
+    int d_linear_hidden() const
+    {
+        return _d_linear_hidden;
+    }
+
+    /** Get _w_shape */
+    TensorShape w_shape() const
+    {
+        return _w_shape;
+    }
+
+    /** Get _b_shape */
+    TensorShape b_shape() const
+    {
+        return _b_shape;
+    }
+
+    private:
+    unsigned int _d_linear_hidden;
+    TensorShape  _w_shape;
+    TensorShape  _b_shape;
+};
+/** Scale Dot Production Layer Information Class */
+class ScaleDotProductionLayerInfo final
+{
+    public:
+    /** Constructor
+     *
+     * @param[in] d_model   Model dimesion
+     * @param[in] h         Parallel attention dimesion
+     */
+    ScaleDotProductionLayerInfo(unsigned int d_model = 512, unsigned int h = 8)
+        : _d_model(d_model), _h(h)
+    {
+    }
+
+    /* Get Model dimesion */
+    unsigned int d_model() const
+    {
+        return _d_model;
+    }
+
+    /* Get Parallel attention dimesion */
+    unsigned int h() const
+    {
+        return _h;
+    }
+
+    private:
+    unsigned int _d_model;
+    unsigned int _h;
+};
+
+/** Layer Normalization Layer Information Class */
+class LayerNormLayerInfo final
+{
+public:
+    /** Constructor
+     * 
+     * @param[in] axis      Axix to perform normalization along
+     * @param[in] epsilon   Lower bound value for the normalization
+     */
+    LayerNormLayerInfo(int axis = 0/*Window::DimX*/,
+                       float epsilon = 1e-5,
+                       float gamma = 1.0,
+                       float beta = 0): _axis(axis),
+                                        _epsilon(epsilon),
+                                        _gamma(gamma),
+                                        _beta(beta)
+    {
+    }
+
+    /** Get normalization axis */
+    int axis() const
+    {
+        return  _axis;
+    }
+
+    /** Get epsilon */
+    float epsilon() const
+    {
+        return  _epsilon;
+    }
+    
+    /** Get gamma */
+    float gamma() const
+    {
+        return  _gamma;
+    }
+
+    /** Get beta */
+    float beta() const
+    {
+        return  _beta;
+    }
+
+private:
+    int _axis; 
+    float _epsilon;
+    float _gamma;
+    float _beta;
+};
+
 } // namespace arm_compute
 #endif // ACL_ARM_COMPUTE_CORE_TYPES_H

@@ -199,7 +199,16 @@ enum class NodeType
     Output,
     Const,
 
-    Dummy
+    Dummy,
+
+    SegmentEmbeddingLayer,
+    TokenEmbeddingLayer,
+    EmbeddingSumLayer,
+    PositionEmbeddingLayer,
+    LinearLayer,
+    AttentionLinearLayer,
+    ScaleDotProductionAttentionLayer,
+    LayerNormLayer
 };
 
 /** Backend Memory Manager affinity **/
@@ -225,6 +234,7 @@ struct NodeParams
     std::string name;   /**< Node name */
     Target      target; /**< Node target */
 };
+
 } // namespace graph
 } // namespace arm_compute
 #endif // ACL_ARM_COMPUTE_GRAPH_TYPES_H

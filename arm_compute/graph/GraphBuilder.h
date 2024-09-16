@@ -41,7 +41,7 @@ class Graph;
  */
 class GraphBuilder final
 {
-public:
+    public:
     /** Adds a Const node to the graph
      *
      * @param[in] g        Graph to add the node to
@@ -53,17 +53,6 @@ public:
      */
     static NodeID
     add_const_node(Graph &g, NodeParams params, const TensorDescriptor &desc, ITensorAccessorUPtr accessor = nullptr);
-    /** Adds an input layer node to the graph
-     *
-     * @param[in] g        Graph to add the node to
-     * @param[in] params   Common node parameters
-     * @param[in] desc     Tensor descriptor of the Tensor
-     * @param[in] accessor (Optional) Accessor of the input node data
-     *
-     * @return Node ID of the created node, EmptyNodeID in case of error
-     */
-    static NodeID
-    add_input_node(Graph &g, NodeParams params, const TensorDescriptor &desc, ITensorAccessorUPtr accessor = nullptr);
     /** Adds an output layer node to the graph
      *
      * @param[in] g        Graph to add the node to
@@ -310,8 +299,8 @@ public:
                                                   NodeIdxPair                          input_box_encoding,
                                                   NodeIdxPair                          input_class_prediction,
                                                   const DetectionPostProcessLayerInfo &detect_info,
-                                                  ITensorAccessorUPtr                  anchors_accessor = nullptr,
-                                                  const QuantizationInfo &anchor_quant_info = QuantizationInfo());
+                                                  ITensorAccessorUPtr                  anchors_accessor  = nullptr,
+                                                  const QuantizationInfo              &anchor_quant_info = QuantizationInfo());
     /** Adds a Dummy node to the graph
      *
      * @note this node if for debugging purposes. Just alters the shape of the graph pipeline as requested.
@@ -375,9 +364,9 @@ public:
                                             NodeParams                    params,
                                             NodeIdxPair                   input,
                                             unsigned int                  num_outputs,
-                                            ITensorAccessorUPtr           weights_accessor = nullptr,
-                                            ITensorAccessorUPtr           bias_accessor    = nullptr,
-                                            const FullyConnectedLayerInfo fc_info          = FullyConnectedLayerInfo(),
+                                            ITensorAccessorUPtr           weights_accessor   = nullptr,
+                                            ITensorAccessorUPtr           bias_accessor      = nullptr,
+                                            const FullyConnectedLayerInfo fc_info            = FullyConnectedLayerInfo(),
                                             const QuantizationInfo       &weights_quant_info = QuantizationInfo(),
                                             const QuantizationInfo       &out_quant_info     = QuantizationInfo(),
                                             FastMathHint                  fast_math_hint     = FastMathHint::Disabled);
@@ -679,6 +668,95 @@ public:
      * @return Node ID of the created node, EmptyNodeID in case of error
      */
     static NodeID add_yolo_node(Graph &g, NodeParams params, NodeIdxPair input, ActivationLayerInfo act_info);
+
+    /** Adds an input layer node to the graph
+     *
+     * @param[in] g        Graph to add the node to
+     * @param[in] params   Common node parameters
+     * @param[in] desc     Tensor descriptor of the Tensor
+     * @param[in] accessor (Optional) Accessor of the input node data
+     *
+     * @return Node ID of the created node, EmptyNodeID in case of error
+     */
+    static NodeID
+    add_input_node(Graph &g, NodeParams params, const TensorDescriptor &desc, std::vector<ITensorAccessorUPtr> &accessors);
+    /** Adds an embedding layer to the graph
+     *
+     * @param[in] g          Graph to add the node to
+     * @param[in] params     Common node parameters
+     * @param[in] input      Input to the token embedding layer node as a NodeID-Index pair
+     * @param[in] tkemb_info Token embedding layer parameters
+     * @param[in] vocabs     Pretrained vocabulary vector accessor
+     * @param[in] segments   Pretrained segments vector accessor
+     * @param[in] position   Pretrained position vector accessor
+     * 
+     * @return Node ID of the created node, EmptyNodeID in case of error
+     */
+    static NodeID add_embedding_node(Graph              &g,
+                                     NodeParams          params,
+                                     NodeIdxPair         input,
+                                     EmbeddingLayerInfo  tkemb_info,
+                                     ITensorAccessorUPtr vocabs   = nullptr,
+                                     ITensorAccessorUPtr segments = nullptr,
+                                     ITensorAccessorUPtr position = nullptr);
+    /** Adds a feed forward layer node to the graph
+     *
+     * @param[in] g                  Graph to add the layer to
+     * @param[in] params             Common node parameters
+     * @param[in] input              Input to the fully connected layer node as a NodeID-Index pair
+     * @param[in] info               Feed Forward layer information
+     *
+     * @return Node ID of the created node, EmptyNodeID in case of error
+     */
+    static NodeID add_linear_node(Graph              &g,
+                                  NodeParams          params,
+                                  NodeIdxPair         input,
+                                  LinearLayerInfo     info       = LinearLayerInfo(),
+                                  ITensorAccessorUPtr ff_weights = nullptr,
+                                  ITensorAccessorUPtr ff_bias    = nullptr);
+    /** Adds a linear layer computing Key, Value, Query to the graph
+     *
+     * @param[in] g             Graph to add the node to
+     * @param[in] params        Common node parameters
+     * @param[in] input         Input to the normalization layer node as a NodeID-Index pair
+     * @param[in] linear_info   Linear layer info
+     * @param[in] query_weights Query weight
+     * @param[in] query_bias    Query bias
+     * @param[in] key_weights   Key weight
+     * @param[in] key_bias      Key bias
+     * @param[in] value_weights Value weight
+     * @param[in] value_bias    Value bias
+     * 
+     * @return Node ID of the created node, EmptyNodeID in case of error
+     */
+    static NodeID add_attention_linear_layer(Graph &g, NodeParams params, NodeIdxPair input, 
+                                                               LinearLayerInfo linear_info,
+                                                               ITensorAccessorUPtr query_weights,
+                                                               ITensorAccessorUPtr query_bias,
+                                                               ITensorAccessorUPtr key_weights,
+                                                               ITensorAccessorUPtr key_bias,
+                                                               ITensorAccessorUPtr value_weights,
+                                                               ITensorAccessorUPtr value_bias);
+    /** Adds a multi-head attention layer to the graph
+     *
+     * @param[in] g         Graph to add the node to
+     * @param[in] params    Common node parameters
+     * @param[in] input     Input to the normalization layer node as a NodeID-Index pair
+     * @param[in] mha_info  Multi-head attention layer info
+     * 
+     * @return Node ID of the created node, EmptyNodeID in case of error
+     */
+    static NodeID add_scale_dot_production_node(Graph &g, NodeParams params, NodeIdxPair input, ScaleDotProductionLayerInfo mha_info);
+    /** Adds a layer normalization layer node to the graph
+     *
+     * @param[in] g       Graph to add the node to
+     * @param[in] params  Common node parameters
+     * @param[in] input   Input to the normalization layer node as a NodeID-Index pair
+     * @param[in] info    Layer normalization infomation
+     *
+     * @return Node ID of the created node, EmptyNodeID in case of error
+     */
+    static NodeID add_layer_norm_node(Graph &g, NodeParams params, NodeIdxPair input, LayerNormLayerInfo info);
 };
 } // namespace graph
 } // namespace arm_compute

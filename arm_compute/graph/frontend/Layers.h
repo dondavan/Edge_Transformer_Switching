@@ -25,11 +25,11 @@
 #define ARM_COMPUTE_GRAPH_LAYERS_H
 
 #include "arm_compute/core/utils/misc/Utility.h"
+#include "arm_compute/graph/GraphBuilder.h"
+#include "arm_compute/graph/Types.h"
 #include "arm_compute/graph/frontend/ILayer.h"
 #include "arm_compute/graph/frontend/IStream.h"
 #include "arm_compute/graph/frontend/SubStream.h"
-#include "arm_compute/graph/GraphBuilder.h"
-#include "arm_compute/graph/Types.h"
 
 #include <memory>
 #include <string>
@@ -40,50 +40,27 @@ namespace graph
 {
 namespace frontend
 {
-/** Input Layer */
-class InputLayer final : public ILayer
-{
-public:
-    /** Construct an input layer.
-     *
-     * @param[in] desc     Description of input tensor.
-     * @param[in] accessor Accessor to get input tensor data from.
-     */
-    InputLayer(TensorDescriptor desc, ITensorAccessorUPtr accessor) : _desc(desc), _accessor(std::move(accessor))
-    {
-    }
-
-    NodeID create_layer(IStream &s) override
-    {
-        NodeParams common_params = {name(), s.hints().target_hint};
-        return GraphBuilder::add_input_node(s.graph(), common_params, _desc, std::move(_accessor));
-    }
-
-private:
-    TensorDescriptor    _desc;
-    ITensorAccessorUPtr _accessor;
-};
-
 /** Constant Layer */
 class ConstantLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a constant layer.
      *
      * @param[in] desc     Description of input tensor.
      * @param[in] accessor Accessor to get input tensor data from.
      */
-    ConstantLayer(TensorDescriptor desc, ITensorAccessorUPtr accessor) : _desc(desc), _accessor(std::move(accessor))
+    ConstantLayer(TensorDescriptor desc, ITensorAccessorUPtr accessor)
+        : _desc(desc), _accessor(std::move(accessor))
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams common_params = {name(), s.hints().target_hint};
+        NodeParams common_params = { name(), s.hints().target_hint };
         return GraphBuilder::add_const_node(s.graph(), common_params, _desc, std::move(_accessor));
     }
 
-private:
+    private:
     TensorDescriptor    _desc;
     ITensorAccessorUPtr _accessor;
 };
@@ -91,7 +68,7 @@ private:
 /** Output Layer */
 class OutputLayer final : public ILayer
 {
-public:
+    public:
     /** Construct an output layer.
      *
      * @param[in] accessor       Accessor to give output tensor data to.
@@ -104,12 +81,12 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), _connection_idx};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), _connection_idx };
         return GraphBuilder::add_output_node(s.graph(), common_params, input, std::move(_accessor));
     }
 
-private:
+    private:
     ITensorAccessorUPtr _accessor;
     unsigned int        _connection_idx;
 };
@@ -117,7 +94,7 @@ private:
 /** Activation Layer */
 class ActivationLayer final : public ILayer
 {
-public:
+    public:
     /** Construct an activation layer.
      *
      * @param[in] act_info       Activation information
@@ -130,13 +107,13 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_activation_node(s.graph(), common_params, input, _act_info,
                                                  std::move(_out_quant_info));
     }
 
-private:
+    private:
     ActivationLayerInfo    _act_info;
     const QuantizationInfo _out_quant_info;
 };
@@ -144,7 +121,7 @@ private:
 /** ArgMinMax Layer */
 class ArgMinMaxLayer final : public ILayer
 {
-public:
+    public:
     /** Construct an activation layer.
      *
      * @param[in] op             Reduction Operation: min or max
@@ -168,13 +145,13 @@ public:
      */
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_arg_min_max_node(s.graph(), common_params, input, _op, _axis, _out_data_type,
                                                   std::move(_out_quant_info));
     }
 
-private:
+    private:
     ReductionOperation _op;
     unsigned int       _axis;
     DataType           _out_data_type;
@@ -184,7 +161,7 @@ private:
 /** Batchnormalization Layer */
 class BatchNormalizationLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a batch normalization layer.
      *
      * @param[in] mean    Accessor to get mean tensor data from.
@@ -211,13 +188,13 @@ public:
         ARM_COMPUTE_ERROR_ON(_mean == nullptr);
         ARM_COMPUTE_ERROR_ON(_var == nullptr);
 
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_batch_normalization_node(s.graph(), common_params, input, _epsilon, std::move(_mean),
                                                           std::move(_var), std::move(_beta), std::move(_gamma));
     }
 
-private:
+    private:
     ITensorAccessorUPtr _mean;
     ITensorAccessorUPtr _var;
     ITensorAccessorUPtr _gamma;
@@ -228,7 +205,7 @@ private:
 /** Bounding Box Transform Layer */
 class BoundingBoxTransformLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a bounding box transform layer.
      *
      * @param[in] sub_stream_input  Graph sub-stream for the input
@@ -250,13 +227,13 @@ public:
      */
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {_ss_input.tail_node(), 0};
-        NodeIdxPair deltas        = {_ss_deltas.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { _ss_input.tail_node(), 0 };
+        NodeIdxPair deltas        = { _ss_deltas.tail_node(), 0 };
         return GraphBuilder::add_bounding_box_transform_node(s.graph(), common_params, input, deltas, _bbox_info);
     }
 
-private:
+    private:
     SubStream                _ss_input;
     SubStream                _ss_deltas;
     BoundingBoxTransformInfo _bbox_info;
@@ -265,30 +242,31 @@ private:
 /** Channel Shuffle Layer */
 class ChannelShuffleLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a Channel Shuffle layer.
      *
      * @param[in] num_groups Number of groups
      */
-    ChannelShuffleLayer(unsigned int num_groups) : _num_groups(num_groups)
+    ChannelShuffleLayer(unsigned int num_groups)
+        : _num_groups(num_groups)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_channel_shuffle_node(s.graph(), common_params, input, _num_groups);
     }
 
-private:
+    private:
     unsigned int _num_groups;
 };
 
 /** Concat Layer */
 class ConcatLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a concatenation layer
      *
      * @param[in] sub_stream1      First graph branch
@@ -332,15 +310,16 @@ public:
      * @param[in] sub_stream Sub-stream
      */
     template <typename... Ts>
-    ConcatLayer(SubStream &&sub_stream) : _sub_streams(), _concat_descriptor(DataLayoutDimension::CHANNEL)
+    ConcatLayer(SubStream &&sub_stream)
+        : _sub_streams(), _concat_descriptor(DataLayoutDimension::CHANNEL)
     {
         _sub_streams.push_back(std::make_unique<SubStream>(std::move(sub_stream)));
     }
     NodeID create_layer(IStream &s) override
     {
         NodeID     nid           = EmptyNodeID;
-        NodeParams common_params = {name(), s.hints().target_hint};
-        if (_sub_streams.size() == 1 && _sub_streams.at(0) != nullptr)
+        NodeParams common_params = { name(), s.hints().target_hint };
+        if(_sub_streams.size() == 1 && _sub_streams.at(0) != nullptr)
         {
             nid = _sub_streams[0]->tail_node();
         }
@@ -348,14 +327,14 @@ public:
         {
             // Collect tail nodes and concatenate
             std::vector<NodeIdxPair> nodes;
-            for (auto &ss : _sub_streams)
+            for(auto &ss : _sub_streams)
             {
-                if (ss && (ss->tail_node() != EmptyNodeID))
+                if(ss && (ss->tail_node() != EmptyNodeID))
                 {
                     const auto tail_node = s.graph().node(ss->tail_node());
-                    if (tail_node != nullptr && tail_node->type() != NodeType::Output)
+                    if(tail_node != nullptr && tail_node->type() != NodeType::Output)
                     {
-                        nodes.push_back({ss->tail_node(), 0});
+                        nodes.push_back({ ss->tail_node(), 0 });
                     }
                 }
             }
@@ -364,7 +343,7 @@ public:
         return nid;
     }
 
-private:
+    private:
     std::vector<std::unique_ptr<SubStream>> _sub_streams;
     descriptors::ConcatLayerDescriptor      _concat_descriptor;
 };
@@ -372,7 +351,7 @@ private:
 /** Convolution Layer */
 class ConvolutionLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a convolution layer.
      *
      * @param[in] conv_width         Convolution width.
@@ -408,15 +387,15 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeIdxPair input         = {s.tail_node(), 0};
-        NodeParams  common_params = {name(), s.hints().target_hint};
+        NodeIdxPair input         = { s.tail_node(), 0 };
+        NodeParams  common_params = { name(), s.hints().target_hint };
         return GraphBuilder::add_convolution_node(s.graph(), common_params, input, Size2D(_conv_width, _conv_height),
                                                   _ofm, _conv_info, _num_groups, s.hints().convolution_method_hint,
                                                   s.hints().fast_math_hint, std::move(_weights), std::move(_bias),
                                                   std::move(_weights_quant_info), std::move(_out_quant_info));
     }
 
-private:
+    private:
     unsigned int           _conv_width;
     unsigned int           _conv_height;
     unsigned int           _ofm;
@@ -431,7 +410,7 @@ private:
 /** Deconvolution Layer */
 class DeconvolutionLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a convolution layer.
      *
      * @param[in] conv_width  Convolution width.
@@ -458,13 +437,13 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeIdxPair input         = {s.tail_node(), 0};
-        NodeParams  common_params = {name(), s.hints().target_hint};
+        NodeIdxPair input         = { s.tail_node(), 0 };
+        NodeParams  common_params = { name(), s.hints().target_hint };
         return GraphBuilder::add_deconvolution_node(s.graph(), common_params, input, Size2D(_conv_width, _conv_height),
                                                     _ofm, _deconv_info, std::move(_weights), std::move(_bias));
     }
 
-private:
+    private:
     unsigned int        _conv_width;
     unsigned int        _conv_height;
     unsigned int        _ofm;
@@ -476,7 +455,7 @@ private:
 /** Depthwise Convolution Layer */
 class DepthwiseConvolutionLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a depthwise convolution layer.
      *
      * @param[in] conv_width         Convolution width.
@@ -509,15 +488,15 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeIdxPair input         = {s.tail_node(), 0};
-        NodeParams  common_params = {name(), s.hints().target_hint};
+        NodeIdxPair input         = { s.tail_node(), 0 };
+        NodeParams  common_params = { name(), s.hints().target_hint };
         return GraphBuilder::add_depthwise_convolution_node(
             s.graph(), common_params, input, Size2D(_conv_width, _conv_height), _conv_info, _depth_multiplier,
             s.hints().depthwise_convolution_method_hint, std::move(_weights), std::move(_bias),
             std::move(_weights_quant_info), std::move(_out_quant_info));
     }
 
-private:
+    private:
     unsigned int           _conv_width;
     unsigned int           _conv_height;
     const PadStrideInfo    _conv_info;
@@ -531,30 +510,31 @@ private:
 /** DepthToSpace Layer */
 class DepthToSpaceLayer final : public ILayer
 {
-public:
+    public:
     /** Construct an DepthToSpace layer.
      *
      * @param[in] block_shape Block size to rearranged
      */
-    DepthToSpaceLayer(int32_t block_shape) : _block_shape(block_shape)
+    DepthToSpaceLayer(int32_t block_shape)
+        : _block_shape(block_shape)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_depth_to_space_node(s.graph(), common_params, input, _block_shape);
     }
 
-private:
+    private:
     int32_t _block_shape;
 };
 
 /** Dequantization Layer */
 class DequantizationLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a dequantization layer.
      *
      */
@@ -564,8 +544,8 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_dequantization_node(s.graph(), common_params, input);
     }
 };
@@ -573,7 +553,7 @@ public:
 /** DetectionOutput Layer */
 class DetectionOutputLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a detection output layer.
      *
      * @param[in] sub_stream_conf  Confidence graph sub-stream.
@@ -589,15 +569,15 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params  = {name(), s.hints().target_hint};
-        NodeIdxPair input_loc      = {s.tail_node(), 0};
-        NodeIdxPair input_conf     = {_ss_conf.tail_node(), 0};
-        NodeIdxPair input_priorbox = {_ss_prior.tail_node(), 0};
+        NodeParams  common_params  = { name(), s.hints().target_hint };
+        NodeIdxPair input_loc      = { s.tail_node(), 0 };
+        NodeIdxPair input_conf     = { _ss_conf.tail_node(), 0 };
+        NodeIdxPair input_priorbox = { _ss_prior.tail_node(), 0 };
         return GraphBuilder::add_detection_output_node(s.graph(), common_params, input_loc, input_conf, input_priorbox,
                                                        _detect_info);
     }
 
-private:
+    private:
     SubStream                _ss_conf;
     SubStream                _ss_prior;
     DetectionOutputLayerInfo _detect_info;
@@ -605,7 +585,7 @@ private:
 /** DetectionOutputPostProcess Layer */
 class DetectionPostProcessLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a detection output layer.
      *
      * @param[in] sub_stream_class_prediction Class prediction graph sub-stream.
@@ -628,15 +608,15 @@ public:
     {
         ARM_COMPUTE_ERROR_ON(_anchors == nullptr);
 
-        NodeParams  common_params          = {name(), s.hints().target_hint};
-        NodeIdxPair input_box_encoding     = {s.tail_node(), 0};
-        NodeIdxPair input_class_prediction = {_sub_stream_class_prediction.tail_node(), 0};
+        NodeParams  common_params          = { name(), s.hints().target_hint };
+        NodeIdxPair input_box_encoding     = { s.tail_node(), 0 };
+        NodeIdxPair input_class_prediction = { _sub_stream_class_prediction.tail_node(), 0 };
         return GraphBuilder::add_detection_post_process_node(s.graph(), common_params, input_box_encoding,
                                                              input_class_prediction, _detect_info, std::move(_anchors),
                                                              std::move(_out_quant_info));
     }
 
-private:
+    private:
     SubStream                     _sub_stream_class_prediction;
     DetectionPostProcessLayerInfo _detect_info;
     ITensorAccessorUPtr           _anchors;
@@ -645,29 +625,30 @@ private:
 /** Dummy Layer */
 class DummyLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a dummy layer.
      *
      * @param[in] shape Output shape
      */
-    DummyLayer(TensorShape shape) : _shape(shape)
+    DummyLayer(TensorShape shape)
+        : _shape(shape)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_dummy_node(s.graph(), common_params, input, _shape);
     }
 
-private:
+    private:
     TensorShape _shape;
 };
 
 class EltwiseLayer final : public ILayer
 {
-public:
+    public:
     /** Construct an element-wise operation layer
      *
      * @param[in] sub_stream0 First graph sub-stream
@@ -681,14 +662,14 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input0        = {_ss0.tail_node(), 0};
-        NodeIdxPair input1        = {_ss1.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input0        = { _ss0.tail_node(), 0 };
+        NodeIdxPair input1        = { _ss1.tail_node(), 0 };
 
         return GraphBuilder::add_elementwise_node(s.graph(), common_params, input0, input1, _op);
     }
 
-private:
+    private:
     SubStream        _ss0;
     SubStream        _ss1;
     EltwiseOperation _op;
@@ -696,7 +677,7 @@ private:
 /** Flatten Layer */
 class FlattenLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a flatten layer. */
     FlattenLayer()
     {
@@ -704,8 +685,8 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_flatten_node(s.graph(), common_params, input);
     }
 };
@@ -713,7 +694,7 @@ public:
 /** Fully Connected Layer */
 class FullyConnectedLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a fully connected layer.
      *
      * @param[in] num_outputs        Number of outputs.
@@ -774,9 +755,9 @@ public:
      */
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
-        if (_weights != nullptr)
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
+        if(_weights != nullptr)
         {
             return GraphBuilder::add_fully_connected_layer(
                 s.graph(), common_params, input, _num_outputs, std::move(_weights), std::move(_bias), _fc_info,
@@ -793,7 +774,7 @@ public:
         }
     }
 
-private:
+    private:
     unsigned int                  _num_outputs;
     ITensorAccessorUPtr           _weights;
     ITensorAccessorUPtr           _bias;
@@ -807,7 +788,7 @@ private:
 /** Generate Proposals Layer */
 class GenerateProposalsLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a generate proposals layer.
      *
      * @param[in] ss_scores  Graph sub-stream for the scores.
@@ -834,14 +815,14 @@ public:
      */
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair scores        = {_ss_scores.tail_node(), 0};
-        NodeIdxPair deltas        = {_ss_deltas.tail_node(), 0};
-        NodeIdxPair anchors       = {_ss_anchors.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair scores        = { _ss_scores.tail_node(), 0 };
+        NodeIdxPair deltas        = { _ss_deltas.tail_node(), 0 };
+        NodeIdxPair anchors       = { _ss_anchors.tail_node(), 0 };
         return GraphBuilder::add_generate_proposals_node(s.graph(), common_params, scores, deltas, anchors, _info);
     }
 
-private:
+    private:
     SubStream             _ss_scores;
     SubStream             _ss_deltas;
     SubStream             _ss_anchors;
@@ -851,24 +832,25 @@ private:
 /** L2 Normalize Layer */
 class L2NormalizeLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a L2 Normalize layer.
      *
      * @param[in] axis    Axis to perform normalization on
      * @param[in] epsilon Lower bound value for the normalization
      */
-    L2NormalizeLayer(int axis, float epsilon) : _axis(axis), _epsilon(epsilon)
+    L2NormalizeLayer(int axis, float epsilon)
+        : _axis(axis), _epsilon(epsilon)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_l2_normalize_node(s.graph(), common_params, input, _axis, _epsilon);
     }
 
-private:
+    private:
     int   _axis;
     float _epsilon;
 };
@@ -876,30 +858,31 @@ private:
 /** Normalization Layer */
 class NormalizationLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a normalization layer.
      *
      * @param[in] norm_info Normalization information.
      */
-    NormalizationLayer(NormalizationLayerInfo norm_info) : _norm_info(norm_info)
+    NormalizationLayer(NormalizationLayerInfo norm_info)
+        : _norm_info(norm_info)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_normalization_node(s.graph(), common_params, input, _norm_info);
     }
 
-private:
+    private:
     NormalizationLayerInfo _norm_info;
 };
 
 /** Normalize planar YUV Layer */
 class NormalizePlanarYUVLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a normalize planar YUV layer.
      *
      * @param[in] mean Accessor to get mean tensor data from.
@@ -915,13 +898,13 @@ public:
         ARM_COMPUTE_ERROR_ON(_mean == nullptr);
         ARM_COMPUTE_ERROR_ON(_std == nullptr);
 
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_normalize_planar_yuv_node(s.graph(), common_params, input, std::move(_mean),
                                                            std::move(_std));
     }
 
-private:
+    private:
     ITensorAccessorUPtr _mean;
     ITensorAccessorUPtr _std;
 };
@@ -929,25 +912,26 @@ private:
 /** Pad Layer */
 class PadLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a pad layer.
      *
      * @param[in] padding   The padding for each spatial dimension of the input tensor. The pair padding[i]
      *                      specifies the front and the end padding in the i-th dimension.
      * @param[in] pad_value Padding value to use. Defaults to 0.
      */
-    PadLayer(PaddingList padding, PixelValue pad_value = PixelValue()) : _padding(padding), _pad_value(pad_value)
+    PadLayer(PaddingList padding, PixelValue pad_value = PixelValue())
+        : _padding(padding), _pad_value(pad_value)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_pad_node(s.graph(), common_params, input, _padding, _pad_value);
     }
 
-private:
+    private:
     PaddingList _padding;
     PixelValue  _pad_value;
 };
@@ -955,25 +939,26 @@ private:
 /** Permute Layer */
 class PermuteLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a permute layer.
      *
      * @param[in] perm   Permutation vector.
      * @param[in] layout (Optional) Data layout to assign to permuted tensor.
      *                   If UNKNOWN then the input's layout will be used.
      */
-    PermuteLayer(PermutationVector perm, DataLayout layout = DataLayout::UNKNOWN) : _perm(perm), _layout(layout)
+    PermuteLayer(PermutationVector perm, DataLayout layout = DataLayout::UNKNOWN)
+        : _perm(perm), _layout(layout)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_permute_node(s.graph(), common_params, input, _perm, _layout);
     }
 
-private:
+    private:
     PermutationVector _perm;
     DataLayout        _layout;
 };
@@ -981,30 +966,31 @@ private:
 /** Pooling Layer */
 class PoolingLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a pooling layer.
      *
      * @param[in] pool_info Pooling information.
      */
-    PoolingLayer(PoolingLayerInfo pool_info) : _pool_info(pool_info)
+    PoolingLayer(PoolingLayerInfo pool_info)
+        : _pool_info(pool_info)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_pooling_node(s.graph(), common_params, input, _pool_info);
     }
 
-private:
+    private:
     PoolingLayerInfo _pool_info;
 };
 
 /** PRelu Layer */
 class PReluLayer final : public ILayer
 {
-public:
+    public:
     /** Construct an PRelu operation layer
      *
      * @param[in] sub_stream0 First graph sub-stream
@@ -1017,14 +1003,14 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {_ss0.tail_node(), 0};
-        NodeIdxPair alpha         = {_ss1.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { _ss0.tail_node(), 0 };
+        NodeIdxPair alpha         = { _ss1.tail_node(), 0 };
 
         return GraphBuilder::add_prelu_node(s.graph(), common_params, input, alpha);
     }
 
-private:
+    private:
     SubStream _ss0;
     SubStream _ss1;
 };
@@ -1032,7 +1018,7 @@ private:
 /** Print Layer */
 class PrintLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a print layer.
      *
      * Example usage to locally dequantize and print a tensor:
@@ -1077,12 +1063,12 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_print_node(s.graph(), common_params, input, _stream, _format_info, _transform);
     }
 
-private:
+    private:
     std::ostream                             &_stream;
     const IOFormatInfo                       &_format_info;
     const std::function<ITensor *(ITensor *)> _transform;
@@ -1091,7 +1077,7 @@ private:
 /** PriorBox Layer */
 class PriorBoxLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a priorbox layer.
      *
      * @param[in] sub_stream First graph sub-stream
@@ -1104,13 +1090,13 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input0        = {s.tail_node(), 0};
-        NodeIdxPair input1        = {_ss.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input0        = { s.tail_node(), 0 };
+        NodeIdxPair input1        = { _ss.tail_node(), 0 };
         return GraphBuilder::add_priorbox_node(s.graph(), common_params, input0, input1, _prior_info);
     }
 
-private:
+    private:
     SubStream         _ss;
     PriorBoxLayerInfo _prior_info;
 };
@@ -1118,30 +1104,31 @@ private:
 /** Quantization Layer */
 class QuantizationLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a quantization layer.
      *
      * @param[in] out_quant_info Output tensor quantization info
      */
-    QuantizationLayer(QuantizationInfo out_quant_info) : _out_quant_info(out_quant_info)
+    QuantizationLayer(QuantizationInfo out_quant_info)
+        : _out_quant_info(out_quant_info)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_quantization_node(s.graph(), common_params, input, _out_quant_info);
     }
 
-private:
+    private:
     QuantizationInfo _out_quant_info;
 };
 
 /** Reduction Layer */
 class ReductionLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a reduction layer.
      *
      * @param[in] op        Reduction operation
@@ -1155,12 +1142,12 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_reduction_operation_node(s.graph(), common_params, input, _op, _axis, _keep_dims);
     }
 
-private:
+    private:
     ReductionOperation _op;
     unsigned int       _axis;
     bool               _keep_dims;
@@ -1169,54 +1156,56 @@ private:
 /** Reorg Layer */
 class ReorgLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a reorg layer.
      *
      * @param[in] stride Stride value to use for reorganizing the values in the output tensor.
      *                   It defines the spatial distance between 2 consecutive pixels in the x and y direction
      */
-    ReorgLayer(int stride) : _stride(stride)
+    ReorgLayer(int stride)
+        : _stride(stride)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_reorg_node(s.graph(), common_params, input, _stride);
     }
 
-private:
+    private:
     int _stride;
 };
 
 /** Reshape Layer */
 class ReshapeLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a reshape layer.
      *
      * @param[in] shape Target shape.
      */
-    ReshapeLayer(TensorShape shape) : _shape(shape)
+    ReshapeLayer(TensorShape shape)
+        : _shape(shape)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_reshape_node(s.graph(), common_params, input, _shape);
     }
 
-private:
+    private:
     TensorShape _shape;
 };
 
 /** Resize Layer */
 class ResizeLayer final : public ILayer
 {
-public:
+    public:
     ResizeLayer(InterpolationPolicy policy, float width_scale, float height_scale)
         : _policy(policy), _width_scale(width_scale), _height_scale(height_scale)
     {
@@ -1224,12 +1213,12 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_resize_node(s.graph(), common_params, input, _policy, _width_scale, _height_scale);
     }
 
-private:
+    private:
     InterpolationPolicy _policy;
     float               _width_scale;
     float               _height_scale;
@@ -1238,7 +1227,7 @@ private:
 /** ROIAlign Layer */
 class ROIAlignLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a RoiAlign layer.
      *
      * @param[in] sub_stream_input Graph sub-stream for the input
@@ -1257,13 +1246,13 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {_ss_input.tail_node(), 0};
-        NodeIdxPair rois          = {_ss_rois.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { _ss_input.tail_node(), 0 };
+        NodeIdxPair rois          = { _ss_rois.tail_node(), 0 };
         return GraphBuilder::add_roi_align_node(s.graph(), common_params, input, rois, _pool_info);
     }
 
-private:
+    private:
     SubStream           _ss_input;
     SubStream           _ss_rois;
     ROIPoolingLayerInfo _pool_info;
@@ -1272,7 +1261,7 @@ private:
 /** Scale Layer */
 class ScaleLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a scale layer.
      *
      * @param[in] mul_w Accessor to get mul weight from.
@@ -1285,12 +1274,12 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_scale_layer(s.graph(), common_params, input, std::move(_mul_w), std::move(_add_w));
     }
 
-private:
+    private:
     ITensorAccessorUPtr _mul_w;
     ITensorAccessorUPtr _add_w;
 };
@@ -1298,24 +1287,25 @@ private:
 /** Slice Layer */
 class SliceLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a slice layer.
      *
      * @param[in] starts The starts of the dimensions of the input tensor to be sliced. The length must be of rank(input).
      * @param[in] ends   The ends of the dimensions of the input tensor to be sliced. The length must be of rank(input).
      */
-    SliceLayer(Coordinates &starts, Coordinates &ends) : _starts(starts), _ends(ends)
+    SliceLayer(Coordinates &starts, Coordinates &ends)
+        : _starts(starts), _ends(ends)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_slice_node(s.graph(), common_params, input, _starts, _ends);
     }
 
-private:
+    private:
     Coordinates _starts;
     Coordinates _ends;
 };
@@ -1323,30 +1313,31 @@ private:
 /** Softmax Layer */
 class SoftmaxLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a softmax layer.
      *
      * @param[in] beta (Optional) Beta value. Default 1.0.
      */
-    SoftmaxLayer(float beta = 1.0f) : _beta(beta)
+    SoftmaxLayer(float beta = 1.0f)
+        : _beta(beta)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_softmax_node(s.graph(), common_params, input, _beta);
     }
 
-private:
+    private:
     float _beta;
 };
 
 /** Stack Layer */
 class StackLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a concatenation layer
      *
      * @param[in] sub_stream1      First graph branch
@@ -1354,7 +1345,8 @@ public:
      * @param[in] rest_sub_streams Rest sub-graph branches
      */
     template <typename... Ts>
-    StackLayer(SubStream &&sub_stream1, SubStream &&sub_stream2, Ts &&...rest_sub_streams) : _sub_streams(), _axis(0)
+    StackLayer(SubStream &&sub_stream1, SubStream &&sub_stream2, Ts &&...rest_sub_streams)
+        : _sub_streams(), _axis(0)
     {
         _sub_streams.push_back(std::make_unique<SubStream>(std::move(sub_stream1)));
         _sub_streams.push_back(std::make_unique<SubStream>(std::move(sub_stream2)));
@@ -1386,15 +1378,16 @@ public:
      * @param[in] sub_stream Sub-stream
      */
     template <typename... Ts>
-    StackLayer(SubStream &&sub_stream) : _sub_streams(), _axis(0)
+    StackLayer(SubStream &&sub_stream)
+        : _sub_streams(), _axis(0)
     {
         _sub_streams.push_back(std::make_unique<SubStream>(std::move(sub_stream)));
     }
     NodeID create_layer(IStream &s) override
     {
         NodeID     nid           = EmptyNodeID;
-        NodeParams common_params = {name(), s.hints().target_hint};
-        if (_sub_streams.size() == 1 && _sub_streams.at(0) != nullptr)
+        NodeParams common_params = { name(), s.hints().target_hint };
+        if(_sub_streams.size() == 1 && _sub_streams.at(0) != nullptr)
         {
             nid = _sub_streams[0]->tail_node();
         }
@@ -1402,14 +1395,14 @@ public:
         {
             // Collect tail nodes and stack
             std::vector<NodeIdxPair> nodes;
-            for (auto &ss : _sub_streams)
+            for(auto &ss : _sub_streams)
             {
-                if (ss && (ss->tail_node() != EmptyNodeID))
+                if(ss && (ss->tail_node() != EmptyNodeID))
                 {
                     const auto tail_node = s.graph().node(ss->tail_node());
-                    if (tail_node != nullptr && tail_node->type() != NodeType::Output)
+                    if(tail_node != nullptr && tail_node->type() != NodeType::Output)
                     {
-                        nodes.push_back({ss->tail_node(), 0});
+                        nodes.push_back({ ss->tail_node(), 0 });
                     }
                 }
             }
@@ -1418,7 +1411,7 @@ public:
         return nid;
     }
 
-private:
+    private:
     std::vector<std::unique_ptr<SubStream>> _sub_streams;
     int                                     _axis;
 };
@@ -1426,7 +1419,7 @@ private:
 /** StridedSlice Layer */
 class StridedSliceLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a strided slice layer.
      *
      * @param[in] starts             The starts of the dimensions of the input tensor to be sliced. The length must be of rank(input).
@@ -1444,12 +1437,12 @@ public:
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_strided_slice_node(s.graph(), common_params, input, _starts, _ends, _strides, _info);
     }
 
-private:
+    private:
     Coordinates           _starts;
     Coordinates           _ends;
     BiStrides             _strides;
@@ -1459,12 +1452,105 @@ private:
 /** YOLO Layer */
 class YOLOLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a YOLO layer.
      *
      * @param[in] act_info Activation info
      */
-    YOLOLayer(ActivationLayerInfo act_info) : _act_info(act_info)
+    YOLOLayer(ActivationLayerInfo act_info)
+        : _act_info(act_info)
+    {
+    }
+
+    NodeID create_layer(IStream &s) override
+    {
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
+        return GraphBuilder::add_yolo_node(s.graph(), common_params, input, _act_info);
+    }
+
+    private:
+    ActivationLayerInfo _act_info;
+};
+
+/** Input Layer */
+class InputLayer final : public ILayer
+{
+    public:
+    /** Construct an input layer.
+     *
+     * @param[in] desc     Description of input tensor.
+     * @param[in] accessor Accessor to get input tensor data from.
+     */
+    template <typename... Ts>
+    InputLayer(TensorDescriptor desc, ITensorAccessorUPtr accessor1, Ts &&...more_accessor)
+        : _desc(desc), _accessors()
+    {
+        _accessors.push_back(std::move(accessor1));
+        utility::for_each([&](ITensorAccessorUPtr &&accessor)
+                          { _accessors.push_back(std::move(accessor)); },
+                          std::move(more_accessor)...);
+    }
+    NodeID create_layer(IStream &s) override
+    {
+        NodeParams common_params = { name(), s.hints().target_hint };
+        return GraphBuilder::add_input_node(s.graph(), common_params, _desc, _accessors);
+    }
+
+    private:
+    TensorDescriptor                 _desc;
+    std::vector<ITensorAccessorUPtr> _accessors;
+};
+
+/** Embedding Layer */
+class EmbeddingLayer final : public ILayer
+{
+    public:
+    /** Construct a token embedding  layer.
+     *
+     * @param[in] emb_info  Embedding layer info
+     */
+    EmbeddingLayer(const EmbeddingLayerInfo &emb_info,
+                   ITensorAccessorUPtr       vocabs,
+                   ITensorAccessorUPtr       segments,
+                   ITensorAccessorUPtr       position_accessor)
+        : _emb_info(emb_info),
+          _vocabs(std::move(vocabs)),
+          _segments(std::move(segments)),
+          _position(std::move(position_accessor))
+    {
+    }
+
+    NodeID create_layer(IStream &s) override
+    {
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
+        return GraphBuilder::add_embedding_node(s.graph(), common_params, input, _emb_info,
+                                                std::move(_vocabs),
+                                                std::move(_segments),
+                                                std::move(_position));
+    }
+
+    private:
+    const EmbeddingLayerInfo &_emb_info;
+    ITensorAccessorUPtr       _vocabs;
+    ITensorAccessorUPtr       _segments;
+    ITensorAccessorUPtr       _position;
+};
+
+/** LinearLayer */
+class LinearLayer final : public ILayer
+{
+public:
+    /** Construct a feed forward layer.
+     *
+     * @param[in] info Feed Forward layer information
+     */
+    LinearLayer(LinearLayerInfo   info,
+                ITensorAccessorUPtr         ff_weights,
+                ITensorAccessorUPtr         ff_bias) :  _info(info),
+                                                        _ff_weights(std::move(ff_weights)),
+                                                        _ff_bias(std::move(ff_bias))
     {
     }
 
@@ -1472,12 +1558,107 @@ public:
     {
         NodeParams  common_params = {name(), s.hints().target_hint};
         NodeIdxPair input         = {s.tail_node(), 0};
-        return GraphBuilder::add_yolo_node(s.graph(), common_params, input, _act_info);
+        return GraphBuilder::add_linear_node(s.graph(), common_params, input, _info, std::move( _ff_weights), std::move(_ff_bias));
     }
 
 private:
-    ActivationLayerInfo _act_info;
+    LinearLayerInfo     _info;
+    ITensorAccessorUPtr _ff_weights;
+    ITensorAccessorUPtr _ff_bias;    
 };
+
+/** Multi Head Linear Layer */
+class AttentionLinearLayer final : public ILayer
+{
+public:
+    /** Construct a linear layer computing Key, Value, Query
+     *
+     */
+    AttentionLinearLayer(LinearLayerInfo info,
+                ITensorAccessorUPtr           query_weights,
+                ITensorAccessorUPtr           query_bias,
+                ITensorAccessorUPtr           key_weights,
+                ITensorAccessorUPtr           key_bias,
+                ITensorAccessorUPtr           value_weights,
+                ITensorAccessorUPtr           value_bias) : _info(info),
+                                                            _query_weights(std::move(query_weights)),
+                                                            _query_bias(std::move(query_bias)),
+                                                            _key_weights(std::move(key_weights)),
+                                                            _key_bias(std::move(key_bias)),
+                                                            _value_weights(std::move(value_weights)),
+                                                            _value_bias(std::move(value_bias))
+    {
+    }
+
+    NodeID create_layer(IStream &s) override
+    {
+        NodeParams  common_params = {name(), s.hints().target_hint};
+        NodeIdxPair input         = {s.tail_node(), 0};
+        return GraphBuilder::add_attention_linear_layer(s.graph(), common_params, input, _info,
+                                                                             std::move(_query_weights),
+                                                                             std::move(_query_bias),
+                                                                             std::move(_key_weights),
+                                                                             std::move(_key_bias),
+                                                                             std::move(_value_weights),
+                                                                             std::move(_value_bias));
+    }
+
+private:
+    LinearLayerInfo _info;
+    ITensorAccessorUPtr _query_weights;
+    ITensorAccessorUPtr _query_bias;        
+    ITensorAccessorUPtr _key_weights;
+    ITensorAccessorUPtr _key_bias;        
+    ITensorAccessorUPtr _value_weights;
+    ITensorAccessorUPtr _value_bias;   
+};
+
+/** ScaleDotProductionLayer */
+class ScaleDotProductionLayer final: public ILayer
+{
+public:
+    /** Construct a multi-head attention layer.
+     *
+     * @param[in] mha_info      Multi head attention layer information
+     */
+    ScaleDotProductionLayer(const ScaleDotProductionLayerInfo &mha_info) : _mha_info(mha_info)
+    {
+    }
+
+    NodeID create_layer(IStream &s) override
+    {
+        NodeParams  common_params = {name(), s.hints().target_hint};
+        NodeIdxPair input         = {s.tail_node(), 0};
+        return GraphBuilder::add_scale_dot_production_node(s.graph(), common_params, input, _mha_info);
+    }
+
+private:
+    const ScaleDotProductionLayerInfo &_mha_info;
+
+};
+
+/** LayerNormLayer */
+class LayerNormLayer final : public ILayer
+{
+public:
+    /** Construct a layer norm layer.
+     *
+     */
+    LayerNormLayer(LayerNormLayerInfo info) : _info(info)
+    {
+    }
+
+    NodeID create_layer(IStream &s) override
+    {
+        NodeParams  common_params = {name(), s.hints().target_hint};
+        NodeIdxPair input         = {s.tail_node(), 0};
+        return GraphBuilder::add_layer_norm_node(s.graph(), common_params, input, _info);
+    }
+
+private:
+    LayerNormLayerInfo _info;
+};
+
 } // namespace frontend
 } // namespace graph
 } // namespace arm_compute

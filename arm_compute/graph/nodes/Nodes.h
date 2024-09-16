@@ -68,4 +68,13 @@
 #include "arm_compute/graph/nodes/StackLayerNode.h"
 #include "arm_compute/graph/nodes/StridedSliceLayerNode.h"
 
+#include "arm_compute/graph/nodes/TokenEmbeddingLayerNode.h"
+#include "arm_compute/graph/nodes/SegmentEmbeddingLayerNode.h"
+#include "arm_compute/graph/nodes/PositionEmbeddingLayerNode.h"
+#include "arm_compute/graph/nodes/EmbeddingSumLayerNode.h"
+#include "arm_compute/graph/nodes/LinearLayerNode.h"
+#include "arm_compute/graph/nodes/AttentionLinearNode.h"
+#include "arm_compute/graph/nodes/ScaleDotProductionAttentionNode.h"
+#include "arm_compute/graph/nodes/LayerNormNode.h"
+
 #endif // ACL_ARM_COMPUTE_GRAPH_NODES_NODES_H

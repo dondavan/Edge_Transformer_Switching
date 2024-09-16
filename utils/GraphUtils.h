@@ -700,6 +700,113 @@ inline graph::Target set_target_hint(int target)
         return graph::Target::NEON;
     }
 }
+
+/** Convert input text to int preprocessor */
+class atoiPreprocessor : public IPreprocessor
+{
+public:
+    /** Default Constructor */
+    atoiPreprocessor() = default;
+    void preprocess(ITensor &tensor) override;
+};
+
+/** Token accessor class */
+class TokenAccessor final : public graph::ITensorAccessor
+{
+public:
+    /** Constructor
+     *
+     * @param[in] filename     Path to text file
+     * @param[in] vocabname    Path to vocabulary file
+     * @param[in] preprocessor (Optional) Text pre-processing object
+     */
+    TokenAccessor(std::string filename, std::string vocabname, std::unique_ptr<IPreprocessor> preprocessor = nullptr);
+    /** Allow instances of this class to be move constructed */
+    TokenAccessor(TokenAccessor &&) = default;
+
+    // Inherited methods overriden:
+    bool access_tensor(ITensor &tensor) override;
+
+private:
+    bool                           _already_loaded;
+    const std::string              _filename;
+    const std::string              _vocabname;
+    std::unique_ptr<IPreprocessor> _preprocessor;
+};
+
+/** Generates appropriate token accessor according to the specified graph parameters
+ *
+ * @param[in] graph_parameters Graph parameters
+ * @param[in] preprocessor     (Optional) Preproccessor object
+ * @param[in] bgr              (Optional) Fill the first plane with blue channel (default = true)
+ *
+ * @return An appropriate tensor accessor
+ */
+inline std::unique_ptr<graph::ITensorAccessor>
+get_token_accessor(const arm_compute::utils::CommonGraphParams &graph_parameters,
+                   std::unique_ptr<IPreprocessor>               preprocessor = nullptr)
+{
+    if (!graph_parameters.validation_file.empty())
+    {
+        return std::make_unique<DummyAccessor>();
+    }
+    else
+    {
+        const std::string &text_file            = graph_parameters.text;
+        const std::string &text_file_lower      = lower_string(text_file);
+        const std::string &vocab_file           = graph_parameters.vocabulary;
+        const std::string &vocab_file_lower     = lower_string(vocab_file);
+        return std::make_unique<TokenAccessor>(text_file_lower,
+                                               vocab_file_lower, std::move(preprocessor));
+    }
+}
+
+/** Text accessor class */
+class TextAccessor final : public graph::ITensorAccessor
+{
+public:
+    /** Constructor
+     *
+     * @param[in] filename     Text file
+     * @param[in] preprocessor (Optional) Text pre-processing object
+     */
+    TextAccessor(std::string filename, std::unique_ptr<IPreprocessor> preprocessor = nullptr);
+    /** Allow instances of this class to be move constructed */
+    TextAccessor(TextAccessor &&) = default;
+
+    // Inherited methods overriden:
+    bool access_tensor(ITensor &tensor) override;
+
+private:
+    bool                           _already_loaded;
+    const std::string              _filename;
+    std::unique_ptr<IPreprocessor> _preprocessor;
+};
+
+/** Generates appropriate segmentation file accessor according to the specified graph parameters
+ *
+ * @param[in] path_to_file     Path to input sentence segmentation file
+ * @param[in] preprocessor     (Optional) Preproccessor object
+ *
+ * @return An appropriate tensor accessor
+ */
+inline std::unique_ptr<graph::ITensorAccessor>
+get_segment_accessor(const std::string &path_to_file,
+                   std::unique_ptr<IPreprocessor> preprocessor = nullptr)
+{
+     if (path_to_file.empty())
+    {
+        return std::make_unique<DummyAccessor>();
+    }
+    else
+    {
+        const std::string &segment_file_lower   = lower_string(path_to_file);
+        return std::make_unique<TextAccessor>(path_to_file, std::move(preprocessor));
+    }
+}
+
+
+
 } // namespace graph_utils
 } // namespace arm_compute
 

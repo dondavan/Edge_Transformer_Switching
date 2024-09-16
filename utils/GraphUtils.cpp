@@ -799,3 +799,16 @@ bool NumPyBinLoader::access_tensor(ITensor &tensor)
     _already_loaded = !_already_loaded;
     return _already_loaded;
 }
+
+void atoiPreprocessor::preprocess(ITensor &tensor)
+{
+    Window window;
+    window.use_tensor_dimensions(tensor.info()->tensor_shape());
+
+    execute_window_loop(window,
+                        [&](const Coordinates &id)
+                        {
+                            *tensor.ptr_to_element(id) = std::atoi(reinterpret_cast<char *>(tensor.ptr_to_element(id)));
+                        });
+    
+}
