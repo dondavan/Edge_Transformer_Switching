@@ -92,39 +92,6 @@ class GraphVanillaTransformerExample : public Example
                             get_segment_accessor(common_params.segment, move(at2_preproccessor)))
                      .set_name("in1")
 
-              << EmbeddingLayer(EmbeddingLayerInfo(d_model,
-                                                   d_vocab,
-                                                   d_segemnt,
-                                                   d_position,
-                                                   true /*Use pretrained positional encoding*/,
-                                                   ConvertPolicy::SATURATE),
-                                get_weights_accessor(data_path, "token_embedding.npy", operation_layout),
-                                get_weights_accessor(data_path, "segment_embedding.npy", operation_layout),
-                                get_weights_accessor(data_path, "positional_embedding.npy", operation_layout))
-                     .set_name("tkemb1");
-
-        add_encoder_block(data_path, "layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-        add_encoder_block(data_path, "layer_1/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-        add_encoder_block(data_path, "layer_2/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-        add_encoder_block(data_path, "layer_3/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-        add_encoder_block(data_path, "layer_4/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-        add_encoder_block(data_path, "layer_5/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-
-        add_encoder_block(data_path, "layer_6/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-        add_encoder_block(data_path, "layer_7/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-        add_encoder_block(data_path, "layer_8/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-        add_encoder_block(data_path, "layer_9/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-        add_encoder_block(data_path, "layer_10/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-        add_encoder_block(data_path, "layer_11/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
-
-        // Pooler
-        graph << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model),
-                                             TensorShape(d_model)),
-                             get_weights_accessor(data_path, "pooler_weight.npy"),
-                             get_weights_accessor(data_path, "pooler_bias.npy"))
-
-              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f))
-
               << OutputLayer(get_output_accessor(common_params)).set_name("out1");
 
         // Finalize graph
