@@ -39,6 +39,12 @@ public:
      * @param[in] desc Tensor descriptor
      */
     InputNode(TensorDescriptor desc);
+    /** Constructor
+     *
+     * @param[in] desc Tensor descriptor
+     * @param[in] size Number of inputs
+     */
+    InputNode(TensorDescriptor desc, size_t size);
 
     // Inherited overridden methods:
     NodeType         type() const override;

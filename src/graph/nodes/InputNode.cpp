@@ -35,8 +35,22 @@ InputNode::InputNode(TensorDescriptor desc) : _desc(std::move(desc))
     _outputs.resize(1, NullTensorID);
 }
 
+InputNode::InputNode(TensorDescriptor desc, size_t size) : _desc(std::move(desc))
+{
+    _outputs.resize(size, NullTensorID);
+}
+
 bool InputNode::forward_descriptors()
 {
+    for(auto idx : outputs())
+    {   
+        if(output_id(idx) == NullTensorID) return false;
+        Tensor *t = output(idx);
+        ARM_COMPUTE_ERROR_ON(t == nullptr);
+        t->desc() = configure_output(idx);
+    }
+    return true;
+    /*
     if (output_id(0) != NullTensorID)
     {
         Tensor *t = output(0);
@@ -44,7 +58,7 @@ bool InputNode::forward_descriptors()
         t->desc() = configure_output(0);
         return true;
     }
-    return false;
+    return false;*/
 }
 
 TensorDescriptor InputNode::configure_output(size_t idx) const
