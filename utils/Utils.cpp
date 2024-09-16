@@ -310,5 +310,30 @@ TextType get_text_type_from_file(const std::string &filename)
     
     return type;
 }
+
+/** Helper function for converting token to id
+ * 
+ * @param[in] path_vocab    String path to vocab list txt file
+ * 
+ * @return A map containing token, id
+*/
+std::map<std::string,int> get_token2id(std::string path_vocab)
+{
+    std::map<std::string,int> token2id;
+
+    std::fstream fstream_vocab;
+    fstream_vocab.open(path_vocab,std::ios::in);
+
+    std::string line;
+    while (getline(fstream_vocab,line))
+    {   
+        char *token     = strtok(const_cast<char*>(line.c_str()), " ");
+        char *token_id  = strtok(nullptr, " "); // Continues previous str invocation
+        token2id[token] = std::stoi(token_id);
+    }
+    fstream_vocab.close();
+
+    return token2id;
+}
 } // namespace utils
 } // namespace arm_compute
