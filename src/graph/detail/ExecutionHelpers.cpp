@@ -161,7 +161,11 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
     {
         if (node != nullptr && node->type() == NodeType::Input)
         {
-            workload.inputs.push_back(node->output(0));
+            //workload.inputs.push_back(node->output(0));
+            for(size_t idx=0; idx <node->num_outputs(); idx++)
+            {
+                workload.inputs.push_back(node->output(idx));
+            }
         }
 
         if (node != nullptr && node->type() == NodeType::Output)
@@ -199,10 +203,19 @@ void call_all_const_node_accessors(Graph &g)
     {
         if (node != nullptr && node->type() == NodeType::Const && node->num_outputs())
         {
-            if (!node->output(0)->bound_edges().empty())
-            {
-                call_tensor_accessor(node->output(0));
+            for(size_t idx=0; idx <node->num_outputs(); idx++)
+            {   
+                if (!node->output(idx)->bound_edges().empty())
+                {
+                    call_tensor_accessor(node->output(idx));
+                }
             }
+            /** Original only call 1 output
+             * if (!node->output(0)->bound_edges().empty())
+             * {
+             *  call_tensor_accessor(node->output(0));
+             * }
+             */
         }
     }
 }

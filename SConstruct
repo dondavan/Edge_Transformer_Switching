@@ -142,6 +142,7 @@ vars.AddVariables(
     BoolVariable("address_sanitizer", "Enable AddressSanitizer", False),
     BoolVariable("undefined_sanitizer", "Enable UndefinedBehaviorSanitizer", False),
     BoolVariable("thread_sanitizer", "Enable ThreadSanitizer", False),
+    BoolVariable("measure", "Measure Runtime", False),
     ("extra_cxx_flags", "Extra CXX flags to be appended to the build command", ""),
     ("extra_link_flags", "Extra LD flags to be appended to the build command", ""),
     ("compiler_cache", "Command to prefix to the C and C++ compiler (e.g ccache)", ""),
@@ -201,6 +202,9 @@ if env.get("export_compile_commands", False):
 if 'armv7a' in env['arch'] and env['os'] == 'android':
     print("WARNING: armv7a on Android is no longer maintained")
 
+if env['measure'] == 1:
+    env.Append(CXXFLAGS = ['-DMEASURE_TIME'])
+    
 if env['linker_script'] and env['os'] != 'bare_metal':
     print("Linker script is only supported for bare_metal builds")
     Exit(1)

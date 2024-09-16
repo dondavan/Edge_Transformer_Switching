@@ -278,5 +278,37 @@ uint64_t get_mem_free_from_meminfo()
     // Nothing found or an error during opening the file
     return 0;
 }
+
+std::tuple<unsigned int> parse_txt_header(std::ifstream &fs)
+{   
+    unsigned int length;
+    fs >> length;
+    discard_comments_and_spaces(fs); //do nothing 
+    
+    return std::make_tuple(length);
+}
+
+TextType get_text_type_from_file(const std::string &filename)
+{
+    TextType type = TextType::UNKNOWN;
+
+    try
+    {
+        // Open file
+        std::ifstream fs;
+        fs.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+        fs.open(filename, std::ios::in | std::ios::binary);
+
+        type = TextType::UTF8;
+
+        fs.close();
+    }
+    catch(std::runtime_error &e)
+    {
+        ARM_COMPUTE_ERROR_VAR("Accessing %s: %s", filename.c_str(), e.what());
+    }
+    
+    return type;
+}
 } // namespace utils
 } // namespace arm_compute

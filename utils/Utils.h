@@ -73,7 +73,7 @@ enum class ImageType
  */
 class Example
 {
-public:
+    public:
     /** Setup the example.
      *
      * @param[in] argc Argument count.
@@ -87,9 +87,9 @@ public:
         return true;
     };
     /** Run the example. */
-    virtual void do_run(){};
+    virtual void do_run() {};
     /** Teardown the example. */
-    virtual void do_teardown(){};
+    virtual void do_teardown() {};
 
     /** Default destructor. */
     virtual ~Example() = default;
@@ -158,7 +158,7 @@ inline std::string get_typestring(DataType data_type)
     const unsigned int i = 1;
     const char        *c = reinterpret_cast<const char *>(&i);
     std::string        endianness;
-    if (*c == 1)
+    if(*c == 1)
     {
         endianness = std::string("<");
     }
@@ -168,7 +168,7 @@ inline std::string get_typestring(DataType data_type)
     }
     const std::string no_endianness("|");
 
-    switch (data_type)
+    switch(data_type)
     {
         case DataType::U8:
         case DataType::QASYMM8:
@@ -257,14 +257,15 @@ class uniform_real_distribution_16bit
     static_assert(std::is_same<T, half>::value || std::is_same<T, bfloat16>::value,
                   "Only half and bfloat16 data types supported");
 
-public:
+    public:
     using result_type = T;
     /** Constructor
      *
      * @param[in] min Minimum value of the distribution
      * @param[in] max Maximum value of the distribution
      */
-    explicit uniform_real_distribution_16bit(float min = 0.f, float max = 1.0) : dist(min, max)
+    explicit uniform_real_distribution_16bit(float min = 0.f, float max = 1.0)
+        : dist(min, max)
     {
     }
 
@@ -277,16 +278,17 @@ public:
         return T(dist(gen));
     }
 
-private:
+    private:
     std::uniform_real_distribution<float> dist;
 };
 
 /** Numpy data loader */
 class NPYLoader
 {
-public:
+    public:
     /** Default constructor */
-    NPYLoader() : _fs(), _shape(), _fortran_order(false), _typestring(), _file_layout(DataLayout::NCHW)
+    NPYLoader()
+        : _fs(), _shape(), _fortran_order(false), _typestring(), _file_layout(DataLayout::NCHW)
     {
     }
 
@@ -310,7 +312,7 @@ public:
             _fortran_order       = header.fortran_order;
             _typestring          = header.dtype.str();
         }
-        catch (const std::ifstream::failure &e)
+        catch(const std::ifstream::failure &e)
         {
             ARM_COMPUTE_ERROR_VAR("Accessing %s: %s", npy_filename.c_str(), e.what());
         }
@@ -341,10 +343,10 @@ public:
         // Use the size of the input NPY tensor
         TensorShape shape;
         shape.set_num_dimensions(_shape.size());
-        for (size_t i = 0; i < _shape.size(); ++i)
+        for(size_t i = 0; i < _shape.size(); ++i)
         {
             size_t src = i;
-            if (_fortran_order)
+            if(_fortran_order)
             {
                 src = _shape.size() - 1 - i;
             }
@@ -378,8 +380,7 @@ public:
             const size_t end_position = _fs.tellg();
             _fs.seekg(current_position, std::ios_base::beg);
 
-            ARM_COMPUTE_ERROR_ON_MSG((end_position - current_position) <
-                                         tensor.info()->tensor_shape().total_size() * tensor.info()->element_size(),
+            ARM_COMPUTE_ERROR_ON_MSG((end_position - current_position) < tensor.info()->tensor_shape().total_size() * tensor.info()->element_size(),
                                      "Not enough data in file");
             ARM_COMPUTE_UNUSED(end_position);
 
@@ -387,12 +388,12 @@ public:
             std::string expect_typestr = get_typestring(tensor.info()->data_type());
 
             bool enable_f32_to_f16_conversion = false;
-            if (_typestring != expect_typestr)
+            if(_typestring != expect_typestr)
             {
                 const std::string f32_typestring = "<f4";
                 const std::string f16_typestring = "<f2";
                 // if typestring does not match, check whether _typestring is F32 and can be downcasted to expect_typestr
-                if (_typestring == f32_typestring && expect_typestr == f16_typestring)
+                if(_typestring == f32_typestring && expect_typestr == f16_typestring)
                 {
                     enable_f32_to_f16_conversion = true;
                 }
@@ -404,11 +405,11 @@ public:
 
             bool are_layouts_different = (_file_layout != tensor.info()->data_layout());
             // Correct dimensions (Needs to match TensorShape dimension corrections)
-            if (_shape.size() != tensor.info()->tensor_shape().num_dimensions())
+            if(_shape.size() != tensor.info()->tensor_shape().num_dimensions())
             {
-                for (int i = static_cast<int>(_shape.size()) - 1; i > 0; --i)
+                for(int i = static_cast<int>(_shape.size()) - 1; i > 0; --i)
                 {
-                    if (_shape[i] == 1)
+                    if(_shape[i] == 1)
                     {
                         _shape.pop_back();
                     }
@@ -421,15 +422,11 @@ public:
 
             TensorShape                    permuted_shape = tensor.info()->tensor_shape();
             arm_compute::PermutationVector perm;
-            if (are_layouts_different && tensor.info()->tensor_shape().num_dimensions() > 2)
+            if(are_layouts_different && tensor.info()->tensor_shape().num_dimensions() > 2)
             {
-                perm = (tensor.info()->data_layout() == arm_compute::DataLayout::NHWC)
-                           ? arm_compute::PermutationVector(2U, 0U, 1U)
-                           : arm_compute::PermutationVector(1U, 2U, 0U);
+                perm = (tensor.info()->data_layout() == arm_compute::DataLayout::NHWC) ? arm_compute::PermutationVector(2U, 0U, 1U) : arm_compute::PermutationVector(1U, 2U, 0U);
                 arm_compute::PermutationVector perm_vec =
-                    (tensor.info()->data_layout() == arm_compute::DataLayout::NCHW)
-                        ? arm_compute::PermutationVector(2U, 0U, 1U)
-                        : arm_compute::PermutationVector(1U, 2U, 0U);
+                    (tensor.info()->data_layout() == arm_compute::DataLayout::NCHW) ? arm_compute::PermutationVector(2U, 0U, 1U) : arm_compute::PermutationVector(1U, 2U, 0U);
 
                 arm_compute::permute(permuted_shape, perm_vec);
             }
@@ -437,12 +434,12 @@ public:
             // Validate tensor shape
             ARM_COMPUTE_ERROR_ON_MSG(_shape.size() != tensor.info()->tensor_shape().num_dimensions(),
                                      "Tensor ranks mismatch");
-            for (size_t i = 0; i < _shape.size(); ++i)
+            for(size_t i = 0; i < _shape.size(); ++i)
             {
                 ARM_COMPUTE_ERROR_ON_MSG(permuted_shape[i] != _shape[i], "Tensor dimensions mismatch");
             }
 
-            switch (tensor.info()->data_type())
+            switch(tensor.info()->data_type())
             {
                 case arm_compute::DataType::QASYMM8:
                 case arm_compute::DataType::S32:
@@ -450,8 +447,7 @@ public:
                 case arm_compute::DataType::F16:
                 {
                     // Read data
-                    if (!are_layouts_different && !_fortran_order && tensor.info()->padding().empty() &&
-                        !enable_f32_to_f16_conversion)
+                    if(!are_layouts_different && !_fortran_order && tensor.info()->padding().empty() && !enable_f32_to_f16_conversion)
                     {
                         // If tensor has no padding read directly from stream.
                         _fs.read(reinterpret_cast<char *>(tensor.buffer()), tensor.info()->total_size());
@@ -461,19 +457,19 @@ public:
                         // If tensor has padding or is in fortran order accessing tensor elements through execution window.
                         Window             window;
                         const unsigned int num_dims = _shape.size();
-                        if (_fortran_order)
+                        if(_fortran_order)
                         {
-                            for (unsigned int dim = 0; dim < num_dims; dim++)
+                            for(unsigned int dim = 0; dim < num_dims; dim++)
                             {
                                 permuted_shape.set(dim, _shape[num_dims - dim - 1]);
                                 perm.set(dim, num_dims - dim - 1);
                             }
-                            if (are_layouts_different)
+                            if(are_layouts_different)
                             {
                                 // Permute only if num_dimensions greater than 2
-                                if (num_dims > 2)
+                                if(num_dims > 2)
                                 {
-                                    if (_file_layout == DataLayout::NHWC) // i.e destination is NCHW --> permute(1,2,0)
+                                    if(_file_layout == DataLayout::NHWC) // i.e destination is NCHW --> permute(1,2,0)
                                     {
                                         arm_compute::permute(perm, arm_compute::PermutationVector(1U, 2U, 0U));
                                     }
@@ -491,7 +487,7 @@ public:
                                             {
                                                 Coordinates dst(id);
                                                 arm_compute::permute(dst, perm);
-                                                if (enable_f32_to_f16_conversion)
+                                                if(enable_f32_to_f16_conversion)
                                                 {
                                                     float f32_val = 0;
                                                     _fs.read(reinterpret_cast<char *>(&f32_val), 4u);
@@ -516,13 +512,13 @@ public:
             // Unmap buffer if creating a CLTensor
             unmap(tensor);
         }
-        catch (const std::ifstream::failure &e)
+        catch(const std::ifstream::failure &e)
         {
             ARM_COMPUTE_ERROR_VAR("Loading NPY file: %s", e.what());
         }
     }
 
-private:
+    private:
     std::ifstream              _fs;
     std::vector<unsigned long> _shape;
     bool                       _fortran_order;
@@ -555,12 +551,13 @@ void save_to_ppm(T &tensor, const std::string &ppm_filename)
         const unsigned int width  = tensor.info()->tensor_shape()[0];
         const unsigned int height = tensor.info()->tensor_shape()[1];
 
-        fs << "P6\n" << width << " " << height << " 255\n";
+        fs << "P6\n"
+           << width << " " << height << " 255\n";
 
         // Map buffer if creating a CLTensor
         map(tensor, true);
 
-        switch (tensor.info()->format())
+        switch(tensor.info()->format())
         {
             case arm_compute::Format::U8:
             {
@@ -592,7 +589,8 @@ void save_to_ppm(T &tensor, const std::string &ppm_filename)
 
                 arm_compute::execute_window_loop(
                     window,
-                    [&](const arm_compute::Coordinates &) {
+                    [&](const arm_compute::Coordinates &)
+                    {
                         fs.write(reinterpret_cast<std::fstream::char_type *>(in.ptr()),
                                  width * tensor.info()->element_size());
                     },
@@ -607,7 +605,7 @@ void save_to_ppm(T &tensor, const std::string &ppm_filename)
         // Unmap buffer if creating a CLTensor
         unmap(tensor);
     }
-    catch (const std::ofstream::failure &e)
+    catch(const std::ofstream::failure &e)
     {
         ARM_COMPUTE_ERROR_VAR("Writing %s: (%s)", ppm_filename.c_str(), e.what());
     }
@@ -635,7 +633,7 @@ void save_to_npy(T &tensor, const std::string &npy_filename, bool fortran_order)
 
         std::vector<npy::ndarray_len_t> shape(tensor.info()->num_dimensions());
 
-        for (unsigned int i = 0, j = tensor.info()->num_dimensions() - 1; i < tensor.info()->num_dimensions(); ++i, --j)
+        for(unsigned int i = 0, j = tensor.info()->num_dimensions() - 1; i < tensor.info()->num_dimensions(); ++i, --j)
         {
             shape[i] = tensor.info()->tensor_shape()[!fortran_order ? j : i];
         }
@@ -649,7 +647,7 @@ void save_to_npy(T &tensor, const std::string &npy_filename, bool fortran_order)
         const npy::dtype_t           dtype = npy::dtype_map.at(std::type_index(typeid(tmp)));
 
         std::ofstream stream(npy_filename, std::ofstream::binary);
-        npy::header_t header{dtype, fortran_order, shape};
+        npy::header_t header{ dtype, fortran_order, shape };
         npy::write_header(stream, header);
 
         arm_compute::Window window;
@@ -666,7 +664,7 @@ void save_to_npy(T &tensor, const std::string &npy_filename, bool fortran_order)
         // Unmap buffer if creating a CLTensor
         unmap(tensor);
     }
-    catch (const std::ofstream::failure &e)
+    catch(const std::ofstream::failure &e)
     {
         ARM_COMPUTE_ERROR_VAR("Writing %s: (%s)", npy_filename.c_str(), e.what());
     }
@@ -690,7 +688,7 @@ void load_trained_data(T &tensor, const std::string &filename)
         // Open file
         fs.open(filename, std::ios::in | std::ios::binary);
 
-        if (!fs.good())
+        if(!fs.good())
         {
             throw std::runtime_error("Could not load binary data: " + filename);
         }
@@ -702,7 +700,7 @@ void load_trained_data(T &tensor, const std::string &filename)
 
         window.set(arm_compute::Window::DimX, arm_compute::Window::Dimension(0, 1, 1));
 
-        for (unsigned int d = 1; d < tensor.info()->num_dimensions(); ++d)
+        for(unsigned int d = 1; d < tensor.info()->num_dimensions(); ++d)
         {
             window.set(d, Window::Dimension(0, tensor.info()->tensor_shape()[d], 1));
         }
@@ -721,7 +719,7 @@ void load_trained_data(T &tensor, const std::string &filename)
         // Unmap buffer if creating a CLTensor
         unmap(tensor);
     }
-    catch (const std::ofstream::failure &e)
+    catch(const std::ofstream::failure &e)
     {
         ARM_COMPUTE_ERROR_VAR("Writing %s: (%s)", filename.c_str(), e.what());
     }
@@ -737,7 +735,8 @@ void fill_tensor_value(TensorType &tensor, T value)
 
     Iterator it_tensor(&tensor, window);
     execute_window_loop(
-        window, [&](const Coordinates &) { *reinterpret_cast<T *>(it_tensor.ptr()) = value; }, it_tensor);
+        window, [&](const Coordinates &)
+        { *reinterpret_cast<T *>(it_tensor.ptr()) = value; }, it_tensor);
 
     unmap(tensor);
 }
@@ -761,7 +760,8 @@ void fill_tensor_vector(TensorType &tensor, std::vector<T> vec)
     int      i = 0;
     Iterator it_tensor(&tensor, window);
     execute_window_loop(
-        window, [&](const Coordinates &) { *reinterpret_cast<T *>(it_tensor.ptr()) = vec.at(i++); }, it_tensor);
+        window, [&](const Coordinates &)
+        { *reinterpret_cast<T *>(it_tensor.ptr()) = vec.at(i++); }, it_tensor);
 
     unmap(tensor);
 }
@@ -789,7 +789,8 @@ void fill_random_tensor(TensorType                     &tensor,
 
     Iterator it(&tensor, window);
     execute_window_loop(
-        window, [&](const Coordinates &) { *reinterpret_cast<T *>(it.ptr()) = dist(gen); }, it);
+        window, [&](const Coordinates &)
+        { *reinterpret_cast<T *>(it.ptr()) = dist(gen); }, it);
 
     unmap(tensor);
 }
@@ -843,7 +844,7 @@ int compare_tensor(ITensor &tensor1, ITensor &tensor2, T tolerance)
         window,
         [&](const Coordinates &)
         {
-            if (std::abs(*reinterpret_cast<T *>(itensor1.ptr()) - *reinterpret_cast<T *>(itensor2.ptr())) > tolerance)
+            if(std::abs(*reinterpret_cast<T *>(itensor1.ptr()) - *reinterpret_cast<T *>(itensor2.ptr())) > tolerance)
             {
                 ++num_mismatches;
             }
@@ -855,6 +856,99 @@ int compare_tensor(ITensor &tensor1, ITensor &tensor2, T tolerance)
 
     return num_mismatches;
 }
+
+/** Supported text types */
+enum class TextType
+{
+    UNKNOWN,
+    UTF8
+};
+
+/** Parse the text header from an input file stream. At the end of the execution,
+ *  the file position pointer will be located at the first pixel stored in the txt file
+ *
+ * @param[in] fs Input file stream to parse
+ *
+ * @return The length stored in the header of the txt file
+ */
+std::tuple<unsigned int> parse_txt_header(std::ifstream &fs);
+
+/** Gets text type given a file
+ *
+ * @param[in] filename File to identify its image type
+ *
+ * @return Text type
+ */
+TextType get_text_type_from_file(const std::string &filename);
+
+/** Helper function for converting token to id
+ * 
+ * @param[in] path_vocab    String path to vocab list txt file
+ * 
+ * @return A map containing token, id
+*/
+std::map<std::string, int> get_token2id(std::string path_vocab)
+{
+    std::map<std::string, int> token2id;
+
+    std::fstream fstream_vocab;
+    fstream_vocab.open(path_vocab, std::ios::in);
+
+    std::string line;
+    while(getline(fstream_vocab, line))
+    {
+        char *token     = strtok(const_cast<char *>(line.c_str()), " ");
+        char *token_id  = strtok(nullptr, " "); // Continues previous str invocation
+        token2id[token] = std::stoi(token_id);
+    }
+    fstream_vocab.close();
+
+    return token2id;
+}
+
+/** Find longest matching string in vocabulary list and convert it into vector
+ *  
+ * @note left    right
+ *         0 1 2 3 4  
+ * 
+ * @param[in] tokens_vec    Input text seperated into tokens stored in a vector
+ * @param[in] token2id      Token to id vocabulary map
+ * @param[in,out] text_ids  Vector stroing converted text id
+*/
+template <typename T>
+void find_longest_matching(std::vector<std::basic_string<T>>   &tokens_vec,
+                           std::map<std::basic_string<T>, int> &token2id,
+                           std::vector<unsigned int>           &text_ids)
+{
+    unsigned int         token_len;
+    unsigned int         left, right;
+    std::basic_string<T> token_buffer;
+    for(const auto &token : tokens_vec)
+    {
+        token_buffer = token;
+        token_len    = token.size();
+        left         = 0;
+    loop:
+        while(left < token_len)
+        {
+            right = token_len;
+            while(right > left)
+            {
+                auto it = token2id.find(token_buffer.substr(left, right - left));
+                if(it != token2id.end())
+                {
+                    text_ids.push_back(it->second);
+                    left         = right;
+                    token_buffer = "##" + token_buffer.substr(left, token_len);
+                    goto loop;
+                }
+                right--;
+            }
+            left++;
+        }
+    }
+}
+
 } // namespace utils
 } // namespace arm_compute
 #endif /* __UTILS_UTILS_H__*/
