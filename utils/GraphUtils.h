@@ -492,41 +492,6 @@ get_weights_accessor(const std::string &path, const std::string &data_file, Data
         return std::make_unique<NumPyBinLoader>(path + data_file, file_layout);
     }
 }
-
-/** Generates appropriate output accessor according to the specified graph parameters
- *
- * @note If the output accessor is requested to validate the graph then ValidationOutputAccessor is generated
- *       else if output_accessor_file is empty will generate a DummyAccessor else will generate a TopNPredictionsAccessor
- *
- * @param[in]  graph_parameters Graph parameters
- * @param[in]  top_n            (Optional) Number of output classes to print (default = 5)
- * @param[in]  is_validation    (Optional) Validation flag (default = false)
- * @param[out] output_stream    (Optional) Output stream (default = std::cout)
- *
- * @return An appropriate tensor accessor
- */
-inline std::unique_ptr<graph::ITensorAccessor>
-get_output_accessor(const arm_compute::utils::CommonGraphParams &graph_parameters,
-                    size_t                                       top_n         = 5,
-                    bool                                         is_validation = false,
-                    std::ostream                                &output_stream = std::cout)
-{
-    ARM_COMPUTE_UNUSED(is_validation);
-    if (!graph_parameters.validation_file.empty())
-    {
-        return std::make_unique<ValidationOutputAccessor>(graph_parameters.validation_file, output_stream,
-                                                          graph_parameters.validation_range_start,
-                                                          graph_parameters.validation_range_end);
-    }
-    else if (graph_parameters.labels.empty())
-    {
-        return std::make_unique<DummyAccessor>(0);
-    }
-    else
-    {
-        return std::make_unique<TopNPredictionsAccessor>(graph_parameters.labels, top_n, output_stream);
-    }
-}
 /** Generates appropriate output accessor according to the specified graph parameters
  *
  * @note If the output accessor is requested to validate the graph then ValidationOutputAccessor is generated
@@ -811,6 +776,70 @@ get_input_accessor(const arm_compute::utils::CommonGraphParams &graph_parameters
     }
 }
 
+/** Raw result accessor class */
+class RawResultAccessor final : public graph::ITensorAccessor
+{
+public:
+    /** Constructor
+     * 
+     * @param[out] output_stream Output stream
+     */
+    RawResultAccessor(std::ostream &output_stream = std::cout);
+    /** Allow instances of this class to be move constructed */
+    RawResultAccessor(RawResultAccessor &&) = default;
+    /** Prevent instances of this class from being copied (As this class contains pointers) */
+    RawResultAccessor(const RawResultAccessor &) = delete;
+    /** Prevent instances of this class from being copied (As this class contains pointers) */
+    RawResultAccessor &operator=(const RawResultAccessor &) = delete;
+
+    // Inherited methods overriden:
+    bool access_tensor(ITensor &tensor) override;
+
+private:
+    template <typename T>
+    void access_typed_tensor(ITensor &tensor);
+
+    std::ostream            &_output_stream;
+};
+
+/** Generates appropriate output accessor according to the specified graph parameters
+ *
+ * @note If the output accessor is requested to validate the graph then ValidationOutputAccessor is generated
+ *       else if output_accessor_file is empty will generate a DummyAccessor else will generate a TopNPredictionsAccessor
+ *
+ * @param[in]  graph_parameters Graph parameters
+ * @param[in]  top_n            (Optional) Number of output classes to print (default = 5)
+ * @param[in]  is_validation    (Optional) Validation flag (default = false)
+ * @param[out] output_stream    (Optional) Output stream (default = std::cout)
+ *
+ * @return An appropriate tensor accessor
+ */
+inline std::unique_ptr<graph::ITensorAccessor>
+get_output_accessor(const arm_compute::utils::CommonGraphParams &graph_parameters,
+                    size_t                                       top_n         = 5,
+                    bool                                         is_validation = false,
+                    std::ostream                                &output_stream = std::cout)
+{
+    ARM_COMPUTE_UNUSED(is_validation);
+    if(graph_parameters.raw_output)
+    {
+        return std::make_unique<RawResultAccessor>(output_stream);
+    }
+    else if (!graph_parameters.validation_file.empty())
+    {
+        return std::make_unique<ValidationOutputAccessor>(graph_parameters.validation_file, output_stream,
+                                                          graph_parameters.validation_range_start,
+                                                          graph_parameters.validation_range_end);
+    }
+    else if (graph_parameters.labels.empty())
+    {
+        return std::make_unique<DummyAccessor>(0);
+    }
+    else
+    {
+        return std::make_unique<TopNPredictionsAccessor>(graph_parameters.labels, top_n, output_stream);
+    }
+}
 
 } // namespace graph_utils
 } // namespace arm_compute

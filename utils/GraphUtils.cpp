@@ -868,3 +868,61 @@ bool TextAccessor::access_tensor(ITensor &tensor)
     _already_loaded = !_already_loaded;
     return _already_loaded;
 }
+
+RawResultAccessor::RawResultAccessor(std::ostream      &output_stream)
+    : _output_stream(output_stream)
+{
+}
+
+template <typename T>
+void RawResultAccessor::access_typed_tensor(ITensor &tensor)
+{
+    _output_stream << std::scientific;
+
+    _output_stream << "---------- Result ----------" << std::endl;
+    for(size_t z = 0; z < tensor.info()->tensor_shape().z(); z++)
+    {   
+        _output_stream << " ################# " << z << " ################# " << std::endl;
+        _output_stream << tensor.info()->strides_in_bytes().z() << std::endl;
+        for(size_t y = 0; y < tensor.info()->tensor_shape().y(); y++)
+        {
+            size_t x = tensor.info()->tensor_shape().x();
+            _output_stream << "[ ";
+            _output_stream << *reinterpret_cast<T *>(tensor.ptr_to_element(Coordinates(0,y,z)))  << ", ";
+            _output_stream << *reinterpret_cast<T *>(tensor.ptr_to_element(Coordinates(1,y,z)))  << ", ";
+            _output_stream << *reinterpret_cast<T *>(tensor.ptr_to_element(Coordinates(2,y,z)))  << ", ";
+            _output_stream << *reinterpret_cast<T *>(tensor.ptr_to_element(Coordinates(3,y,z)))  << ", ";
+
+            _output_stream  << " ..., ";
+
+            _output_stream << *reinterpret_cast<T *>(tensor.ptr_to_element(Coordinates(x-4,y,z)))  << ", ";
+            _output_stream << *reinterpret_cast<T *>(tensor.ptr_to_element(Coordinates(x-3,y,z)))  << ", ";
+            _output_stream << *reinterpret_cast<T *>(tensor.ptr_to_element(Coordinates(x-2,y,z)))  << ", ";
+            _output_stream << *reinterpret_cast<T *>(tensor.ptr_to_element(Coordinates(x-1,y,z)))  << ", ";
+
+            _output_stream << "] ";
+            _output_stream << std::endl;
+        }
+        _output_stream  << std::endl;
+    }
+
+}
+
+bool RawResultAccessor::access_tensor(ITensor &tensor)
+{
+    ARM_COMPUTE_ERROR_ON_DATA_TYPE_CHANNEL_NOT_IN(&tensor, 1, DataType::F32, DataType::QASYMM8);
+
+    switch (tensor.info()->data_type())
+    {
+        case DataType::QASYMM8:
+            access_typed_tensor<uint8_t>(tensor);
+            break;
+        case DataType::F32:
+            access_typed_tensor<float>(tensor);
+            break;
+        default:
+            ARM_COMPUTE_ERROR("OUTPUT DATA TYPE NOT SUPPORTED!");
+    }
+
+    return false;
+}
