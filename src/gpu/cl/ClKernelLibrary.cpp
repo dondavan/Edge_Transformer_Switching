@@ -352,6 +352,17 @@ const std::map<std::string, std::string> ClKernelLibrary::_kernel_program_map = 
     {"strided_slice", "common/slice_ops.cl"},
     {"tile", "common/tile.cl"},
     {"transpose", "common/transpose.cl"},
+
+    {"vectorize","common/vectorize.cl"},
+    {"positionalemb","common/positionalemb.cl"},
+    {"embsum","common/embsum.cl"},
+    {"linear","common/linear.cl"},
+    {"simple_forward","common/simple_forward.cl"},
+    {"simple_forward_1","common/simple_forward_1.cl"},
+    {"layer_norm","common/layer_norm.cl"},
+    {"mat_mul_mmul_hugh_nt_nt","common/mat_mul_mmul_hugh.cl"},
+    {"mat_mul_mmul_hugh_nt_t","common/mat_mul_mmul_hugh.cl"},
+    {"reshape_layer_hugh", "common/reshape_layer_hugh.cl"},
 #ifdef ENABLE_NCHW_KERNELS
     {"batch_to_space_nchw", "nchw/batch_to_space.cl"},
     {"batch_to_space_static_nchw", "nchw/batch_to_space.cl"},
@@ -775,6 +786,43 @@ const std::map<std::string, std::string> ClKernelLibrary::_program_source_map = 
     {
         "common/mat_mul_quantized_mmul.cl",
 #include "./cl_kernels/common/mat_mul_quantized_mmul.clembed"
+    },
+
+    {
+        "common/vectorize.cl",
+#include "./cl_kernels/common/vectorize.clembed"
+    },
+    {
+        "common/positionalemb.cl",
+#include "./cl_kernels/common/positionalemb.clembed"
+    },
+    {
+        "common/embsum.cl",
+#include "./cl_kernels/common/embsum.clembed"
+    },
+    {
+        "common/linear.cl",
+#include "./cl_kernels/common/linear.clembed"
+    },
+    {
+        "common/simple_forward.cl",
+#include "./cl_kernels/common/simple_forward.clembed"
+    },
+    {
+        "common/simple_forward_1.cl",
+#include "./cl_kernels/common/simple_forward_1.clembed"
+    },
+    {
+        "common/layer_norm.cl",
+#include "./cl_kernels/common/layer_norm.clembed"
+    },
+    {
+        "common/mat_mul_mmul_hugh.cl",
+#include "./cl_kernels/common/mat_mul_mmul_hugh.clembed"
+    },
+    {
+        "common/reshape_layer_hugh.cl",
+#include "./cl_kernels/common/reshape_layer_hugh.clembed"
     },
 #ifdef ENABLE_NCHW_KERNELS
     {

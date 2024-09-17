@@ -348,5 +348,13 @@ enum class WeightFormat
     OHWIo64i8      = 0x804000
 };
 
+/** Text encoding formats */
+enum class TextFormat
+{
+    UNKNOWN,  /**< Unknown text format */
+    UTF8      /**< Utf-8 */
+};
+
+
 } // namespace arm_compute
 #endif /* ACL_ARM_COMPUTE_CORE_CORETYPES */

@@ -133,6 +133,26 @@ using SoftmaxKernelDataTypeISASelectorDataPtr =
     std::add_pointer<bool(const SoftmaxKernelDataTypeISASelectorData &data)>::type;
 using ScatterKernelDataTypeISASelectorDataPtr =
     std::add_pointer<bool(const ScatterKernelDataTypeISASelectorData &data)>::type;
+
+
+struct VectorizeKernelDataTypeISASelectorData
+{
+    DataType            dt;
+    cpuinfo::CpuIsaInfo isa;
+};
+
+struct CpuAddVecKernelDataTypeISASelectorData
+{
+    DataType            dt;
+    cpuinfo::CpuIsaInfo isa;
+};
+
+using VectorizeKernelDataTypeISASelectorDataPtr =
+    std::add_pointer<bool(const VectorizeKernelDataTypeISASelectorData &data)>::type;
+
+using CpuAddVecKernelDataTypeISASelectorDataPtr =
+    std::add_pointer<bool(const CpuAddVecKernelDataTypeISASelectorData &data)>::type;
+    
 } // namespace kernels
 } // namespace cpu
 } // namespace arm_compute

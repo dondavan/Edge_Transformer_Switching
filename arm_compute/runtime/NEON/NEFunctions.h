@@ -112,4 +112,13 @@
 #include "arm_compute/runtime/NEON/functions/NEUnstack.h"
 #include "arm_compute/runtime/NEON/functions/NEWinogradConvolutionLayer.h"
 
+#include "arm_compute/runtime/NEON/functions/NELayerNormLayer.h"
+#include "arm_compute/runtime/NEON/functions/NELinearLayer.h"
+#include "arm_compute/runtime/NEON/functions/NEAttentionLinearLayer.h"
+#include "arm_compute/runtime/NEON/functions/NEEmbeddingSumLayer.h"
+#include "arm_compute/runtime/NEON/functions/NEPositionEmbeddingLayer.h"
+#include "arm_compute/runtime/NEON/functions/NETokenEmbeddingLayer.h"
+#include "arm_compute/runtime/NEON/functions/NESegmentEmbeddingLayer.h"
+#include "arm_compute/runtime/NEON/functions/NEScaleDotProductionAttentionLayer.h"
+
 #endif // ACL_ARM_COMPUTE_RUNTIME_NEON_NEFUNCTIONS_H

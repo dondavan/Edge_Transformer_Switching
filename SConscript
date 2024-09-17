@@ -495,7 +495,18 @@ if env['opencl'] and env['embed_kernels']:
                        'src/core/CL/cl_kernels/common/stack_layer.cl',
                        'src/core/CL/cl_kernels/common/tile.cl',
                        'src/core/CL/cl_kernels/common/transpose.cl',
-                       'src/core/CL/cl_kernels/common/unpooling_layer.cl'
+                       'src/core/CL/cl_kernels/common/unpooling_layer.cl',
+
+
+                       'src/core/CL/cl_kernels/common/vectorize.cl',
+                       'src/core/CL/cl_kernels/common/positionalemb.cl',
+                       'src/core/CL/cl_kernels/common/embsum.cl',
+                       "src/core/CL/cl_kernels/common/linear.cl",
+                       "src/core/CL/cl_kernels/common/simple_forward.cl",
+                       "src/core/CL/cl_kernels/common/simple_forward_1.cl",
+                       "src/core/CL/cl_kernels/common/layer_norm.cl",
+                       "src/core/CL/cl_kernels/common/mat_mul_mmul_hugh.cl",
+                       'src/core/CL/cl_kernels/common/reshape_layer_hugh.cl'
                     ]
 
     # NCHW kernels

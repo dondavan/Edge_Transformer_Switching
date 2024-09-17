@@ -227,6 +227,31 @@ std::unique_ptr<IFunction> NEFunctionFactory::create(INode *node, GraphContext &
         case NodeType::StridedSliceLayer:
             return detail::create_strided_slice_layer<NEStridedSlice, NETargetInfo>(
                 *polymorphic_downcast<StridedSliceLayerNode *>(node));
+        
+        case NodeType::TokenEmbeddingLayer:
+            return detail::create_token_embedding_layer<NETokenEmbeddingLayer, NETargetInfo>(
+                *polymorphic_downcast<TokenEmbeddingLayerNode *>(node));
+        case NodeType::SegmentEmbeddingLayer:
+            return detail::create_segment_embedding_layer<NESegmentEmbeddingLayer, NETargetInfo>(
+                *polymorphic_downcast<SegmentEmbeddingLayerNode *>(node));
+        case NodeType::PositionEmbeddingLayer:
+            return detail::create_position_embedding_layer<NEPositionEmbeddingLayer, NETargetInfo>(
+                *polymorphic_downcast<PositionEmbeddingLayerNode *>(node));
+        case NodeType::EmbeddingSumLayer:
+            return detail::create_embedding_sum_layer<NEEmbeddingSumLayer, NETargetInfo>(
+                *polymorphic_downcast<EmbeddingSumLayerNode *>(node));
+        case NodeType::LinearLayer:
+            return detail::create_linear_layer<NELinearLayer, NETargetInfo>(
+                *polymorphic_downcast<LinearLayerNode *>(node));
+        case NodeType::AttentionLinearLayer:
+            return detail::create_attention_linear_layer<NEAttentionLinearLayer,NETargetInfo>(
+                *polymorphic_downcast<AttentionLinearNode *>(node));
+        case NodeType::ScaleDotProductionAttentionLayer:
+            return detail::create_scale_dot_production_layer<NEScaleDotProductionAttentionLayer,NETargetInfo>(
+                *polymorphic_downcast<ScaleDotProductionAttentionNode *>(node));
+        case NodeType::LayerNormLayer:
+            return detail::create_layer_norm_layer<NELayerNormLayer, NETargetInfo>(
+                *polymorphic_downcast<LayerNormNode *>(node));
         default:
             return nullptr;
     }

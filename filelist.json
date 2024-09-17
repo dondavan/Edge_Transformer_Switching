@@ -879,7 +879,82 @@
           "src/runtime/CL/functions/CLNormalizePlanarYUVLayer.cpp"
         ]
       }
-    }
+    },
+
+
+    "TokenEmbedding": {
+        "files": {
+          "common": [
+            "src/gpu/cl/kernels/ClVectorizeKernel.cpp",
+            "src/gpu/cl/operators/ClTokenEmbed.cpp",
+            "src/runtime/CL/functions/CLTokenEmbeddingLayer.cpp"
+          ]
+        }
+      },
+      "SegmentEmbedding": {
+        "files": {
+          "common": [
+            "src/gpu/cl/kernels/ClVectorizeKernel.cpp",
+            "src/gpu/cl/operators/ClSegmentEmbed.cpp",
+            "src/runtime/CL/functions/CLSegmentEmbeddingLayer.cpp"
+          ]
+        }
+      },
+      "PositionalEmbedding": {
+        "files": {
+          "common": [
+            "src/gpu/cl/kernels/ClPositionEmbeddingKernel.cpp",
+            "src/gpu/cl/operators/ClPositionEmbed.cpp",
+            "src/runtime/CL/functions/CLPositionEmbeddingLayer.cpp"
+          ]
+        }
+      },
+      "EmbeddingSum": {
+        "files": {
+          "common": [
+            "src/gpu/cl/kernels/ClEmbSumKernel.cpp",
+            "src/gpu/cl/operators/ClEmbedSum.cpp",
+            "src/runtime/CL/functions/CLEmbeddingSumLayer.cpp"
+          ]
+        }
+      },
+      "Linear": {
+        "files": {
+          "common": [
+            "src/gpu/cl/kernels/ClLinearKernel.cpp",
+            "src/gpu/cl/operators/ClLinear.cpp",
+            "src/runtime/CL/functions/CLLinearLayer.cpp"
+          ]
+        }
+      },
+      "LayerNorm": {
+        "files": {
+          "common": [
+            "src/gpu/cl/operators/ClLayerNorm.cpp",
+            "src/runtime/CL/functions/CLLayerNormLayer.cpp",
+            "src/gpu/cl/kernels/ClLayerNormKernel.cpp"
+          ]
+        }
+      },
+      "AttentionLinear": {
+        "deps": [
+          "Linear"
+        ],
+        "files": {
+          "common": [
+            "src/runtime/CL/functions/CLAttentionLinearLayer.cpp"
+          ]
+        }
+      },
+      "ScaleDotProduction": {
+        "files": {
+          "common": [
+            "src/gpu/cl/kernels/ClHughReshapeKernel.cpp",
+            "src/gpu/cl/operators/ClScaleDotProduction.cpp",
+            "src/runtime/CL/functions/CLScaleDotProductionAttentionLayer.cpp"
+          ]
+        }
+      }
   }
 },
   "cpu": {
@@ -2399,6 +2474,105 @@
         "deps": [ "StridedSlice" ],
         "files": {
           "common": [ "src/runtime/NEON/functions/NEUnstack.cpp" ]
+        }
+      },
+
+      "TokenEmbedding": {
+        "deps": [
+          "PositionalEncoding"
+        ],
+        "files": {
+          "common": [
+            "src/cpu/kernels/CpuTokenEmbedKernel.cpp",
+            "src/cpu/operators/CpuTokenEmbed.cpp",
+            "src/runtime/NEON/functions/NETokenEmbeddingLayer.cpp"
+          ],
+          "neon": {
+            "fp32": [
+              "src/cpu/kernels/tokenembed/generic/neon/fp32.cpp"
+            ]
+          }
+        }
+      },
+      "SegmentEmbedding": {
+        "files": {
+          "common": [
+            "src/cpu/kernels/CpuVectorizeKernel.cpp",
+            "src/cpu/operators/CpuSegmentEmbed.cpp",
+            "src/runtime/NEON/functions/NESegmentEmbeddingLayer.cpp"
+          ],
+          "neon": {
+            "fp32": [
+              "src/cpu/kernels/vectorize/generic/neon/fp32.cpp"
+            ]
+          }
+        }
+      },
+      "PositionEmbedding": {
+        "files": {
+          "common": [
+            "src/cpu/kernels/CpuPositionEmbeddingKernel.cpp",
+            "src/cpu/operators/CpuPositionEmbed.cpp",
+            "src/runtime/NEON/functions/NEPositionEmbeddingLayer.cpp"
+          ],
+          "neon": {
+            "fp32": [
+              "src/cpu/kernels/vectorize/generic/neon/fp32.cpp"
+            ]
+          }
+        }
+      },
+      "Linear": {
+        "files": {
+          "common": [
+            "src/cpu/kernels/CpuAddVecKernel.cpp",
+            "src/cpu/kernels/CpuLinearKernel.cpp",
+            "src/cpu/operators/CpuLinear.cpp",
+            "src/runtime/NEON/functions/NELinearLayer.cpp"
+          ],
+          "neon": {
+            "common": [
+              "src/cpu/kernels/add_vec/generic/neon/impl.cpp"
+            ],
+            "fp32": [
+              "src/cpu/kernels/add_vec/generic/neon/fp32.cpp"
+            ]
+          }
+        }
+      },
+      "AttentionLinear": {
+        "deps": [
+          "Linear"
+        ],
+        "files": {
+          "common": [
+            "src/runtime/NEON/functions/NEAttentionLinearLayer.cpp"
+          ]
+        }
+      },
+      "ScaleDotProduction": {
+        "files": {
+          "common": [
+            "src/runtime/NEON/functions/NEScaleDotProductionAttentionLayer.cpp",
+            "src/cpu/operators/CpuScaleDotProduction.cpp"
+          ]
+        }
+      },
+      "LayerNorm": {
+        "files": {
+          "common": [
+            "src/cpu/kernels/CpuLayerNormKernel.cpp",
+            "src/cpu/operators/CpuLayerNorm.cpp",
+            "src/runtime/NEON/functions/NELayerNormLayer.cpp"
+          ]
+        }
+      },
+      "EmbeddingSum": {
+        "files": {
+          "common": [
+            "src/cpu/operators/CpuEmbedSum.cpp",
+            "src/runtime/NEON/functions/NEEmbeddingSumLayer.cpp"
+          ]
         }
       }
     }

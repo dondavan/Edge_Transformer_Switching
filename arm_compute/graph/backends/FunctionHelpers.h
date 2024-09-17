@@ -1677,6 +1677,301 @@ std::unique_ptr<IFunction> create_strided_slice_layer(StridedSliceLayerNode &nod
 
     return func;
 }
+
+/** Creates a backend token embedding layer function
+ *
+ * @tparam TokenEmbeddingLayerFunction  Backend token embedding function
+ * @tparam TargetInfo                   Target-specific information
+ *
+ * @param[in] node Node to create the backend function for
+ *
+ * @return Backend token embedding layer function
+ */
+template <typename TokenEmbeddingLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_token_embedding_layer(TokenEmbeddingLayerNode &node)
+{
+    validate_node<TargetInfo>(node, 2 /* expected inputs */, 1 /* expected outputs */);
+
+    // Extract IO and info
+    
+    typename TargetInfo::TensorType *input    = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *vocab    = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
+    const EmbeddingLayerInfo tkemb_info  = node.token_embedding_info();
+
+    // Create function
+    auto func = std::make_unique<TokenEmbeddingLayerFunction>();
+    func->configure(input,vocab,output,tkemb_info);
+
+    ARM_COMPUTE_LOG_GRAPH_INFO(
+        "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
+                        << " Data Type: " << input->info()->data_type() << "Input Shape: " << input->info()->tensor_shape() << std::endl);
+
+    return func;
+}
+
+/** Creates a backend segment embedding layer function
+ *
+ * @tparam SegmentEmbeddingLayerFunction  Backend segment embedding function
+ * @tparam TargetInfo                     Target-specific information
+ *
+ * @param[in] node Node to create the backend function for
+ *
+ * @return Backend segment embedding layer function
+ */
+template <typename SegmentEmbeddingLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_segment_embedding_layer(SegmentEmbeddingLayerNode &node)
+{
+    validate_node<TargetInfo>(node, 2 /* expected inputs */, 1 /* expected outputs */);
+
+    // Extract IO and info
+    
+    typename TargetInfo::TensorType *input    = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *segment  = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
+
+    // Create function
+    auto func = std::make_unique<SegmentEmbeddingLayerFunction>();
+    func->configure(input,segment,output);
+
+    return func;
+}
+
+/** Creates a backend position embedding layer function
+ *
+ * @tparam PositionEmbeddingLayerFunction  Backend position embedding function
+ * @tparam TargetInfo                     Target-specific information
+ *
+ * @param[in] node Node to create the backend function for
+ *
+ * @return Backend position embedding layer function
+ */
+template <typename PositionEmbeddingLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_position_embedding_layer(PositionEmbeddingLayerNode &node)
+{
+    validate_node<TargetInfo>(node, 2 /* expected inputs */, 1 /* expected outputs */);
+
+    // Extract IO and info
+    
+    typename TargetInfo::TensorType *input    = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *position  = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
+
+    // Create function
+    auto func = std::make_unique<PositionEmbeddingLayerFunction>();
+    func->configure(input,position,output);
+
+    return func;
+}
+
+/** Creates a backend embedding summing layer function
+ *
+ * @tparam EmbeddingSumLayerFunction  Backend position embedding function
+ * @tparam TargetInfo                 Target-specific information
+ *
+ * @param[in] node Node to create the backend function for summing all three embedding layer output
+ *
+ * @return Backend embedding sum layer function
+ */
+template <typename EmbeddingSumLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_embedding_sum_layer(EmbeddingSumLayerNode &node)
+{
+    validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
+
+    // Extract IO and info
+    typename TargetInfo::TensorType *token      = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *segment    = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *position   = get_backing_tensor<TargetInfo>(node.input(2));
+    typename TargetInfo::TensorType *output     = get_backing_tensor<TargetInfo>(node.output(0));
+    const EmbeddingLayerInfo info = node.embedding_sum_info();
+
+    // Create function
+    auto func = std::make_unique<EmbeddingSumLayerFunction>();
+    func->configure(token,segment,position,output,info);
+
+    return func;
+}
+
+
+/** Creates a backend linear layer function
+ *
+ * @tparam LinearLayerFunction  Backend linear layer function
+ * @tparam TargetInfo           Target-specific information
+ *
+ * @param[in] node Node to create the backend function for
+ *
+ * @return Backend linear layer function
+ */
+template <typename LinearLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
+{
+    validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
+
+    // Extract IO and info
+    
+    typename TargetInfo::TensorType *input    = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *weight   = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *bias     = get_backing_tensor<TargetInfo>(node.input(2));
+    typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
+    const LinearLayerInfo linear_info         = node.linear_info();
+
+    // Create function
+    auto func = std::make_unique<LinearLayerFunction>();
+    func->configure(input, weight, bias, output, linear_info);
+
+    ARM_COMPUTE_LOG_GRAPH_INFO(
+        "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
+                        << " Data Type: " << input->info()->data_type() << "Input Shape: " << input->info()->tensor_shape() << std::endl);
+
+    return func;
+}
+
+/** Creates a backend linear layer function
+ *
+ * @tparam LinearLayerFunction  Backend linear layer function
+ * @tparam TargetInfo           Target-specific information
+ *
+ * @param[in] node Node to create the backend function for
+ *
+ * @return Backend linear layer function
+ */
+template <typename LinearLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
+{
+    validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
+
+    // Extract IO and info
+    
+    typename TargetInfo::TensorType *input    = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *weight   = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *bias     = get_backing_tensor<TargetInfo>(node.input(2));
+    typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
+    const LinearLayerInfo linear_info         = node.linear_info();
+
+    // Create function
+    auto func = std::make_unique<LinearLayerFunction>();
+    func->configure(input, weight, bias, output, linear_info);
+
+    ARM_COMPUTE_LOG_GRAPH_INFO(
+        "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
+                        << " Data Type: " << input->info()->data_type() << "Input Shape: " << input->info()->tensor_shape() << std::endl);
+
+    return func;
+}
+
+/** Creates a backend attention linear function
+ *
+ * @tparam AttentionLinearLayerFunction  Backend attention linear function
+ * @tparam TargetInfo                       Target-specific information
+ *
+ * @param[in] node Node to create the backend function for
+ *
+ * @return Backend attention linear function
+ */
+template <typename AttentionLinearLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &node)
+{
+    validate_node<TargetInfo>(node, 9 /* expected inputs */, 3 /* expected outputs */);
+
+    // Extract IO and info
+    typename TargetInfo::TensorType *query_input   = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *query_w   = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *query_b   = get_backing_tensor<TargetInfo>(node.input(2));
+    typename TargetInfo::TensorType *key_input   = get_backing_tensor<TargetInfo>(node.input(3));
+    typename TargetInfo::TensorType *key_w   = get_backing_tensor<TargetInfo>(node.input(4));
+    typename TargetInfo::TensorType *key_b   = get_backing_tensor<TargetInfo>(node.input(5));
+    typename TargetInfo::TensorType *value_input   = get_backing_tensor<TargetInfo>(node.input(6));
+    typename TargetInfo::TensorType *value_w   = get_backing_tensor<TargetInfo>(node.input(7));
+    typename TargetInfo::TensorType *value_b   = get_backing_tensor<TargetInfo>(node.input(8));
+
+    typename TargetInfo::TensorType *query_output  = get_backing_tensor<TargetInfo>(node.output(0));
+    typename TargetInfo::TensorType *key_output  = get_backing_tensor<TargetInfo>(node.output(1));
+    typename TargetInfo::TensorType *value_output  = get_backing_tensor<TargetInfo>(node.output(2));
+    const LinearLayerInfo linear_info         = node.linear_info();
+
+    // Create and configure function
+    auto func = std::make_unique<AttentionLinearLayerFunction>();
+    func->configure(query_input,query_w,query_b,
+                    key_input,key_w,key_b,
+                    value_input,value_w,value_b,
+                    query_output,key_output,value_output,
+                    linear_info);
+    // Log info
+    ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
+                                               << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
+                                               << " Input shape: " << input->info()->tensor_shape()
+                                               << " Output shape: " << output->info()->tensor_shape() << std::endl);
+
+    return func;
+}
+
+/** Creates a backend scale dot production function
+ *
+ * @tparam ScaleDotProductionLayerFunction  Backend scale dot production function
+ * @tparam TargetInfo                       Target-specific information
+ *
+ * @param[in] node Node to create the backend function for
+ *
+ * @return Backend simple forwardlayer function
+ */
+template <typename ScaleDotProductionLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_scale_dot_production_layer(ScaleDotProductionAttentionNode &node)
+{
+    validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
+
+     // Extract IO and info
+    typename TargetInfo::TensorType *query   = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *key     = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *value   = get_backing_tensor<TargetInfo>(node.input(2));
+    typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
+
+    // Create and configure function
+    auto func = std::make_unique<ScaleDotProductionLayerFunction>();
+    func->configure(query,key,value,output,node.sdpa_info());
+
+    // Log info
+    ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
+                                               << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
+                                               << " Input shape: " << input->info()->tensor_shape()
+                                               << " Output shape: " << output->info()->tensor_shape() << std::endl);
+
+    return func;
+}
+
+/** Creates a backend layer normalization function
+ *
+ * @tparam LayerNormalizationLayerFunction  Backend layer normalization function
+ * @tparam TargetInfo                       Target-specific information
+ *
+ * @param[in] node Node to create the backend function for
+ *
+ * @return Backend layer normalization function
+ */
+template <typename LayerNormLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
+{
+    validate_node<TargetInfo>(node, 1 /* expected inputs */, 1 /* expected outputs */);
+
+    // Extract IO and info
+    typename TargetInfo::TensorType *input   = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
+
+    ARM_COMPUTE_ERROR_ON(input == nullptr);
+    ARM_COMPUTE_ERROR_ON(output == nullptr);
+
+    // Create and configure function
+    auto func = std::make_unique<LayerNormLayerFunction>();
+    func->configure(input,output,node.layer_norm_info());
+
+    // Log info
+    ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
+                                               << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
+                                               << " Input shape: " << input->info()->tensor_shape()
+                                               << " Output shape: " << output->info()->tensor_shape() << std::endl);
+
+    return func;
+}
+
 } // namespace detail
 } // namespace backends
 } // namespace graph
