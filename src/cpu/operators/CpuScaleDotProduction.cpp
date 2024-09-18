@@ -24,7 +24,7 @@ void CpuScaleDotProduction::configure(const ITensorInfo *query,
                                       const ITensorInfo *key,
                                       const ITensorInfo *value,
                                       ITensorInfo *output,
-                                      const ScaleDotProductionAttentionLayerInfo& info)
+                                      const ScaleDotProductionLayerInfo& info)
 {
     ARM_COMPUTE_LOG_PARAMS(key, value, query, output);
     

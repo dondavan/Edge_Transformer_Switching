@@ -38,7 +38,7 @@ void NEScaleDotProductionAttentionLayer::configure(const ITensor *query,
                                                    const ITensor *key,
                                                    const ITensor *value,
                                                    ITensor *output,
-                                                   const ScaleDotProductionAttentionLayerInfo& info)
+                                                   const ScaleDotProductionLayerInfo& info)
 {
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();

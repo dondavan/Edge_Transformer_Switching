@@ -31,7 +31,7 @@ void ClScaleDotProduction::configure(const ClCompileContext                     
                                      const ITensorInfo                          *key,
                                      const ITensorInfo                          *value,
                                      ITensorInfo                                *output,
-                                     const ScaleDotProductionAttentionLayerInfo &info)
+                                     const ScaleDotProductionLayerInfo &info)
 {
     ARM_COMPUTE_LOG_PARAMS(key, value, query, output);
     ARM_COMPUTE_UNUSED(compile_context, query, key, value, output, info);

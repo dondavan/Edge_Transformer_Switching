@@ -38,7 +38,7 @@ class CLScaleDotProductionAttentionLayer : public IFunction
                    const ICLTensor                            *key,
                    const ICLTensor                            *value,
                    ICLTensor                                  *output,
-                   const ScaleDotProductionAttentionLayerInfo &info);
+                   const ScaleDotProductionLayerInfo &info);
     /** Set the input and output tensor.
      * 
      * @param[in]  query      Input tenser of Attention Query, Data type supported: F32
@@ -51,7 +51,7 @@ class CLScaleDotProductionAttentionLayer : public IFunction
                    const ICLTensor                            *key,
                    const ICLTensor                            *value,
                    ICLTensor                                  *output,
-                   const ScaleDotProductionAttentionLayerInfo &info);
+                   const ScaleDotProductionLayerInfo &info);
     /** Static function to check if given info will lead to a valid configuration of @ref CLScaleDotProductionAttentionLayer
      *
      * @param[in] output Destination tensor info. Data type supported: same as @p input

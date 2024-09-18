@@ -38,7 +38,7 @@ void CLScaleDotProductionAttentionLayer::configure(const ICLTensor              
                                                    const ICLTensor                            *key,
                                                    const ICLTensor                            *value,
                                                    ICLTensor                                  *output,
-                                                   const ScaleDotProductionAttentionLayerInfo &info)
+                                                   const ScaleDotProductionLayerInfo &info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), query, key, value, output, info);
 }
@@ -47,7 +47,7 @@ void CLScaleDotProductionAttentionLayer::configure(const CLCompileContext       
                                                    const ICLTensor                            *key,
                                                    const ICLTensor                            *value,
                                                    ICLTensor                                  *output,
-                                                   const ScaleDotProductionAttentionLayerInfo &info)
+                                                   const ScaleDotProductionLayerInfo &info)
 {
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();

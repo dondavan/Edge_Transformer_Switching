@@ -43,7 +43,7 @@ class ClScaleDotProduction : public IClOperator
                    const ITensorInfo                          *key,
                    const ITensorInfo                          *value,
                    ITensorInfo                                *output,
-                   const ScaleDotProductionAttentionLayerInfo &info);
+                   const ScaleDotProductionLayerInfo &info);
     /** Static function to check if given info will lead to a valid configuration
      *
      * Similar to @ref ClScaleDotProduction::configure()

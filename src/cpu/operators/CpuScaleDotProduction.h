@@ -43,7 +43,7 @@ public:
      * @param[in]  value           Attention value tensor info. Data types supported: F32.
      * @param[out] output          Destination tensor info. Data type supported: F32
      */
-    void configure( const ITensorInfo *query, const ITensorInfo *key, const ITensorInfo *value, ITensorInfo *output, const ScaleDotProductionAttentionLayerInfo& info);
+    void configure( const ITensorInfo *query, const ITensorInfo *key, const ITensorInfo *value, ITensorInfo *output, const ScaleDotProductionLayerInfo& info);
     /** Static function to check if given info will lead to a valid configuration
      *
      * Similar to @ref CpuScaleDotProduction::configure()
