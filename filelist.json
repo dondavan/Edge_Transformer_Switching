@@ -2477,12 +2477,9 @@
       },
 
       "TokenEmbedding": {
-        "deps": [
-          "PositionalEncoding"
-        ],
         "files": {
           "common": [
-            "src/cpu/kernels/CpuTokenEmbedKernel.cpp",
+            "src/cpu/kernels/CpuVectorizeKernel.cpp",
             "src/cpu/operators/CpuTokenEmbed.cpp",
             "src/runtime/NEON/functions/NETokenEmbeddingLayer.cpp"
           ],
