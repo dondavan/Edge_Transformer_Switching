@@ -502,8 +502,7 @@ if env['opencl'] and env['embed_kernels']:
                        'src/core/CL/cl_kernels/common/positionalemb.cl',
                        'src/core/CL/cl_kernels/common/embsum.cl',
                        "src/core/CL/cl_kernels/common/layer_norm.cl",
-                       "src/core/CL/cl_kernels/common/mat_mul_mmul_hugh.cl",
-                       'src/core/CL/cl_kernels/common/reshape_layer_hugh.cl'
+                       "src/core/CL/cl_kernels/common/mat_mul_mmul_hugh.cl"
                     ]
 
     # NCHW kernels

@@ -359,7 +359,6 @@ const std::map<std::string, std::string> ClKernelLibrary::_kernel_program_map = 
     {"layer_norm","common/layer_norm.cl"},
     {"mat_mul_mmul_hugh_nt_nt","common/mat_mul_mmul_hugh.cl"},
     {"mat_mul_mmul_hugh_nt_t","common/mat_mul_mmul_hugh.cl"},
-    {"reshape_layer_hugh", "common/reshape_layer_hugh.cl"},
 #ifdef ENABLE_NCHW_KERNELS
     {"batch_to_space_nchw", "nchw/batch_to_space.cl"},
     {"batch_to_space_static_nchw", "nchw/batch_to_space.cl"},
@@ -804,10 +803,6 @@ const std::map<std::string, std::string> ClKernelLibrary::_program_source_map = 
     {
         "common/mat_mul_mmul_hugh.cl",
 #include "./cl_kernels/common/mat_mul_mmul_hugh.clembed"
-    },
-    {
-        "common/reshape_layer_hugh.cl",
-#include "./cl_kernels/common/reshape_layer_hugh.clembed"
     },
 #ifdef ENABLE_NCHW_KERNELS
     {
