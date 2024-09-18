@@ -356,7 +356,6 @@ const std::map<std::string, std::string> ClKernelLibrary::_kernel_program_map = 
     {"vectorize","common/vectorize.cl"},
     {"positionalemb","common/positionalemb.cl"},
     {"embsum","common/embsum.cl"},
-    {"linear","common/linear.cl"},
     {"simple_forward","common/simple_forward.cl"},
     {"simple_forward_1","common/simple_forward_1.cl"},
     {"layer_norm","common/layer_norm.cl"},
@@ -799,14 +798,6 @@ const std::map<std::string, std::string> ClKernelLibrary::_program_source_map = 
     {
         "common/embsum.cl",
 #include "./cl_kernels/common/embsum.clembed"
-    },
-    {
-        "common/linear.cl",
-#include "./cl_kernels/common/linear.clembed"
-    },
-    {
-        "common/simple_forward.cl",
-#include "./cl_kernels/common/simple_forward.clembed"
     },
     {
         "common/simple_forward_1.cl",
