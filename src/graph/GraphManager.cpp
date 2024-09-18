@@ -70,18 +70,26 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
         ctx.set_config(config);
     }
 
+    std::cout << "switching/src/graph/GraphManager.cpp force_target_to_graph start:" << std::endl;
     if (!is_target_supported(target))
     {
         forced_target = get_default_target();
         ARM_COMPUTE_LOG_GRAPH_INFO("Switching target from " << target << " to " << forced_target << std::endl);
     }
     force_target_to_graph(graph, forced_target);
+    std::cout << "switching/src/graph/GraphManager.cpp force_target_to_graph end:" << std::endl;
 
+
+    std::cout << "switching/src/graph/GraphManager.cpp setup_requested_backend_context start:" << std::endl;
     // Setup backend context
     setup_requested_backend_context(ctx, forced_target);
+    std::cout << "switching/src/graph/GraphManager.cpp setup_requested_backend_context end:" << std::endl;
 
+
+    std::cout << "switching/src/graph/GraphManager.cpp configure_all_tensors start:" << std::endl;
     // Configure all tensors
     detail::configure_all_tensors(graph);
+    std::cout << "switching/src/graph/GraphManager.cpp configure_all_tensors end:" << std::endl;
 
     // Apply backend mutating passes
     pm.run_type(graph, IGraphMutator::MutationType::Backend);
@@ -92,17 +100,25 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
     // Validate all nodes
     detail::validate_all_nodes(graph);
 
+
+    std::cout << "switching/src/graph/GraphManager.cpp configure_all_nodes start:" << std::endl;
     // Configure all nodes
     auto workload = detail::configure_all_nodes(graph, ctx, topological_sorted_nodes);
     ARM_COMPUTE_ERROR_ON_MSG(workload.tasks.empty(), "Could not configure all nodes!");
+    std::cout << "switching/src/graph/GraphManager.cpp configure_all_nodes end:" << std::endl;
 
+
+    std::cout << "switching/src/graph/GraphManager.cpp Allocate const tensors and call accessors start:" << std::endl;
     // Allocate const tensors and call accessors
     detail::allocate_const_tensors(graph);
     detail::call_all_const_node_accessors(graph);
+    std::cout << "switching/src/graph/GraphManager.cpp Allocate const tensors and call accessors end:" << std::endl;
 
     // Prepare graph
     detail::prepare_all_tasks(workload);
 
+
+    std::cout << "switching/src/graph/GraphManager.cpp Setup tensor memory start:" << std::endl;
     // Setup tensor memory (Allocate all tensors or setup transition manager)
     if (ctx.config().use_transition_memory_manager)
     {
@@ -112,6 +128,7 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
     {
         detail::allocate_all_tensors(graph);
     }
+    std::cout << "switching/src/graph/GraphManager.cpp Setup tensor memory end:" << std::endl;
 
     // Finalize Graph context
     ctx.finalize();
@@ -131,20 +148,29 @@ void GraphManager::execute_graph(Graph &graph)
 
     while (true)
     {
+        
+        std::cout << "switching/src/graph/GraphManager.cpp call_all_input_node_accessors start:" << std::endl;
         // Call input accessors
         if (!detail::call_all_input_node_accessors(it->second))
         {
             return;
         }
+        std::cout << "switching/src/graph/GraphManager.cpp call_all_input_node_accessors end:" << std::endl;
 
+
+        std::cout << "switching/src/graph/GraphManager.cpp call_all_tasks start:" << std::endl;
         // Run graph
         detail::call_all_tasks(it->second);
+        std::cout << "switching/src/graph/GraphManager.cpp call_all_tasks end:" << std::endl;
 
+
+        std::cout << "switching/src/graph/GraphManager.cpp call_all_output_node_accessors start:" << std::endl;
         // Call output accessors
         if (!detail::call_all_output_node_accessors(it->second))
         {
             return;
         }
+        std::cout << "switching/src/graph/GraphManager.cpp call_all_output_node_accessors end:" << std::endl;
     }
 }
 
