@@ -140,6 +140,7 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
     // Reserve memory for tasks
     workload.tasks.reserve(node_order.size());
 
+    std::cout << "switching/src/graph/detail/ExecutionHelpers.cpp Create tasks start:" << std::endl;
     // Create tasks
     for (auto &node_id : node_order)
     {
@@ -155,7 +156,10 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
             }
         }
     }
+    std::cout << "switching/src/graph/detail/ExecutionHelpers.cpp Create tasks end:" << std::endl;
 
+
+    std::cout << "switching/src/graph/detail/ExecutionHelpers.cpp Add inputs and outputs start:" << std::endl;
     // Add inputs and outputs
     for (auto &node : g.nodes())
     {
@@ -174,6 +178,7 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
             continue;
         }
     }
+    std::cout << "switching/src/graph/detail/ExecutionHelpers.cpp Add inputs and outputs end:" << std::endl;
 
     return workload;
 }
