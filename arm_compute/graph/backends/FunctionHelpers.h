@@ -1826,39 +1826,6 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
     return func;
 }
 
-/** Creates a backend linear layer function
- *
- * @tparam LinearLayerFunction  Backend linear layer function
- * @tparam TargetInfo           Target-specific information
- *
- * @param[in] node Node to create the backend function for
- *
- * @return Backend linear layer function
- */
-template <typename LinearLayerFunction, typename TargetInfo>
-std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
-{
-    validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
-
-    // Extract IO and info
-    
-    typename TargetInfo::TensorType *input    = get_backing_tensor<TargetInfo>(node.input(0));
-    typename TargetInfo::TensorType *weight   = get_backing_tensor<TargetInfo>(node.input(1));
-    typename TargetInfo::TensorType *bias     = get_backing_tensor<TargetInfo>(node.input(2));
-    typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
-    const LinearLayerInfo linear_info         = node.linear_info();
-
-    // Create function
-    auto func = std::make_unique<LinearLayerFunction>();
-    func->configure(input, weight, bias, output, linear_info);
-
-    ARM_COMPUTE_LOG_GRAPH_INFO(
-        "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
-                        << " Data Type: " << input->info()->data_type() << "Input Shape: " << input->info()->tensor_shape() << std::endl);
-
-    return func;
-}
-
 /** Creates a backend attention linear function
  *
  * @tparam AttentionLinearLayerFunction  Backend attention linear function
