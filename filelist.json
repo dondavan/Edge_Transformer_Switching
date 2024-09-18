@@ -2485,7 +2485,7 @@
           ],
           "neon": {
             "fp32": [
-              "src/cpu/kernels/tokenembed/generic/neon/fp32.cpp"
+              "src/cpu/kernels/vectorize/generic/neon/fp32.cpp"
             ]
           }
         }
@@ -2510,12 +2510,7 @@
             "src/cpu/kernels/CpuPositionEmbeddingKernel.cpp",
             "src/cpu/operators/CpuPositionEmbed.cpp",
             "src/runtime/NEON/functions/NEPositionEmbeddingLayer.cpp"
-          ],
-          "neon": {
-            "fp32": [
-              "src/cpu/kernels/vectorize/generic/neon/fp32.cpp"
-            ]
-          }
+          ]
         }
       },
       "Linear": {
