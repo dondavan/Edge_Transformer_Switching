@@ -98,6 +98,7 @@ void validate_node(const INode &node, size_t num_expected_inputs, size_t num_exp
 template <typename ActivationLayerFunction, typename TargetInfo>
 std::unique_ptr<IFunction> create_activation_layer(ActivationLayerNode &node)
 {
+    std::cout << "ActivationLayerNode create " <<std::endl;
     validate_node<TargetInfo>(node, 1 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
@@ -115,6 +116,7 @@ std::unique_ptr<IFunction> create_activation_layer(ActivationLayerNode &node)
                         << " Activation function: " << act_info.activation() << " a: " << act_info.a() << " b: "
                         << act_info.b() << " InPlace : " << is_in_place_operation(input, output) << std::endl);
 
+    std::cout << "ActivationLayerNode create " <<std::endl;
     return func;
 }
 
