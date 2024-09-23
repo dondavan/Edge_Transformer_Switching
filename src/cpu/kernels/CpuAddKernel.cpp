@@ -147,20 +147,29 @@ void CpuAddKernel::configure(const ITensorInfo *src0, const ITensorInfo *src1, I
     ARM_COMPUTE_ERROR_ON_NULLPTR(src0, src1, dst);
     ARM_COMPUTE_ERROR_THROW_ON(validate_arguments(*src0, *src1, *dst, policy));
 
+    std::cout << "1" << std::endl;
     const auto can_use_fixedpoint = add_q8_neon_fixedpoint_possible(src0, src1, dst);
     const auto uk                 = CpuAddKernel::get_implementation<CpuAddKernelDataTypeISASelectorData>(
         CpuAddKernelDataTypeISASelectorData{src0->data_type(), CPUInfo::get().get_isa(), can_use_fixedpoint});
 
+    std::cout << "2" << std::endl;
     ARM_COMPUTE_ERROR_ON_NULLPTR(uk);
 
     _policy     = policy;
     _run_method = uk->ukernel;
     _name       = std::string("CpuAddKernel").append("/").append(uk->name);
 
+    std::cout << "3" << std::endl;
+
     // Auto initialize dst if not initialized
+
+    std::cout << "4" << std::endl;
     const TensorShape &out_shape = TensorShape::broadcast_shape(src0->tensor_shape(), src1->tensor_shape());
+    std::cout << "5" << std::endl;
     set_shape_if_empty(*dst, out_shape);
+    std::cout << "6" << std::endl;
     set_data_type_if_unknown(*dst, src0->data_type());
+    std::cout << "7" << std::endl;
 
     // Configure kernel window
     Window win;

@@ -22,26 +22,17 @@ void CpuEmbedSum::configure(const ITensorInfo *token,
                             ITensorInfo *output,
                             const EmbeddingLayerInfo &emb_info)
 {
-    std::cout << "1"<< std::endl;
     _add_kernel_1 = std::make_unique<kernels::CpuAddKernel>();
     _add_kernel_2 = std::make_unique<kernels::CpuAddKernel>();
 
-    std::cout << "2"<< std::endl;
-
     _add_kernel_1->configure(token,segemnt,&_tmp_token_segment,emb_info.c_policy());
-
-    std::cout << "3"<< std::endl;
     
     _aux_mem[TokenSegmentOutput] =
                 experimental::MemoryInfo(offset_int_vec(TokenSegmentOutput),
                                          experimental::MemoryLifetime::Persistent,
                                          _tmp_token_segment.total_size());
-
-    std::cout << "4"<< std::endl;
     
     _add_kernel_2->configure(&_tmp_token_segment,position,output,emb_info.c_policy());
-
-    std::cout << "5"<< std::endl;
 }
 
 Status
