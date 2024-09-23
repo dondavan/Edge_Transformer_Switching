@@ -34,24 +34,18 @@ void NEEmbeddingSumLayer::configure(ITensor *token, ITensor *segment, ITensor *p
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    std::cout << "1 " << std::endl;
+
     _impl->token    = token;
     _impl->segment  = segment;
     _impl->position = position;
     _impl->dst      = output;
 
-    std::cout << "2 " << std::endl;
-
     _impl->op = std::make_unique<cpu::CpuEmbedSum>();
-
-    std::cout << "3 " << std::endl;
     _impl->op->configure(_impl->token->info(),
                          _impl->segment->info(),
                          _impl->position->info(),
                          _impl->dst->info(),
                          emb_info);
-    
-    std::cout << "4 " << std::endl;
 
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
