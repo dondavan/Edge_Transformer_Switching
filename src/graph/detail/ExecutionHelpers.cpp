@@ -147,9 +147,18 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
         auto node = g.node(node_id);
         if (node != nullptr)
         {
+            std::cout << "assigned_target" <<std::endl;
             Target                     assigned_target = node->assigned_target();
+            std::cout << "assigned_target" <<std::endl;
+
+            std::cout << " backends::IDeviceBackend  &backend" <<std::endl;
             backends::IDeviceBackend  &backend         = backends::BackendRegistry::get().get_backend(assigned_target);
+            std::cout << " backends::IDeviceBackend  &backend" <<std::endl;
+
+            std::cout << " std::unique_ptr<IFunction> func" <<std::endl;
             std::unique_ptr<IFunction> func            = backend.configure_node(*node, ctx);
+
+            std::cout << " std::unique_ptr<IFunction> func" <<std::endl;
             if (func != nullptr || is_utility_node(node))
             {
                 workload.tasks.emplace_back(ExecutionTask(std::move(func), node));
