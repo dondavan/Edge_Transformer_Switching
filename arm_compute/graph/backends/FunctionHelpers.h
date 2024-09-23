@@ -116,7 +116,6 @@ std::unique_ptr<IFunction> create_activation_layer(ActivationLayerNode &node)
                         << " Activation function: " << act_info.activation() << " a: " << act_info.a() << " b: "
                         << act_info.b() << " InPlace : " << is_in_place_operation(input, output) << std::endl);
 
-    std::cout << "ActivationLayerNode create " <<std::endl;
     return func;
 }
 
@@ -1778,34 +1777,18 @@ std::unique_ptr<IFunction> create_position_embedding_layer(PositionEmbeddingLaye
 template <typename EmbeddingSumLayerFunction, typename TargetInfo>
 std::unique_ptr<IFunction> create_embedding_sum_layer(EmbeddingSumLayerNode &node)
 {
-    std::cout << "1" << std::endl;
     validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
 
-
-    std::cout << "2" << std::endl;
     // Extract IO and info
     typename TargetInfo::TensorType *token      = get_backing_tensor<TargetInfo>(node.input(0));
-
-    std::cout << "3" << std::endl;
     typename TargetInfo::TensorType *segment    = get_backing_tensor<TargetInfo>(node.input(1));
-
-    std::cout << "4" << std::endl;
     typename TargetInfo::TensorType *position   = get_backing_tensor<TargetInfo>(node.input(2));
-
-    std::cout << "5" << std::endl;
     typename TargetInfo::TensorType *output     = get_backing_tensor<TargetInfo>(node.output(0));
-
-    std::cout << "6" << std::endl;
     const EmbeddingLayerInfo info = node.embedding_sum_info();
 
-    std::cout << "7" << std::endl;
     // Create function
     auto func = std::make_unique<EmbeddingSumLayerFunction>();
-
-    std::cout << "8" << std::endl;
     func->configure(token,segment,position,output,info);
-
-    std::cout << "9" << std::endl;
 
     return func;
 }
