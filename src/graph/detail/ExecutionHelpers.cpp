@@ -156,6 +156,7 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
             std::cout << " backends::IDeviceBackend  &backend" <<std::endl;
 
             std::cout << " std::unique_ptr<IFunction> func" <<std::endl;
+            std::cout << node->name() << std::endl;
             std::unique_ptr<IFunction> func            = backend.configure_node(*node, ctx);
 
             std::cout << " std::unique_ptr<IFunction> func" <<std::endl;
