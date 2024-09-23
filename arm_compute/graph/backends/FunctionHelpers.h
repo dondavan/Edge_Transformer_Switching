@@ -1801,9 +1801,11 @@ std::unique_ptr<IFunction> create_embedding_sum_layer(EmbeddingSumLayerNode &nod
     std::cout << "7" << std::endl;
     // Create function
     auto func = std::make_unique<EmbeddingSumLayerFunction>();
-    func->configure(token,segment,position,output,info);
 
     std::cout << "8" << std::endl;
+    func->configure(token,segment,position,output,info);
+
+    std::cout << "9" << std::endl;
 
     return func;
 }
