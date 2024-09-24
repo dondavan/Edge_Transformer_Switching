@@ -277,13 +277,16 @@ validate_and_configure_window_for_arithmetic_operators(ITensorInfo &src1, ITenso
     std::cout << "src1.tensor_shape().x(): " << src1.tensor_shape().x() << std::endl;
     std::cout << "src1.tensor_shape().y(): " << src1.tensor_shape().y() << std::endl;
     std::cout << "src1.tensor_shape().z(): " << src1.tensor_shape().z() << std::endl;
+    std::cout << "src2.tensor_shape().x(): " << src2.tensor_shape().x() << std::endl;
+    std::cout << "src2.tensor_shape().y(): " << src2.tensor_shape().y() << std::endl;
+    std::cout << "src2.tensor_shape().z(): " << src2.tensor_shape().z() << std::endl;
     // Auto initialize dst if not initialized
-    const TensorShape &dst_shape = TensorShape::broadcast_shape(src1.tensor_shape());
+    const TensorShape &dst_shape = TensorShape::broadcast_shape(src2.tensor_shape());
 
     std::cout << "dst_shape.x(): " << dst_shape.x() << std::endl;
     std::cout << "dst_shape.y(): " << dst_shape.y() << std::endl;
     std::cout << "dst_shape.z(): " << dst_shape.z() << std::endl;
-    auto_init_if_empty(dst, src1.clone()->set_tensor_shape(dst_shape));
+    auto_init_if_empty(dst, src2.clone()->set_tensor_shape(dst_shape));
     // Explicitly set the tensor shape to preserve dimensions
     dst.set_tensor_shape(dst_shape);
 
