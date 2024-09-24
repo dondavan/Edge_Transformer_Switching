@@ -277,45 +277,16 @@ validate_and_configure_window_for_arithmetic_operators(ITensorInfo &src1, ITenso
 std::pair<Status, Window>
 validate_and_configure_window_for_logical_binary_operators(ITensorInfo &src1, ITensorInfo &src2, ITensorInfo &dst)
 {
-    /*
-    const std::pair<TensorShape, ValidRegion> broadcast_pair =
-        ITensorInfo::broadcast_shape_and_valid_region(src1, src2);
-    const TensorShape &out_shape = broadcast_pair.first;
-    
-    set_shape_if_empty(dst, out_shape);
-    set_data_type_if_unknown(dst, DataType::U8);
-    */
-
-    // Auto initialize dst if not initialized
     const std::pair<TensorShape, ValidRegion> broadcast_pair =
         ITensorInfo::broadcast_shape_and_valid_region(src1, src2);
     const TensorShape &out_shape = broadcast_pair.first;
 
-
-    std::cout << "src1->tensor_shape().x(): " << src1.tensor_shape().x() << std::endl;
-    std::cout << "src1->tensor_shape().y(): " << src1.tensor_shape().y() << std::endl;
-    std::cout << "src1->tensor_shape().z(): " << src1.tensor_shape().z() << std::endl;
-    std::cout << "src2->tensor_shape().x(): " << src2.tensor_shape().x() << std::endl;
-    std::cout << "src2->tensor_shape().y(): " << src2.tensor_shape().y() << std::endl;
-    std::cout << "src2->tensor_shape().z(): " << src2.tensor_shape().z() << std::endl;
-
-    std::cout << "dst_shape.x(): " << out_shape.x() << std::endl;
-    std::cout << "dst_shape.y(): " << out_shape.y() << std::endl;
-    std::cout << "dst_shape.z(): " << out_shape.z() << std::endl;
-    auto_init_if_empty(dst, src1.clone()->set_tensor_shape(out_shape));
-    // Explicitly set the tensor shape to preserve dimensions
     set_shape_if_empty(dst, out_shape);
-
-
-    std::cout << "dst->tensor_shape().x(): " << dst.tensor_shape().x() << std::endl;
-    std::cout << "dst->tensor_shape().y(): " << dst.tensor_shape().y() << std::endl;
-    std::cout << "dst->tensor_shape().z(): " << dst.tensor_shape().z() << std::endl;
-
-    std::cout << "dst.dimension(0): " << dst.dimension(0) << std::endl;
-    std::cout << "dst.dimension(1): " << dst.dimension(1) << std::endl;
-    std::cout << "dst.dimension(2): " << dst.dimension(2) << std::endl;
-
     set_data_type_if_unknown(dst, DataType::U8);
+
+    std::cout << "validate_and_configure_window_for_logical_binary_operators dst.dimension(0): " << dst.dimension(0) << std::endl;
+    std::cout << "validate_and_configure_window_for_logical_binary_operators dst.dimension(1): " << dst.dimension(1) << std::endl;
+    std::cout << "validate_and_configure_window_for_logical_binary_operators dst.dimension(2): " << dst.dimension(2) << std::endl;
 
     return configure_window_arithmetic_common(dst);
 }
@@ -343,6 +314,33 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
                                            ITensorInfo            *src2,
                                            ITensorInfo            *dst)
 {
+    /*
+    // Auto initialize dst if not initialized
+    const TensorShape &dst_shape = TensorShape::broadcast_shape(src1->tensor_shape());
+
+    std::cout << "src1->tensor_shape().x(): " << src1->tensor_shape().x() << std::endl;
+    std::cout << "src1->tensor_shape().y(): " << src1->tensor_shape().y() << std::endl;
+    std::cout << "src1->tensor_shape().z(): " << src1->tensor_shape().z() << std::endl;
+    std::cout << "src2->tensor_shape().x(): " << src2->tensor_shape().x() << std::endl;
+    std::cout << "src2->tensor_shape().y(): " << src2->tensor_shape().y() << std::endl;
+    std::cout << "src2->tensor_shape().z(): " << src2->tensor_shape().z() << std::endl;
+
+    std::cout << "dst_shape.x(): " << dst_shape.x() << std::endl;
+    std::cout << "dst_shape.y(): " << dst_shape.y() << std::endl;
+    std::cout << "dst_shape.z(): " << dst_shape.z() << std::endl;
+    auto_init_if_empty(*dst, src1->clone()->set_tensor_shape(dst_shape));
+    // Explicitly set the tensor shape to preserve dimensions
+    dst->set_tensor_shape(dst_shape);
+
+
+    std::cout << "dst->tensor_shape().x(): " << dst->tensor_shape().x() << std::endl;
+    std::cout << "dst->tensor_shape().y(): " << dst->tensor_shape().y() << std::endl;
+    std::cout << "dst->tensor_shape().z(): " << dst->tensor_shape().z() << std::endl;
+
+    std::cout << "dst.dimension(0): " << (*dst).dimension(0) << std::endl;
+    std::cout << "dst.dimension(1): " << (*dst).dimension(1) << std::endl;
+    std::cout << "dst.dimension(2): " << (*dst).dimension(2) << std::endl;
+    */
     // Configure kernel window
     auto win_config = validate_and_configure_window(*src1, *src2, *dst);
     ARM_COMPUTE_ERROR_THROW_ON(win_config.first);
