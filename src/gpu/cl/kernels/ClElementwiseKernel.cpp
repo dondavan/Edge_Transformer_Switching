@@ -310,6 +310,12 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
                                            ITensorInfo            *src2,
                                            ITensorInfo            *dst)
 {
+    // Auto initialize dst if not initialized
+    const TensorShape &dst_shape = TensorShape::broadcast_shape(src1->tensor_shape(),src2->tensor_shape());
+    auto_init_if_empty(*dst, src1->clone()->set_tensor_shape(dst_shape));
+    // Explicitly set the tensor shape to preserve dimensions
+    set_shape_if_empty(*dst, dst_shape);
+
     // Configure kernel window
     auto win_config = validate_and_configure_window(*src1, *src2, *dst);
     ARM_COMPUTE_ERROR_THROW_ON(win_config.first);
