@@ -96,14 +96,14 @@ void ClSoftmaxKernel::configure(const CLCompileContext  &compile_context,
     ARM_COMPUTE_UNUSED(compile_context, src, dst, info);
 
     /* Init dst shape if output and input are not same tensor */
-    TensorShape dst_shape = src.tensor_shape();
+    TensorShape target_dst_shape = src.tensor_shape();
     if(dst.tensor_shape().total_size() == 0)
     {
-        auto_init_if_empty(dst, src.clone()->set_tensor_shape(dst_shape));
+        auto_init_if_empty(dst, src.clone()->set_tensor_shape(target_dst_shape));
     }
     // Explicitly set the tensor shape to preserve dimensions
-    dst.set_tensor_shape(dst_shape);
-    
+    dst.set_tensor_shape(target_dst_shape);
+
     const auto &dst_shape = dst.tensor_shape();
 
     const auto data_type    = src.data_type();
