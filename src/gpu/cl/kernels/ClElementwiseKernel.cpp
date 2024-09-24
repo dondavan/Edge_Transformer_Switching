@@ -273,6 +273,10 @@ validate_and_configure_window_for_arithmetic_operators(ITensorInfo &src1, ITenso
     auto_init_if_empty(dst, out_shape, 1, src1.data_type());
     */
     ARM_COMPUTE_UNUSED(src2);
+
+    std::cout << "src1.tensor_shape().x(): " << src1.tensor_shape().x() << std::endl;
+    std::cout << "src1.tensor_shape().y(): " << src1.tensor_shape().y() << std::endl;
+    std::cout << "src1.tensor_shape().z(): " << src1.tensor_shape().z() << std::endl;
     // Auto initialize dst if not initialized
     const TensorShape &dst_shape = TensorShape::broadcast_shape(src1.tensor_shape());
 
