@@ -211,6 +211,16 @@ CLBuildOptions generate_build_options_with_arithmetic_rules(const ITensorInfo &s
     std::cout << "dst.dimension(1): " << dst.dimension(1) << std::endl;
     std::cout << "dst.dimension(2): " << dst.dimension(2) << std::endl;
 
+
+    std::cout << "src1.dimension(0): " << src1.dimension(0) << std::endl;
+    std::cout << "src1.dimension(1): " << src1.dimension(1) << std::endl;
+    std::cout << "src1.dimension(2): " << src1.dimension(2) << std::endl;
+
+
+    std::cout << "src2.dimension(0): " << src2.dimension(0) << std::endl;
+    std::cout << "src2.dimension(1): " << src2.dimension(1) << std::endl;
+    std::cout << "src2.dimension(2): " << src2.dimension(2) << std::endl;
+
     build_opts.add_option("-DDATA_TYPE=" + get_cl_type_from_data_type(src1.data_type()));
     build_opts.add_option("-DVEC_SIZE_IN1=" +
                           support::cpp11::to_string(src1.dimension(0) == 1 ? 1 : num_elems_processed_per_iteration));
