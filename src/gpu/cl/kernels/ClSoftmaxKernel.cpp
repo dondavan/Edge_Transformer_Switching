@@ -94,17 +94,14 @@ void ClSoftmaxKernel::configure(const CLCompileContext  &compile_context,
                                 const SoftmaxKernelInfo &info)
 {
     ARM_COMPUTE_UNUSED(compile_context, src, dst, info);
-
-    /* Init dst shape if output and input are not same tensor */
-    TensorShape target_dst_shape = src.tensor_shape();
-    if(dst.tensor_shape().total_size() == 0)
-    {
-        auto_init_if_empty(dst, src.clone()->set_tensor_shape(target_dst_shape));
-    }
+    
+    // Auto initialize dst if not initialized
+    const TensorShape &dst_shape = TensorShape::broadcast_shape(src.tensor_shape());
+    auto_init_if_empty(dst, src.clone()->set_tensor_shape(dst_shape));
     // Explicitly set the tensor shape to preserve dimensions
-    dst.set_tensor_shape(target_dst_shape);
+    set_shape_if_empty(dst, dst_shape);
 
-    const auto &dst_shape = dst.tensor_shape();
+    //const auto &dst_shape = dst.tensor_shape();
 
     const auto data_type    = src.data_type();
     const auto element_size = src.element_size();
