@@ -204,6 +204,12 @@ CLBuildOptions generate_build_options_with_arithmetic_rules(const ITensorInfo &s
 
     const unsigned int num_elems_processed_per_iteration =
         adjust_vec_size(vector_size_byte_opencl / dst.element_size(), dst.dimension(0));
+    std::cout << "num_elems_processed_per_iteration: " << num_elems_processed_per_iteration << std::endl;
+    std::cout << "vector_size_byte_opencl: " << vector_size_byte_opencl << std::endl;
+    std::cout << "dst.element_size(): " << dst.element_size() << std::endl;
+    std::cout << "dst.dimension(0): " << dst.dimension(0) << std::endl;
+    std::cout << "dst.dimension(1): " << dst.dimension(1) << std::endl;
+    std::cout << "dst.dimension(2): " << dst.dimension(2) << std::endl;
 
     build_opts.add_option("-DDATA_TYPE=" + get_cl_type_from_data_type(src1.data_type()));
     build_opts.add_option("-DVEC_SIZE_IN1=" +
