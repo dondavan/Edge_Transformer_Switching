@@ -140,36 +140,22 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
     // Reserve memory for tasks
     workload.tasks.reserve(node_order.size());
 
-    std::cout << "switching/src/graph/detail/ExecutionHelpers.cpp Create tasks start:" << std::endl;
     // Create tasks
     for (auto &node_id : node_order)
     {
         auto node = g.node(node_id);
         if (node != nullptr)
         {
-            std::cout << "assigned_target" <<std::endl;
             Target                     assigned_target = node->assigned_target();
-            std::cout << "assigned_target" <<std::endl;
-
-            std::cout << " backends::IDeviceBackend  &backend" <<std::endl;
             backends::IDeviceBackend  &backend         = backends::BackendRegistry::get().get_backend(assigned_target);
-            std::cout << " backends::IDeviceBackend  &backend" <<std::endl;
-
-            std::cout << " std::unique_ptr<IFunction> func" <<std::endl;
-            std::cout << node->name() << std::endl;
             std::unique_ptr<IFunction> func            = backend.configure_node(*node, ctx);
-
-            std::cout << " std::unique_ptr<IFunction> func" <<std::endl;
             if (func != nullptr || is_utility_node(node))
             {
                 workload.tasks.emplace_back(ExecutionTask(std::move(func), node));
             }
         }
     }
-    std::cout << "switching/src/graph/detail/ExecutionHelpers.cpp Create tasks end:" << std::endl;
 
-
-    std::cout << "switching/src/graph/detail/ExecutionHelpers.cpp Add inputs and outputs start:" << std::endl;
     // Add inputs and outputs
     for (auto &node : g.nodes())
     {
@@ -188,7 +174,6 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
             continue;
         }
     }
-    std::cout << "switching/src/graph/detail/ExecutionHelpers.cpp Add inputs and outputs end:" << std::endl;
 
     return workload;
 }
