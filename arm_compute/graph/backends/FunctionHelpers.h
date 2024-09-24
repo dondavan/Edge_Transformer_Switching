@@ -98,7 +98,6 @@ void validate_node(const INode &node, size_t num_expected_inputs, size_t num_exp
 template <typename ActivationLayerFunction, typename TargetInfo>
 std::unique_ptr<IFunction> create_activation_layer(ActivationLayerNode &node)
 {
-    std::cout << "ActivationLayerNode create " <<std::endl;
     validate_node<TargetInfo>(node, 1 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
