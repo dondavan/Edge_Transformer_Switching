@@ -108,6 +108,10 @@ void ClSoftmaxKernel::configure(const CLCompileContext  &compile_context,
 
     const auto tmp_data_type = is_quantized ? DataType::F32 : data_type;
 
+    std::cout << "element_size " << element_size << std::endl;
+    std::cout << "dst_shape[0] " << dst_shape[0]<< std::endl;
+    std::cout << "dst_shape[1] " << dst_shape[1]<< std::endl;
+    std::cout << "dst_shape[2] " << dst_shape[2]<< std::endl;
     const auto vec_size          = adjust_vec_size(16 / element_size, dst_shape[0]);
     const auto vec_size_leftover = dst_shape[0] % vec_size;
 
