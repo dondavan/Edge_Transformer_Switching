@@ -333,6 +333,10 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
     std::cout << "dst->tensor_shape().y(): " << dst->tensor_shape().y() << std::endl;
     std::cout << "dst->tensor_shape().z(): " << dst->tensor_shape().z() << std::endl;
 
+    std::cout << "dst.dimension(0): " << (*dst).dimension(0) << std::endl;
+    std::cout << "dst.dimension(1): " << (*dst).dimension(1) << std::endl;
+    std::cout << "dst.dimension(2): " << (*dst).dimension(2) << std::endl;
+
     // Configure kernel window
     auto win_config = validate_and_configure_window(*src1, *src2, *dst);
     ARM_COMPUTE_ERROR_THROW_ON(win_config.first);
