@@ -312,6 +312,11 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
 {
     // Auto initialize dst if not initialized
     const TensorShape &dst_shape = TensorShape::broadcast_shape(src1->tensor_shape(),src2->tensor_shape());
+
+
+    std::cout << "dst_shape.x(): " << dst_shape.x() << std::endl;
+    std::cout << "dst_shape.y(): " << dst_shape.y() << std::endl;
+    std::cout << "dst_shape.z(): " << dst_shape.z() << std::endl;
     auto_init_if_empty(*dst, src1->clone()->set_tensor_shape(dst_shape));
     // Explicitly set the tensor shape to preserve dimensions
     set_shape_if_empty(*dst, dst_shape);
