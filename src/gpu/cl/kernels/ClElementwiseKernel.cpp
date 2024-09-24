@@ -299,6 +299,7 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
     ARM_COMPUTE_ERROR_THROW_ON(win_config.first);
 
     std::string kernel_name = "elementwise_operation_" + name();
+    std::cout << "kernel_name: start  " << kernel_name << std::endl;
     if (is_data_type_quantized(src1->data_type()))
     {
         kernel_name += "_quantized";
@@ -315,6 +316,7 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
 
     // Create kernel
     _kernel = create_kernel(compile_context, kernel_name, build_opts.options());
+    std::cout << "kernel_name: created  " << kernel_name << std::endl;
 
     ICLKernel::configure_internal(win_config.second);
 
