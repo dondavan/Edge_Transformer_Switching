@@ -82,12 +82,13 @@ void ClLinearKernel::configure(const CLCompileContext &compile_context,
     kernel_name += matmul_kernel_info.adj_lhs ? "_t" : "_nt";
     kernel_name += matmul_kernel_info.adj_rhs ? "_t" : "_nt";
 
-    std::cout << kernel_name << std::endl;
+    std::cout << kernel_name << " start" << std::endl;
     // A macro guard to compile ONLY the kernel of interest 
     build_opts.add_option("-D" + upper_string(kernel_name));
 
     // Create kernel
     _kernel = create_kernel(compile_context, kernel_name, build_opts.options());
+    std::cout << kernel_name << " created" << std::endl;
 }
 
 Status ClLinearKernel::validate(const ITensorInfo *src, const ITensorInfo *vector, ITensorInfo *dst)

@@ -160,8 +160,9 @@ void ClSoftmaxKernel::configure(const CLCompileContext  &compile_context,
 
         _tmp_info = TensorInfo(tmp_shape, 1, tmp_data_type);
     }
-
+    std::cout << kernel_name << " start" << std::endl;
     _kernel = create_kernel(compile_context, kernel_name, build_opts.options());
+    std::cout << kernel_name << " end" << std::endl;
 
     // Configure kernel window and kernel arguments.
     Window win = calculate_max_window(src, Steps(vec_size));

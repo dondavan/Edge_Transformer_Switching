@@ -77,8 +77,10 @@ void ClReshapeKernel::configure(const CLCompileContext &compile_context, const I
 
     // Create kernel
     std::set<std::string> build_opts = {"-DDATA_TYPE=" + get_cl_unsigned_type_from_element_size(src->element_size())};
-    _kernel                          = create_kernel(compile_context, "reshape_layer", build_opts);
 
+    std::cout << "reshape_layer start" << std::endl;
+    _kernel                          = create_kernel(compile_context, "reshape_layer", build_opts);
+    std::cout << "reshape_layer created" << std::endl;
     // Add static arguments
     const cl_int2 src_shape = {
         {static_cast<cl_int>(src->tensor_shape()[0]), static_cast<cl_int>(src->tensor_shape()[1])}};

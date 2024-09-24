@@ -109,8 +109,9 @@ void ClPermuteKernel::configure(const CLCompileContext  &compile_context,
     build_opts.add_option("-DP3=" + support::cpp11::to_string((_perm.num_dimensions() >= 3) ? perm[2] : 2));
     build_opts.add_option("-DP4=" + support::cpp11::to_string((_perm.num_dimensions() >= 4) ? perm[3] : 3));
 
+    std::cout << "permute start" << std::endl;
     _kernel = create_kernel(compile_context, "permute", build_opts.options());
-
+    std::cout << "permute created" << std::endl;
     // Configure  kernel window
     Window win = calculate_max_window(*src, Steps());
 
