@@ -115,12 +115,14 @@ void ClScaleDotProduction::configure(const ClCompileContext                     
     product_mm_kernel->set_target(gpu_target);
     product_mm_kernel->configure(compile_context, &_permuted_query, &_permuted_key, nullptr, &_scaled_query_key, scale, 0, mm_kernel_info_qk);
     _product_mm_kernel = std::move(product_mm_kernel);
-
+    
+    /*
     //  Softmax of previous product
     SoftmaxKernelInfo softmax_info{ 1.0f, false, query->data_type(), 0 };
     auto              softmax_kernel = std::make_unique<kernels::ClSoftmaxKernel>();
     softmax_kernel->configure(compile_context, _scaled_query_key, _softmaxed_product, softmax_info);
     _softmax_kernel = std::move(softmax_kernel);
+    */
 
     // Specify whether transpose weights is necessary in matmul info
     const MatMulInfo mat_info_pv = MatMulInfo();
@@ -132,12 +134,12 @@ void ClScaleDotProduction::configure(const ClCompileContext                     
     // 2. Use heuristics to get kernel info object
     std::unique_ptr<cl_matmul::IClMatMulNativeKernelConfig> kernel_config_pv =
         cl_matmul::ClMatMulNativeKernelConfigurationFactory::create(gpu_target);
-    MatMulKernelInfo mm_kernel_info_pv = kernel_config_pv->configure(&_softmaxed_product, &_permuted_value, mat_info_pv);
+    MatMulKernelInfo mm_kernel_info_pv = kernel_config_pv->configure(&_scaled_query_key, &_permuted_value, mat_info_pv);
 
     //  Multiply between scaled product and value
     auto context_mm_kernel = std::make_unique<kernels::ClLinearKernel>();
     context_mm_kernel->set_target(gpu_target);
-    context_mm_kernel->configure(compile_context, &_softmaxed_product, &_permuted_value, nullptr, &_gemmed_context, 1.0f, 0, mm_kernel_info_pv);
+    context_mm_kernel->configure(compile_context, &_scaled_query_key, &_permuted_value, nullptr, &_gemmed_context, 1.0f, 0, mm_kernel_info_pv);
     _context_mm_kernel = std::move(context_mm_kernel);
 
     // Concat multi-Head reshape
@@ -273,6 +275,7 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "MMUL QK cost: " << cost_time << std::endl;
 #endif
 
+    /*
     // Softmax scaled product
     ITensorPack softmax_pack = { { ACL_SRC, scaled_query_key.get() }, { ACL_DST, softmaxed_product.get() } };
 #ifdef MEASURE_TIME
@@ -285,9 +288,10 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
     measure_out.precision(5);
     measure_out << std::scientific << "softmax cost: " << cost_time << std::endl;
 #endif
+*/
 
     // Run matrix multiply compute multi-head attention between Context and Value
-    ITensorPack gemm_context_pack{ { ACL_SRC_0, softmaxed_product.get() }, { ACL_SRC_1, permuted_value.get() }, { ACL_DST, gemmed_context.get() } };
+    ITensorPack gemm_context_pack{ { ACL_SRC_0, scaled_query_key.get() }, { ACL_SRC_1, permuted_value.get() }, { ACL_DST, gemmed_context.get() } };
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
 #endif
