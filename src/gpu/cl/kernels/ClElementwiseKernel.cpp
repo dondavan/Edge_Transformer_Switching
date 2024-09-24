@@ -326,7 +326,7 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
     std::cout << "dst_shape.z(): " << dst_shape.z() << std::endl;
     auto_init_if_empty(*dst, src1->clone()->set_tensor_shape(dst_shape));
     // Explicitly set the tensor shape to preserve dimensions
-    set_shape_if_empty(*dst, dst_shape);
+    dst->set_tensor_shape(dst_shape);
 
 
     std::cout << "dst->tensor_shape().x(): " << dst->tensor_shape().x() << std::endl;
