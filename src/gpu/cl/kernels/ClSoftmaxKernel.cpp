@@ -117,6 +117,7 @@ void ClSoftmaxKernel::configure(const CLCompileContext  &compile_context,
     build_opts.add_option("-DDATA_TYPE=" + get_cl_type_from_data_type(data_type));
     build_opts.add_option("-DTMP_DATA_TYPE=" + get_cl_type_from_data_type(tmp_data_type));
     build_opts.add_option("-DVEC_SIZE=" + support::cpp11::to_string(vec_size));
+    std::cout << "VEC_SICE: " <<support::cpp11::to_string(vec_size) << std::endl;
     build_opts.add_option("-DVEC_SIZE_LEFTOVER=" + support::cpp11::to_string(vec_size_leftover));
     build_opts.add_option("-DLENGTH=" + support::cpp11::to_string(length));
     build_opts.add_option_if(info.is_log, "-DIS_LOG");
