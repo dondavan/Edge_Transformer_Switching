@@ -311,7 +311,7 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
                                            ITensorInfo            *dst)
 {
     // Auto initialize dst if not initialized
-    const TensorShape &dst_shape = TensorShape::broadcast_shape(src1->tensor_shape(),src2->tensor_shape());
+    const TensorShape &dst_shape = TensorShape::broadcast_shape(src1->tensor_shape());
 
 
     std::cout << "src1->tensor_shape().x(): " << src1->tensor_shape().x() << std::endl;
