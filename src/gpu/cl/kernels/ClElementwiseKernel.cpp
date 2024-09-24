@@ -314,6 +314,13 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
     const TensorShape &dst_shape = TensorShape::broadcast_shape(src1->tensor_shape(),src2->tensor_shape());
 
 
+    std::cout << "src1->tensor_shape().x(): " << src1->tensor_shape().x() << std::endl;
+    std::cout << "src1->tensor_shape().y(): " << src1->tensor_shape().y() << std::endl;
+    std::cout << "src1->tensor_shape().z(): " << src1->tensor_shape().z() << std::endl;
+    std::cout << "src2->tensor_shape().x(): " << src2->tensor_shape().x() << std::endl;
+    std::cout << "src2->tensor_shape().y(): " << src2->tensor_shape().y() << std::endl;
+    std::cout << "src2->tensor_shape().z(): " << src2->tensor_shape().z() << std::endl;
+
     std::cout << "dst_shape.x(): " << dst_shape.x() << std::endl;
     std::cout << "dst_shape.y(): " << dst_shape.y() << std::endl;
     std::cout << "dst_shape.z(): " << dst_shape.z() << std::endl;
