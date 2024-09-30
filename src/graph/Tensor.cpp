@@ -87,14 +87,18 @@ bool Tensor::call_accessor()
     std::cout << "3" << std::endl;
     if (access_data)
     {
+        std::cout << "3.1" << std::endl;
         // Map tensor
         _handle->map(true);
+
+        std::cout << "3.2" << std::endl;
 
         // Return in case of null backend buffer
         if (_handle->tensor().buffer() == nullptr)
         {
             return false;
         }
+        std::cout << "3.3" << std::endl;
     }
 
     std::cout << "4" << std::endl;
