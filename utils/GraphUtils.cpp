@@ -821,7 +821,7 @@ TokenAccessor::TokenAccessor(std::string filename, std::string vocabname, std::u
 
 bool TokenAccessor::access_tensor(ITensor &tensor)
 {
-    std::cout << "switching/utils/GraphUtils.cpp token access " << std::endll;
+    std::cout << "switching/utils/GraphUtils.cpp token access " << std::endl;
     if (!_already_loaded)
     {
         auto textloader = utils::TextLoaderFactory::create(_filename);
