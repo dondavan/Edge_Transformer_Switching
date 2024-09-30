@@ -226,6 +226,8 @@ bool call_all_input_node_accessors(ExecutionWorkload &workload)
     std::for_each(std::begin(workload.inputs), std::end(workload.inputs),
                   [&](Tensor *input_tensor)
                   {
+                    if(input_tensor == nullptr) std::cout <<  "null tensor" << std::endl;
+                       else std::cout <<  "good tensor" << std::endl;
                       bool valid_input = (input_tensor != nullptr) && input_tensor->call_accessor();
                       if(valid_input) std::cout <<  "valid_input" << std::endl;
                        else std::cout <<  "not valid" << std::endl;
