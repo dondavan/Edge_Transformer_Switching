@@ -117,6 +117,9 @@ std::unique_ptr<ITensorHandle> NEDeviceBackend::create_tensor(const Tensor &tens
 
     // Create backend tensor handle
     TensorInfo info(tensor_desc.shape, 1, tensor_desc.data_type, tensor_desc.quant_info);
+    std::cout << "tensor_desc.shape.x() " <<tensor_desc.shape.x() << std::endl;
+    std::cout << "tensor_desc.shape.y() " <<tensor_desc.shape.y() << std::endl;
+    std::cout << "tensor_desc.shape.z() " <<tensor_desc.shape.z() << std::endl;
     info.set_data_layout(tensor_desc.layout);
 
     return std::make_unique<NETensorHandle>(info);
