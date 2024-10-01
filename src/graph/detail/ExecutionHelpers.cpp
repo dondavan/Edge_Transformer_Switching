@@ -244,6 +244,7 @@ void prepare_all_tasks(ExecutionWorkload &workload)
 
 void call_all_tasks(ExecutionWorkload &workload)
 {
+    std::cout << "call_all_tasks 1 " << std::endl;
     ARM_COMPUTE_ERROR_ON(workload.ctx == nullptr);
 
     // Acquire memory for the transition buffers
@@ -255,11 +256,15 @@ void call_all_tasks(ExecutionWorkload &workload)
         }
     }
 
+    std::cout << "call_all_tasks 2 " << std::endl;
+
     // Execute tasks
     for (auto &task : workload.tasks)
     {
         task();
     }
+
+    std::cout << "call_all_tasks 3 " << std::endl;
 
     // Release memory for the transition buffers
     for (auto &mm_ctx : workload.ctx->memory_managers())
@@ -269,6 +274,8 @@ void call_all_tasks(ExecutionWorkload &workload)
             mm_ctx.second.cross_group->release();
         }
     }
+
+    std::cout << "call_all_tasks 4 " << std::endl;
 }
 
 bool call_all_output_node_accessors(ExecutionWorkload &workload)
