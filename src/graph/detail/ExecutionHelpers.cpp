@@ -228,6 +228,7 @@ bool call_all_input_node_accessors(ExecutionWorkload &workload)
                   {
                       bool valid_input = (input_tensor != nullptr) && input_tensor->call_accessor();
                       is_valid         = is_valid && valid_input;
+                      std::cout << "call_all_input_node_accessors " << is_valid << std::endl;
                   });
     return is_valid;
 }
