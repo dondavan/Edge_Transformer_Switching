@@ -824,20 +824,27 @@ bool TokenAccessor::access_tensor(ITensor &tensor)
     std::cout << "switching/utils/GraphUtils.cpp token access " << std::endl;
     if (!_already_loaded)
     {
+
+    std::cout << "switching/utils/GraphUtils.cpp token access 1" << std::endl;
         auto textloader = utils::TextLoaderFactory::create(_filename);
         ARM_COMPUTE_EXIT_ON_MSG(textloader == nullptr, "Unsupported Text type");
 
+    std::cout << "switching/utils/GraphUtils.cpp token access 2" << std::endl;
         // Open a text feeder from file (ifstream)
         textloader->open(_filename);
         
+    std::cout << "switching/utils/GraphUtils.cpp token access 3" << std::endl;
         // Fill tensor with text
         textloader->fill_token(tensor,_vocabname);
 
+    std::cout << "switching/utils/GraphUtils.cpp token access 4" << std::endl;
         // Preprocess tensor
         if (_preprocessor)
         {
             _preprocessor->preprocess(tensor);
         }
+    
+    std::cout << "switching/utils/GraphUtils.cpp token access 5" << std::endl;
     }
 
     _already_loaded = !_already_loaded;
