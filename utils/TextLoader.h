@@ -157,6 +157,7 @@ class ITextLoader
             {
                 buffer += _feeder->get();
             }
+            std::cout << buffer << std::endl;
 
             const char start_token[] = u8"[CLS]";
             const char end_token[]   = u8"[SEP]";
@@ -182,6 +183,10 @@ class ITextLoader
 
             // [CLS]
             text_ids.push_back(token2id[start_token]);
+            for(auto id : text_ids)
+            {
+                std::cout << id << std::endl;
+            }
 
             // Input content
             utils::find_longest_matching<char>(tokens_vec, token2id, text_ids);
