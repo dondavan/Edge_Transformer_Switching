@@ -157,27 +157,19 @@ class ITextLoader
             {
                 buffer += _feeder->get();
             }
-            std::cout << buffer << std::endl;
 
             const char start_token[] = u8"[CLS]";
             const char end_token[]   = u8"[SEP]";
 
-            std::cout << "1" << std::endl;
             /** Sepreate into tokens and look up vocab list */
-            std::cout << vocabname << std::endl;
             std::map<std::basic_string<char>, int> token2id = utils::get_token2id(vocabname);
-            std::cout << "1.1" << std::endl;
             std::vector<unsigned int>              text_ids;
             std::vector<std::basic_string<char>>   tokens_vec;
-
-            std::cout << "2" << std::endl;
 
             /* Split the text into words */
             std::basic_string<char> pat = R"([[:punct:]]|[[:alpha:]]+|[[:digit:]]+)";
             std::regex              re(pat);
             std::smatch             m;
-
-            std::cout << "3" << std::endl;
 
             while(std::regex_search(buffer, m, re))
             {
@@ -188,14 +180,8 @@ class ITextLoader
                 buffer = m.suffix();
             }
 
-            std::cout << "4" << std::endl;
-
             // [CLS]
             text_ids.push_back(token2id[start_token]);
-            for(auto id : text_ids)
-            {
-                std::cout << id << std::endl;
-            }
 
             // Input content
             utils::find_longest_matching<char>(tokens_vec, token2id, text_ids);
