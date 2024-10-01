@@ -164,7 +164,6 @@ class ITextLoader
 
             std::cout << "1" << std::endl;
             /** Sepreate into tokens and look up vocab list */
-            std::map<std::basic_string<char>, int> token2id = utils::get_token2id(vocabname);
             std::vector<unsigned int>              text_ids;
             std::vector<std::basic_string<char>>   tokens_vec;
 
