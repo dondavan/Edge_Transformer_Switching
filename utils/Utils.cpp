@@ -319,18 +319,24 @@ TextType get_text_type_from_file(const std::string &filename)
 */
 std::map<std::string,int> get_token2id(std::string path_vocab)
 {
+    std::cout << "token 2 id 1" << std::endl;
     std::map<std::string,int> token2id;
 
     std::fstream fstream_vocab;
     fstream_vocab.open(path_vocab,std::ios::in);
+    std::cout << "token 2 id 2" << std::endl;
 
     std::string line;
+
+    std::cout << "token 2 id 3" << std::endl;
     while (getline(fstream_vocab,line))
     {   
         char *token     = strtok(const_cast<char*>(line.c_str()), " ");
         char *token_id  = strtok(nullptr, " "); // Continues previous str invocation
         token2id[token] = std::stoi(token_id);
     }
+
+    std::cout << "token 2 id 4" << std::endl;
     fstream_vocab.close();
 
     return token2id;
