@@ -26,6 +26,7 @@ namespace
 template <typename T>
 void run_position_embedding(const Window &window, const ITensor *src, const ITensor *vector, ITensor *dst)
 {
+    std::cout << "run_position_embedding" << std::endl;
     ARM_COMPUTE_UNUSED(src);
 
     Window win = window;
