@@ -117,7 +117,6 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
     // Prepare graph
     detail::prepare_all_tasks(workload);
 
-
     std::cout << "switching/src/graph/GraphManager.cpp Setup tensor memory start:" << std::endl;
     // Setup tensor memory (Allocate all tensors or setup transition manager)
     if (ctx.config().use_transition_memory_manager)
