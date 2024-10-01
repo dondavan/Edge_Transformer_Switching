@@ -198,7 +198,6 @@ class ITextLoader
                 [&](const Coordinates &)
                 {
                     *reinterpret_cast<unsigned int *>(out.ptr()) = text_ids[i];
-                    std::cout << "switching/utils/TextLoader.h" << text_ids[i] << std::endl;
                     i++;
                 },
                 out);
