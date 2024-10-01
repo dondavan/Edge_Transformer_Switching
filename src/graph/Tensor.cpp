@@ -74,47 +74,34 @@ std::unique_ptr<ITensorAccessor> Tensor::extract_accessor()
 
 bool Tensor::call_accessor()
 {
-    std::cout << "1" << std::endl;
     // Early exit guard
     if (!_accessor || !_handle)
     {
         return false;
     }
 
-    std::cout << "2" << std::endl;
     const bool access_data = _accessor->access_tensor_data();
 
-    std::cout << "3" << std::endl;
     if (access_data)
     {
-        std::cout << "3.1" << std::endl;
         // Map tensor
         _handle->map(true);
-
-        std::cout << "3.2" << std::endl;
 
         // Return in case of null backend buffer
         if (_handle->tensor().buffer() == nullptr)
         {
             return false;
         }
-        std::cout << "3.3" << std::endl;
     }
-
-    std::cout << "4" << std::endl;
 
     // Call accessor
     bool retval = _accessor->access_tensor(_handle->tensor());
-
-    std::cout << "5" << std::endl;
 
     if (access_data)
     {
         // Unmap tensor
         _handle->unmap();
     }
-
-    std::cout << "6" << std::endl;
 
     return retval;
 }
