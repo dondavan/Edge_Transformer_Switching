@@ -83,6 +83,8 @@ size_t CpuVectorizeKernel::get_mws(const CPUInfo &platform, size_t thread_count)
 
 void CpuVectorizeKernel::run_op(ITensorPack &tensors, const Window &window, const ThreadInfo &info)
 {
+
+    std::cout << "CpuVectorizeKernel::run_op 1" << std::endl;
     ARM_COMPUTE_UNUSED(info);
     ARM_COMPUTE_ERROR_ON_UNCONFIGURED_KERNEL(this);
     ARM_COMPUTE_ERROR_ON_INVALID_SUBWINDOW(IKernel::window(), window);
@@ -95,6 +97,8 @@ void CpuVectorizeKernel::run_op(ITensorPack &tensors, const Window &window, cons
     ITensor       *dst    = tensors.get_tensor(TensorType::ACL_DST);
 
     _run_method(src, vector, dst, window);
+
+    std::cout << "CpuVectorizeKernel::run_op 2" << std::endl;
 }
 
 const char *CpuVectorizeKernel::name() const
