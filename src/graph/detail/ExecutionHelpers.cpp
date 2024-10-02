@@ -120,7 +120,6 @@ void allocate_const_tensors(Graph &g)
 void allocate_all_tensors(Graph &g)
 {
     auto &tensors = g.tensors();
-    std::cout << " allocate_all_tensors(Graph &g)" <<std::endl;
 
     for (auto &tensor : tensors)
     {
@@ -128,10 +127,6 @@ void allocate_all_tensors(Graph &g)
             tensor->handle()->tensor().info()->is_resizable() && tensor->handle()->tensor().is_used())
         {
             tensor->handle()->allocate();
-            std::cout << "Yeahhhhhhh " <<std::endl;
-        }else
-        {
-            std::cout << "ehhhhhh " <<std::endl;
         }
     }
 }
@@ -233,7 +228,6 @@ bool call_all_input_node_accessors(ExecutionWorkload &workload)
                   {
                       bool valid_input = (input_tensor != nullptr) && input_tensor->call_accessor();
                       is_valid         = is_valid && valid_input;
-                      std::cout << "call_all_input_node_accessors " << is_valid << std::endl;
                   });
     return is_valid;
 }
@@ -250,7 +244,7 @@ void prepare_all_tasks(ExecutionWorkload &workload)
 
 void call_all_tasks(ExecutionWorkload &workload)
 {
-    std::cout << "call_all_tasks 1 " << std::endl;
+    std::cout << "call all task 1 " << std::endl;
     ARM_COMPUTE_ERROR_ON(workload.ctx == nullptr);
 
     // Acquire memory for the transition buffers
@@ -260,17 +254,16 @@ void call_all_tasks(ExecutionWorkload &workload)
         {
             mm_ctx.second.cross_group->acquire();
         }
-    }
+    }  
 
-    std::cout << "call_all_tasks 2 " << std::endl;
+    std::cout << "call all task 2 " << std::endl;
 
     // Execute tasks
     for (auto &task : workload.tasks)
     {
         task();
     }
-
-    std::cout << "call_all_tasks 3 " << std::endl;
+    std::cout << "call all task 3 " << std::endl;
 
     // Release memory for the transition buffers
     for (auto &mm_ctx : workload.ctx->memory_managers())
@@ -280,8 +273,7 @@ void call_all_tasks(ExecutionWorkload &workload)
             mm_ctx.second.cross_group->release();
         }
     }
-
-    std::cout << "call_all_tasks 4 " << std::endl;
+    std::cout << "call all task 4 " << std::endl;
 }
 
 bool call_all_output_node_accessors(ExecutionWorkload &workload)
