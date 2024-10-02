@@ -43,7 +43,7 @@ void run_position_embedding(const Window &window, const ITensor *src, const ITen
     Iterator vector_iter(vector,win);
 
     const auto dst_ptr      = reinterpret_cast<float *>(dst_iter.ptr());
-    const auto vector_ptr   = reinterpret_cast<float *>(vector_iter.ptr());
+    //const auto vector_ptr   = reinterpret_cast<float *>(vector_iter.ptr());
 
     std::cout << "run_position_embedding 1" << std::endl;
 
