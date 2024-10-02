@@ -44,7 +44,8 @@ void run_position_embedding(const Window &window, const ITensor *src, const ITen
 
     const auto dst_ptr      = reinterpret_cast<float *>(dst_iter.ptr());
     const auto vector_ptr   = reinterpret_cast<float *>(vector_iter.ptr());
-    ARM_COMPUTE_UNUSED(dst_ptr,vector_ptr);
+    std::cout << *dst_ptr << std::endl;
+    std::cout << *vector_ptr << std::endl;
 
     std::cout << "run_position_embedding 1" << std::endl;
 
@@ -57,6 +58,7 @@ void run_position_embedding(const Window &window, const ITensor *src, const ITen
             std::cout << "run_position_embedding 2" << std::endl;
                 offset_dst     = x * vector_depth;
                 offset_vector  = x * vector_depth;
+                std::memcpy(dst_ptr + offset_dst, vector_ptr + offset_vector, (vector_depth) * sizeof(*vector_ptr));  
                 
     std::cout << "run_position_embedding 3" << std::endl;          
             }
