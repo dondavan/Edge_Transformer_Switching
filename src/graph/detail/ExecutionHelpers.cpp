@@ -120,6 +120,7 @@ void allocate_const_tensors(Graph &g)
 void allocate_all_tensors(Graph &g)
 {
     auto &tensors = g.tensors();
+    std::cout << " allocate_all_tensors(Graph &g)" <<std::endl;
 
     for (auto &tensor : tensors)
     {
