@@ -74,8 +74,13 @@ void CpuPositionEmbeddingKernel::configure(const ITensorInfo *src, const ITensor
 {
     ARM_COMPUTE_ERROR_ON_NULLPTR(src, dst);
     ARM_COMPUTE_UNUSED(pos);
+    
     // Configure output tensor info.
     auto_init_if_empty(*dst, TensorInfo(*src->clone()));
+
+    std::cout << "switching/src/cpu/kernels/CpuVectorizeKernel.cpp " << dst->tensor_shape().x() << std::endl;
+    std::cout << "switching/src/cpu/kernels/CpuVectorizeKernel.cpp " << dst->tensor_shape().y() << std::endl;
+    std::cout << "switching/src/cpu/kernels/CpuVectorizeKernel.cpp " << dst->tensor_shape().z() << std::endl;
 
     // Configure kernel window
     Window win = calculate_max_window(*src, Steps());
