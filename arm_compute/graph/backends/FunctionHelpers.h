@@ -1698,7 +1698,6 @@ std::unique_ptr<IFunction> create_token_embedding_layer(TokenEmbeddingLayerNode 
     typename TargetInfo::TensorType *vocab    = get_backing_tensor<TargetInfo>(node.input(1));
     typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
     const EmbeddingLayerInfo tkemb_info  = node.token_embedding_info();
-    std::cout << "create_token_embedding_layer " << *(node.input(1)->handle()->tensor().buffer()) << std::endl;
     std::cout << "create_token_embedding_layer " << *(node.output(0)->handle()->tensor().buffer()) << std::endl;
 
     // Create function
