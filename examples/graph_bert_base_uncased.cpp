@@ -66,9 +66,9 @@ class GraphVanillaTransformerExample : public Example
 
         // Model parameters
         constexpr unsigned int d_model    = 768U;   // Dim layer output
-        //constexpr unsigned int d_vocab    = 30522U; // Vocaboary size
-        //constexpr unsigned int d_segemnt  = 2U;     // Sentence segmentation size
-        //constexpr unsigned int d_position = 512U;   // Pretrained positional encoding length
+        constexpr unsigned int d_vocab    = 30522U; // Vocaboary size
+        constexpr unsigned int d_segemnt  = 2U;     // Sentence segmentation size
+        constexpr unsigned int d_position = 512U;   // Pretrained positional encoding length
         constexpr unsigned int h          = 12U;    // Parallel attention (Heads)
         constexpr float        eps        = 1e-12;  // Layer normalization eplision
         constexpr unsigned int d_ff       = 3072U;  // Dim feedforward
@@ -77,7 +77,7 @@ class GraphVanillaTransformerExample : public Example
         const TensorShape src_tensor = TensorShape(common_params.input_len);
 
         // Data layout
-        //const DataLayout operation_layout = DataLayout::NCHW;
+        const DataLayout operation_layout = DataLayout::NCHW;
 
         TensorDescriptor input_descriptor = TensorDescriptor(src_tensor, common_params.data_type);
 
@@ -90,9 +90,18 @@ class GraphVanillaTransformerExample : public Example
         // Encode Input
         graph << InputLayer(input_descriptor, get_token_accessor(common_params),
                             get_segment_accessor(common_params.segment, move(at2_preproccessor)))
-                     .set_name("in1");
+                     .set_name("in1")
 
-              
+              << EmbeddingLayer(EmbeddingLayerInfo(d_model,
+                                                   d_vocab,
+                                                   d_segemnt,
+                                                   d_position,
+                                                   true /*Use pretrained positional encoding*/,
+                                                   ConvertPolicy::SATURATE),
+                                get_weights_accessor(data_path, "token_embedding.npy", operation_layout),
+                                get_weights_accessor(data_path, "segment_embedding.npy", operation_layout),
+                                get_weights_accessor(data_path, "positional_embedding.npy", operation_layout))
+                     .set_name("tkemb1");
 
         add_encoder_block(data_path, "layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
         add_encoder_block(data_path, "layer_1/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
