@@ -26,7 +26,6 @@ namespace
 template <typename T>
 void run_position_embedding(const Window &window, const ITensor *src, const ITensor *vector, ITensor *dst)
 {
-    std::cout << "run_position_embedding" << std::endl;
     ARM_COMPUTE_UNUSED(src);
 
     Window win = window;
@@ -45,23 +44,14 @@ void run_position_embedding(const Window &window, const ITensor *src, const ITen
     const auto dst_ptr      = reinterpret_cast<float *>(dst_iter.ptr());
     const auto vector_ptr   = reinterpret_cast<float *>(vector_iter.ptr());
 
-    std::cout << *vector_ptr << std::endl;
-    std::cout << *vector_ptr << std::endl;
-
-    std::cout << "run_position_embedding 1" << std::endl;
-
     execute_window_loop(win,
         [&](const Coordinates &)
         {
             for(unsigned int x = window_start_x; x < window_end_x; x++)
             {
-
-            std::cout << "run_position_embedding 2" << std::endl;
                 offset_dst     = x * vector_depth;
                 offset_vector  = x * vector_depth;
-                std::memcpy(dst_ptr + offset_dst, vector_ptr + offset_vector, (vector_depth) * sizeof(*vector_ptr));  
-                
-    std::cout << "run_position_embedding 3" << std::endl;          
+                std::memcpy(dst_ptr + offset_dst, vector_ptr + offset_vector, (vector_depth) * sizeof(*vector_ptr));            
             }
             
         },dst_iter,vector_iter);
@@ -74,13 +64,8 @@ void CpuPositionEmbeddingKernel::configure(const ITensorInfo *src, const ITensor
 {
     ARM_COMPUTE_ERROR_ON_NULLPTR(src, dst);
     ARM_COMPUTE_UNUSED(pos);
-    
     // Configure output tensor info.
     auto_init_if_empty(*dst, TensorInfo(*src->clone()));
-
-    std::cout << "switching/src/cpu/kernels/CpuVectorizeKernel.cpp " << dst->tensor_shape().x() << std::endl;
-    std::cout << "switching/src/cpu/kernels/CpuVectorizeKernel.cpp " << dst->tensor_shape().y() << std::endl;
-    std::cout << "switching/src/cpu/kernels/CpuVectorizeKernel.cpp " << dst->tensor_shape().z() << std::endl;
 
     // Configure kernel window
     Window win = calculate_max_window(*src, Steps());
