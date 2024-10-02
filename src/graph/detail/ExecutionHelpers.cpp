@@ -127,6 +127,9 @@ void allocate_all_tensors(Graph &g)
             tensor->handle()->tensor().info()->is_resizable() && tensor->handle()->tensor().is_used())
         {
             tensor->handle()->allocate();
+        }else
+        {
+            std::cout << "ehhhhhh " <<std::endl;
         }
     }
 }
