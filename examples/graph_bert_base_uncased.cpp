@@ -136,6 +136,8 @@ class GraphVanillaTransformerExample : public Example
         config.tuner_file  = common_params.tuner_file;
         config.mlgo_file   = common_params.mlgo_file;
 
+        config.use_transition_memory_manager = false;
+
 #ifdef MEASURE_TIME
         // Clear previous output
         std::ofstream ofs;
