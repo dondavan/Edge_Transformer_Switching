@@ -62,10 +62,9 @@ void NETokenEmbeddingLayer::run()
 #endif
     ITensorPack pack;
     std::cout << "NETokenEmbeddingLayer::run " << std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->src->ptr_to_element(Coordinates(0))) << std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->src->ptr_to_element(Coordinates(1))) << std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->src->ptr_to_element(Coordinates(2))) << std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->src->ptr_to_element(Coordinates(767))) << std::endl;
+    std::cout << *reinterpret_cast<int *>(_impl->src->ptr_to_element(Coordinates(0))) << std::endl;
+    std::cout << *reinterpret_cast<int *>(_impl->src->ptr_to_element(Coordinates(1))) << std::endl;
+    std::cout << *reinterpret_cast<int *>(_impl->src->ptr_to_element(Coordinates(2))) << std::endl;
     pack.add_tensor(TensorType::ACL_SRC_0, _impl->src);
     pack.add_tensor(TensorType::ACL_SRC_1, _impl->vocab);
     pack.add_tensor(TensorType::ACL_DST, _impl->dst);
