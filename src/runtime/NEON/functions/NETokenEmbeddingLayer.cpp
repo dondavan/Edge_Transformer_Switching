@@ -60,7 +60,6 @@ void NETokenEmbeddingLayer::run()
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    std::cout << "NETokenEmbeddingLayer::run()" << std::endl;
     ITensorPack pack;
     pack.add_tensor(TensorType::ACL_SRC_0, _impl->src);
     pack.add_tensor(TensorType::ACL_SRC_1, _impl->vocab);
