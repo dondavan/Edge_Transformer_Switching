@@ -292,15 +292,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     ITensorPack softmax_pack = {{ACL_SRC, scaled_query_key.get()}, {ACL_DST, softmaxed_product.get()}};
     _softmax_func->run(softmax_pack);
 
-    std::cout << "switching/src/cpu/operators/CpuScaleDotProduction.cpp" <<std::endl;
-    std::cout << softmaxed_product.get()->info()->tensor_shape().x() << std::endl;
-    std::cout << softmaxed_product.get()->info()->tensor_shape().y() << std::endl;
-    std::cout << softmaxed_product.get()->info()->tensor_shape().z() << std::endl;
-    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(4,6,11))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(5,6,11))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(6,6,11))) <<std::endl;
-
-
     // Run interleave kernel
     ITensorPack interleave_product_pack{{ACL_SRC, softmaxed_product.get()}, {ACL_DST, interleaved_product.get()}};
     NEScheduler::get().schedule_op(_product_interleave_kernel.get(), Window::DimY, _product_interleave_kernel->window(),
@@ -351,6 +342,16 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "concat_reshape cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+
+
+
+    std::cout << "switching/src/cpu/operators/CpuScaleDotProduction.cpp" <<std::endl;
+    std::cout << output->info()->tensor_shape().x() << std::endl;
+    std::cout << output->info()->tensor_shape().y() << std::endl;
+    std::cout << output->info()->tensor_shape().z() << std::endl;
+    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(4,6,11))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(5,6,11))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(6,6,11))) <<std::endl;
 }
 
 experimental::MemoryRequirements CpuScaleDotProduction::workspace() const
