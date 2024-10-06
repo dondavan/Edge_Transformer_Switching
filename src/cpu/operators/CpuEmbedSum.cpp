@@ -67,15 +67,6 @@ void CpuEmbedSum::run(ITensorPack &tensors)
     run_pack.add_const_tensor(ACL_SRC_1, position);
     run_pack.add_tensor(ACL_DST, output);
     NEScheduler::get().schedule_op(_add_kernel_2.get(), Window::DimY, _add_kernel_2->window(), run_pack);
-
-    std::cout << "Embedded Sum" <<std::endl;
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
-
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(765,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(766,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(767,6,0))) <<std::endl;
 }
 
 } // namespace cpu
