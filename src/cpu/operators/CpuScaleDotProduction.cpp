@@ -296,9 +296,9 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     std::cout << softmaxed_product.get()->info()->tensor_shape().x() << std::endl;
     std::cout << softmaxed_product.get()->info()->tensor_shape().y() << std::endl;
     std::cout << softmaxed_product.get()->info()->tensor_shape().z() << std::endl;
-    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(4,6,11))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(5,6,11))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(6,6,11))) <<std::endl;
 
 
     // Run interleave kernel
