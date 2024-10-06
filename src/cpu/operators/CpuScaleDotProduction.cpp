@@ -203,10 +203,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "query_reshape cost: " << cost_time << std::endl;
 #endif
 
-    std::cout << reshaped_query.get()->info()->tensor_shape().x() <<std::endl;
-    std::cout << reshaped_query.get()->info()->tensor_shape().y() <<std::endl;
-    std::cout << reshaped_query.get()->info()->tensor_shape().z() <<std::endl;
-
     ITensorPack query_permute_pack{{ACL_SRC, reshaped_query.get()},{ACL_DST, permuted_query.get()}};
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
@@ -218,6 +214,11 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out.precision(5);
     measure_out << std::scientific << "query_permute_func cost: " << cost_time << std::endl;
 #endif
+
+    std::cout << permuted_query.get()->info()->tensor_shape().x() <<std::endl;
+    std::cout << permuted_query.get()->info()->tensor_shape().y() <<std::endl;
+    std::cout << permuted_query.get()->info()->tensor_shape().z() <<std::endl;
+
 
 
     // Run Key multi-Head reshape 
