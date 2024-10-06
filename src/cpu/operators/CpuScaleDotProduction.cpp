@@ -161,6 +161,15 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     auto value  = tensors.get_const_tensor(ACL_SRC_2);
     auto output = tensors.get_tensor(ACL_DST);
 
+    std::cout << "switching/src/runtime/NEON/functions/NEAttentionLinearLayer.cpp" <<std::endl;
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
+
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(765,6,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(766,6,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(767,6,0))) <<std::endl;
+
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CpuAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
     CpuAuxTensorHandler reshaped_key(offset_int_vec(KeyReshape), _reshaped_key, tensors);

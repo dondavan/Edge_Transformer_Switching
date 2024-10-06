@@ -99,14 +99,6 @@ void NEAttentionLinearLayer::run()
     query_pack.add_tensor(TensorType::ACL_DST, _impl->query_output);
     _impl->query_kernel->run(query_pack);
 
-    std::cout << "switching/src/runtime/NEON/functions/NEAttentionLinearLayer.cpp" <<std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->key_input->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->key_input->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->key_input->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
-
-    std::cout << *reinterpret_cast<float *>(_impl->key_input->ptr_to_element(Coordinates(765,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->key_input->ptr_to_element(Coordinates(766,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->key_input->ptr_to_element(Coordinates(767,6,0))) <<std::endl;
     // K
     ITensorPack key_pack;
     key_pack.add_tensor(TensorType::ACL_SRC_0, _impl->key_input);
@@ -114,14 +106,6 @@ void NEAttentionLinearLayer::run()
     key_pack.add_tensor(TensorType::ACL_SRC_2, _impl->key_b);
     key_pack.add_tensor(TensorType::ACL_DST, _impl->key_output);
     _impl->key_kernel->run(key_pack);
-
-    std::cout << *reinterpret_cast<float *>(_impl->key_output->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->key_output->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->key_output->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
-
-    std::cout << *reinterpret_cast<float *>(_impl->key_output->ptr_to_element(Coordinates(765,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->key_output->ptr_to_element(Coordinates(766,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(_impl->key_output->ptr_to_element(Coordinates(767,6,0))) <<std::endl;
 
     // V
     ITensorPack value_pack;
