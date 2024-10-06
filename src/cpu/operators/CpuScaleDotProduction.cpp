@@ -298,10 +298,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     std::cout << *reinterpret_cast<float *>(scaled_query_key.get()->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
     std::cout << *reinterpret_cast<float *>(scaled_query_key.get()->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
 
-    std::cout << *reinterpret_cast<float *>(scaled_query_key.get()->ptr_to_element(Coordinates(765,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(scaled_query_key.get()->ptr_to_element(Coordinates(766,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(scaled_query_key.get()->ptr_to_element(Coordinates(767,6,0))) <<std::endl;
-
     ITensorPack softmax_pack = {{ACL_SRC, scaled_query_key.get()}, {ACL_DST, softmaxed_product.get()}};
     _softmax_func->run(softmax_pack);
 
