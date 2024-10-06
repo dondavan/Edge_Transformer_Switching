@@ -219,13 +219,13 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     std::cout << permuted_query.get()->info()->tensor_shape().y() <<std::endl;
     std::cout << permuted_query.get()->info()->tensor_shape().z() <<std::endl;
 
-    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(0,6,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(1,6,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(2,6,0))) <<std::endl;
 
-    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(61,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(62,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(63,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(61,6,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(62,6,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(permuted_query.get()->ptr_to_element(Coordinates(63,6,0))) <<std::endl;
 
 
     // Run Key multi-Head reshape 
