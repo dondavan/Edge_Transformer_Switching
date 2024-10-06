@@ -161,14 +161,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     auto value  = tensors.get_const_tensor(ACL_SRC_2);
     auto output = tensors.get_tensor(ACL_DST);
 
-    std::cout << "switching/src/runtime/NEON/functions/NEAttentionLinearLayer.cpp" <<std::endl;
-    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
-
-    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(765,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(766,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(767,6,0))) <<std::endl;
+    std::cout << "switching/src/cpu/operators/CpuScaleDotProduction.cpp" <<std::endl;
 
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CpuAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
@@ -188,6 +181,14 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     CpuAuxTensorHandler gemmed_context(offset_int_vec(GemmedContext), _gemmed_context, tensors);
 
     // Run Query multi-Head reshape 
+
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
+
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(765,6,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(766,6,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(767,6,0))) <<std::endl;
     ITensorPack query_reshape_pack{{ACL_SRC_0, query},{ACL_DST, reshaped_query.get()}};
     //const auto query_split_dimension = _query_reshape_kernel->get_split_dimension();
 #ifdef MEASURE_TIME
@@ -202,6 +203,9 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "query_reshape cost: " << cost_time << std::endl;
 #endif
 
+    std::cout << reshaped_query.get()->info()->tensor_shape().x() <<std::endl;
+    std::cout << reshaped_query.get()->info()->tensor_shape().y() <<std::endl;
+    std::cout << reshaped_query.get()->info()->tensor_shape().z() <<std::endl;
 
     ITensorPack query_permute_pack{{ACL_SRC, reshaped_query.get()},{ACL_DST, permuted_query.get()}};
 #ifdef MEASURE_TIME
