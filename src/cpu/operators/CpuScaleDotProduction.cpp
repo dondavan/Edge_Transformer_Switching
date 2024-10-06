@@ -238,7 +238,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     ITensorPack key_transpose_pack{{ACL_SRC, permuted_key.get()}, {ACL_DST, transposed_key.get()}};
     _key_transpose_func->run(key_transpose_pack);
 
-
     // Run Value multi-Head reshape 
     ITensorPack value_reshape_pack{{ACL_SRC_0, value},{ACL_DST, reshaped_value.get()}};
     //const auto value_split_dimension = _value_reshape_kernel->get_split_dimension();
@@ -290,16 +289,16 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "MMUL QK cost: " << cost_time << std::endl;
 #endif
 
-    std::cout << "switching/src/cpu/operators/CpuScaleDotProduction.cpp" <<std::endl;
-    std::cout << scaled_query_key.get()->info()->tensor_shape().x() << std::endl;
-    std::cout << scaled_query_key.get()->info()->tensor_shape().y() << std::endl;
-    std::cout << scaled_query_key.get()->info()->tensor_shape().z() << std::endl;
-    std::cout << *reinterpret_cast<float *>(scaled_query_key.get()->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(scaled_query_key.get()->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(scaled_query_key.get()->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
-
     ITensorPack softmax_pack = {{ACL_SRC, scaled_query_key.get()}, {ACL_DST, softmaxed_product.get()}};
     _softmax_func->run(softmax_pack);
+
+    std::cout << "switching/src/cpu/operators/CpuScaleDotProduction.cpp" <<std::endl;
+    std::cout << softmaxed_product.get()->info()->tensor_shape().x() << std::endl;
+    std::cout << softmaxed_product.get()->info()->tensor_shape().y() << std::endl;
+    std::cout << softmaxed_product.get()->info()->tensor_shape().z() << std::endl;
+    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(softmaxed_product.get()->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
 
 
     // Run interleave kernel
