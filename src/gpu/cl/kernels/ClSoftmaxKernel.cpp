@@ -115,10 +115,6 @@ void ClSoftmaxKernel::configure(const CLCompileContext  &compile_context,
 
     const auto tmp_data_type = is_quantized ? DataType::F32 : data_type;
 
-    std::cout << "element_size " << element_size << std::endl;
-    std::cout << "dst_shape[0] " << dst_shape[0]<< std::endl;
-    std::cout << "dst_shape[1] " << dst_shape[1]<< std::endl;
-    std::cout << "dst_shape[2] " << dst_shape[2]<< std::endl;
     const auto vec_size          = adjust_vec_size(16 / element_size, dst_shape[0]);
     const auto vec_size_leftover = dst_shape[0] % vec_size;
 
@@ -128,7 +124,6 @@ void ClSoftmaxKernel::configure(const CLCompileContext  &compile_context,
     build_opts.add_option("-DDATA_TYPE=" + get_cl_type_from_data_type(data_type));
     build_opts.add_option("-DTMP_DATA_TYPE=" + get_cl_type_from_data_type(tmp_data_type));
     build_opts.add_option("-DVEC_SIZE=" + support::cpp11::to_string(vec_size));
-    std::cout << "VEC_SICE: " <<support::cpp11::to_string(vec_size) << std::endl;
     build_opts.add_option("-DVEC_SIZE_LEFTOVER=" + support::cpp11::to_string(vec_size_leftover));
     build_opts.add_option("-DLENGTH=" + support::cpp11::to_string(length));
     build_opts.add_option_if(info.is_log, "-DIS_LOG");
@@ -172,9 +167,7 @@ void ClSoftmaxKernel::configure(const CLCompileContext  &compile_context,
 
         _tmp_info = TensorInfo(tmp_shape, 1, tmp_data_type);
     }
-    std::cout << kernel_name << " start" << std::endl;
     _kernel = create_kernel(compile_context, kernel_name, build_opts.options());
-    std::cout << kernel_name << " end" << std::endl;
 
     // Configure kernel window and kernel arguments.
     Window win = calculate_max_window(src, Steps(vec_size));
