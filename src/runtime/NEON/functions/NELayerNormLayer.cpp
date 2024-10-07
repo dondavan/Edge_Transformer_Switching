@@ -69,6 +69,9 @@ void NELayerNormLayer::run()
 
     ITensorPack pack;
     
+    pack.add_tensor(TensorType::ACL_SRC, _impl->src);
+    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
+    
     _impl->op->run(pack);
 
 #ifdef MEASURE_TIME
