@@ -43,8 +43,6 @@ void CLLayerNormLayer::configure(const CLCompileContext   &compile_context,
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
 
-
-    std::cout << "CLLayerNormLayer::configure start" << std::endl;
     ARM_COMPUTE_ERROR_ON_NULLPTR(input, output);
     ARM_COMPUTE_LOG_PARAMS(input, output);
 
@@ -53,8 +51,6 @@ void CLLayerNormLayer::configure(const CLCompileContext   &compile_context,
 
     _impl->op = std::make_unique<opencl::ClLayerNorm>();
     _impl->op->configure(compile_context, input->info(), output->info(), LayerNorm_info);
-
-    std::cout << "CLLayerNormLayer::configure end" << std::endl;
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();

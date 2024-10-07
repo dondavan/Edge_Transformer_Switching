@@ -204,22 +204,6 @@ CLBuildOptions generate_build_options_with_arithmetic_rules(const ITensorInfo &s
 
     const unsigned int num_elems_processed_per_iteration =
         adjust_vec_size(vector_size_byte_opencl / dst.element_size(), dst.dimension(0));
-    std::cout << "num_elems_processed_per_iteration: " << num_elems_processed_per_iteration << std::endl;
-    std::cout << "vector_size_byte_opencl: " << vector_size_byte_opencl << std::endl;
-    std::cout << "dst.element_size(): " << dst.element_size() << std::endl;
-    std::cout << "dst.dimension(0): " << dst.dimension(0) << std::endl;
-    std::cout << "dst.dimension(1): " << dst.dimension(1) << std::endl;
-    std::cout << "dst.dimension(2): " << dst.dimension(2) << std::endl;
-
-
-    std::cout << "src1.dimension(0): " << src1.dimension(0) << std::endl;
-    std::cout << "src1.dimension(1): " << src1.dimension(1) << std::endl;
-    std::cout << "src1.dimension(2): " << src1.dimension(2) << std::endl;
-
-
-    std::cout << "src2.dimension(0): " << src2.dimension(0) << std::endl;
-    std::cout << "src2.dimension(1): " << src2.dimension(1) << std::endl;
-    std::cout << "src2.dimension(2): " << src2.dimension(2) << std::endl;
 
     build_opts.add_option("-DDATA_TYPE=" + get_cl_type_from_data_type(src1.data_type()));
     build_opts.add_option("-DVEC_SIZE_IN1=" +
@@ -274,26 +258,12 @@ validate_and_configure_window_for_arithmetic_operators(ITensorInfo &src1, ITenso
     */
     ARM_COMPUTE_UNUSED(src2);
 
-    std::cout << "src1.tensor_shape().x(): " << src1.tensor_shape().x() << std::endl;
-    std::cout << "src1.tensor_shape().y(): " << src1.tensor_shape().y() << std::endl;
-    std::cout << "src1.tensor_shape().z(): " << src1.tensor_shape().z() << std::endl;
-    std::cout << "src2.tensor_shape().x(): " << src2.tensor_shape().x() << std::endl;
-    std::cout << "src2.tensor_shape().y(): " << src2.tensor_shape().y() << std::endl;
-    std::cout << "src2.tensor_shape().z(): " << src2.tensor_shape().z() << std::endl;
     // Auto initialize dst if not initialized
     const TensorShape &dst_shape = TensorShape::broadcast_shape(src2.tensor_shape());
 
-    std::cout << "dst_shape.x(): " << dst_shape.x() << std::endl;
-    std::cout << "dst_shape.y(): " << dst_shape.y() << std::endl;
-    std::cout << "dst_shape.z(): " << dst_shape.z() << std::endl;
     auto_init_if_empty(dst, src2.clone()->set_tensor_shape(dst_shape));
     // Explicitly set the tensor shape to preserve dimensions
     dst.set_tensor_shape(dst_shape);
-
-    std::cout << "validate_and_configure_window_for_logical_binary_operators dst.dimension(0): " << dst.dimension(0) << std::endl;
-    std::cout << "validate_and_configure_window_for_logical_binary_operators dst.dimension(1): " << dst.dimension(1) << std::endl;
-    std::cout << "validate_and_configure_window_for_logical_binary_operators dst.dimension(2): " << dst.dimension(2) << std::endl;
-
 
     return configure_window_arithmetic_common(dst);
 }
@@ -339,7 +309,6 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
     ARM_COMPUTE_ERROR_THROW_ON(win_config.first);
 
     std::string kernel_name = "elementwise_operation_" + name();
-    std::cout << "kernel_name: start  " << kernel_name << std::endl;
     if (is_data_type_quantized(src1->data_type()))
     {
         kernel_name += "_quantized";
@@ -356,7 +325,6 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
 
     // Create kernel
     _kernel = create_kernel(compile_context, kernel_name, build_opts.options());
-    std::cout << "kernel_name: created  " << kernel_name << std::endl;
 
     ICLKernel::configure_internal(win_config.second);
 
