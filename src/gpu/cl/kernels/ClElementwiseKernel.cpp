@@ -256,7 +256,7 @@ validate_and_configure_window_for_arithmetic_operators(ITensorInfo &src1, ITenso
 
     auto_init_if_empty(dst, out_shape, 1, src1.data_type());
     */
-    ARM_COMPUTE_UNUSED(src2);
+    ARM_COMPUTE_UNUSED(src1,src2);
 
     // Auto initialize dst if not initialized
     const TensorShape &dst_shape = TensorShape::broadcast_shape(src2.tensor_shape());
