@@ -28,7 +28,7 @@ struct CLLinearLayer::Impl
     ICLTensor                        *dst{ nullptr };
     std::unique_ptr<opencl::ClLinear> op{ nullptr };
 
-    bool is_prepared{false};
+    bool is_prepared{ false };
 };
 
 CLLinearLayer::CLLinearLayer(std::shared_ptr<IMemoryManager> memory_manager,
@@ -57,8 +57,6 @@ void CLLinearLayer::configure(const CLCompileContext &compile_context,
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
 
-
-    std::cout << "CLLinearLayer::configure start" << std::endl;
     _impl->src    = input;
     _impl->weight = weight;
     _impl->bias   = bias;
@@ -66,8 +64,6 @@ void CLLinearLayer::configure(const CLCompileContext &compile_context,
 
     _impl->op = std::make_unique<opencl::ClLinear>();
     _impl->op->configure(compile_context, input->info(), weight->info(), bias->info(), output->info(), 1.0f, 0.f);
-
-    std::cout << "CLLinearLayer::configure end" << std::endl;
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
@@ -86,7 +82,6 @@ Status CLLinearLayer::validate(const ICLTensor *input,
     ARM_COMPUTE_UNUSED(linear_info);
     return opencl::ClLinear::validate(input->info(), weight->info(), bias->info(), output->info(), 1.0f, 1.0f);
 }
-
 
 void CLLinearLayer::run()
 {
