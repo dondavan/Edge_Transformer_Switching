@@ -69,7 +69,6 @@ void layer_norm_fp32(const ITensor *src, ITensor *dst, const Window &window, flo
                 *reinterpret_cast<float *>(output_ptr + axis) = res;
             }
 
-            ARM_COMPUTE_UNUSED(epsilon);
             ARM_COMPUTE_UNUSED(input_ptr);
             ARM_COMPUTE_UNUSED(output_ptr);
         },
