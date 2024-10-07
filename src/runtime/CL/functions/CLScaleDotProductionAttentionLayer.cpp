@@ -52,15 +52,11 @@ void CLScaleDotProductionAttentionLayer::configure(const CLCompileContext       
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    
-    std::cout << "CLScaleDotProductionAttentionLayer::configure start" << std::endl;
 
     /* Scale dot production of key and query */
     _impl->scale_dot_production_op = std::make_unique<opencl::ClScaleDotProduction>();
     _impl->scale_dot_production_op->configure(compile_context, query->info(), key->info(), value->info(), output->info(), info);
     _impl->scale_dot_pack = { { ACL_SRC_0, query }, { ACL_SRC_1, key }, { ACL_SRC_2, value }, { ACL_DST, output } };
-
-    std::cout << "CLScaleDotProductionAttentionLayer::configure end" << std::endl;
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
