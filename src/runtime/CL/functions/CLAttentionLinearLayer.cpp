@@ -74,7 +74,6 @@ void CLAttentionLinearLayer::configure(const CLCompileContext &compile_context,
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    std::cout << "CLAttentionLinearLayer::configure start" << std::endl;
     _impl->query_input  = query_input;
     _impl->query_w      = query_w;
     _impl->query_b      = query_b;
@@ -99,7 +98,6 @@ void CLAttentionLinearLayer::configure(const CLCompileContext &compile_context,
     _impl->value_kernel = std::make_unique<opencl::ClLinear>();
     _impl->value_kernel->configure(compile_context, value_input->info(), value_w->info(), value_b->info(), value_output->info(), 1.0f, 0.f);
 
-    std::cout << "CLAttentionLinearLayer::configure end" << std::endl;
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
     double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
