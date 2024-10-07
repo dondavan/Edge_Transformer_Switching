@@ -74,7 +74,7 @@ void NELayerNormLayer::run()
     
     _impl->op->run(pack);
 
-    std::cout << "switching/src/runtime/NEON/functions/NEArithmeticAddition.cpp" <<std::endl;
+    std::cout << "switching/src/runtime/NEON/functions/NELayerNormLayer.cpp" <<std::endl;
     std::cout << _impl->dst->info()->tensor_shape().x() << std::endl;
     std::cout << _impl->dst->info()->tensor_shape().y() << std::endl;
     std::cout << _impl->dst->info()->tensor_shape().z() << std::endl;
