@@ -74,6 +74,19 @@ void NELayerNormLayer::run()
     
     _impl->op->run(pack);
 
+    std::cout << "switching/src/runtime/NEON/functions/NEArithmeticAddition.cpp" <<std::endl;
+    std::cout << _impl->dst->info()->tensor_shape().x() << std::endl;
+    std::cout << _impl->dst->info()->tensor_shape().y() << std::endl;
+    std::cout << _impl->dst->info()->tensor_shape().z() << std::endl;
+    std::cout << *reinterpret_cast<float *>(_impl->dst->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(_impl->dst->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(_impl->dst->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
+
+
+    std::cout << *reinterpret_cast<float *>(_impl->dst->ptr_to_element(Coordinates(765,6,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(_impl->dst->ptr_to_element(Coordinates(766,6,0))) <<std::endl;
+    std::cout << *reinterpret_cast<float *>(_impl->dst->ptr_to_element(Coordinates(767,6,0))) <<std::endl;
+
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
