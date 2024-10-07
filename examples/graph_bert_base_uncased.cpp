@@ -70,7 +70,7 @@ class GraphVanillaTransformerExample : public Example
         constexpr unsigned int d_segemnt  = 2U;     // Sentence segmentation size
         constexpr unsigned int d_position = 512U;   // Pretrained positional encoding length
         constexpr unsigned int h          = 12U;    // Parallel attention (Heads)
-        constexpr float        eps        = 1e-5;  // Layer normalization eplision
+        constexpr float        eps        = 1e-12;  // Layer normalization eplision
         constexpr unsigned int d_ff       = 3072U;  // Dim feedforward
 
         // Create input tensor
