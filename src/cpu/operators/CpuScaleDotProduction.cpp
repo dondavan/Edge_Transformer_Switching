@@ -342,21 +342,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "concat_reshape cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
-
-
-
-    std::cout << "switching/src/cpu/operators/CpuScaleDotProduction.cpp" <<std::endl;
-    std::cout << output->info()->tensor_shape().x() << std::endl;
-    std::cout << output->info()->tensor_shape().y() << std::endl;
-    std::cout << output->info()->tensor_shape().z() << std::endl;
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(1,0,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(2,0,0))) <<std::endl;
-
-
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(765,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(766,6,0))) <<std::endl;
-    std::cout << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(767,6,0))) <<std::endl;
 }
 
 experimental::MemoryRequirements CpuScaleDotProduction::workspace() const
