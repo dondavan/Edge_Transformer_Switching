@@ -115,7 +115,6 @@ inline T *CommandLineParser::add_positional_option(As &&...args)
 
 inline void CommandLineParser::parse(int argc, char **argv)
 {
-    std::cout << argv << std::endl;
     const std::regex option_regex{"--((?:no-)?)([^=]+)(?:=(.*))?"};
 
     const auto set_option = [&](const std::string &option, const std::string &name, const std::string &value)
