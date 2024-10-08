@@ -107,7 +107,7 @@ enum class Target
     NEON,        /**< Arm® Neon™ capable target device */
     CL,          /**< OpenCL capable target device */
     CLVK,        /**< CLVK capable target device */
-    SW,      /**< Layer Switching */
+    SWITCH,      /**< Layer Switching */
 };
 
 /** Supported Element-wise operations */
