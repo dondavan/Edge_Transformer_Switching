@@ -94,6 +94,9 @@ EdgeID Graph::add_connection(NodeID source, size_t source_idx, NodeID sink, size
     if (tid == NullTensorID)
     {
         tid = create_tensor();
+    }else
+    {
+        std::cout << "exist" << std::endl;
     }
     std::unique_ptr<Tensor> &tensor = _tensors[tid];
 
