@@ -50,6 +50,8 @@ inline ::std::ostream &operator<<(::std::ostream &os, const Target &target)
             break;
         case Target::CLVK:
             os << "CLVK";
+        case Target::SWITCH:
+            os << "SWITCH";
             break;
         default:
             ARM_COMPUTE_ERROR("NOT_SUPPORTED!");

@@ -58,6 +58,7 @@ Target target_from_name(const std::string &name)
         {"neon", Target::NEON},
         {"cl", Target::CL},
         {"clvk", Target::CLVK},
+        {"switch", Target::SWITCH},
     };
 
 #ifndef ARM_COMPUTE_EXCEPTIONS_DISABLED
