@@ -88,6 +88,7 @@ bool EnumOption<T>::parse(std::string value)
         T                 typed_value{};
 
         stream >> typed_value;
+        std::cout << typed_value << std::endl;
 
         if (!stream.fail())
         {

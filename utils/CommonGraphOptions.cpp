@@ -175,7 +175,7 @@ CommonGraphOptions::CommonGraphOptions(CommandLineParser &parser)
 
     const std::set<CLTunerMode> supported_tuner_modes{CLTunerMode::EXHAUSTIVE, CLTunerMode::NORMAL, CLTunerMode::RAPID};
 
-    target      = parser.add_option<EnumOption<Target>>("target", supported_targets, Target::SWITCH);
+    target      = parser.add_option<EnumOption<Target>>("target", supported_targets, Target::NEON);
     data_type   = parser.add_option<EnumOption<DataType>>("type", supported_data_types, DataType::F32);
     data_layout = parser.add_option<EnumOption<DataLayout>>("layout", supported_data_layouts);
     tuner_mode  = parser.add_option<EnumOption<CLTunerMode>>("tuner-mode", supported_tuner_modes, CLTunerMode::NORMAL);
