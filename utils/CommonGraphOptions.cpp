@@ -157,7 +157,7 @@ CommonGraphOptions::CommonGraphOptions(CommandLineParser &parser)
     std::set<arm_compute::graph::Target> supported_targets{
         Target::NEON,
         Target::CL,
-        Target::CLVK,
+        Target::SWITCH,
         Target::SWITCH,
     };
 
