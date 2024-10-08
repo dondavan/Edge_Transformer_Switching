@@ -95,7 +95,7 @@ struct CommonGraphParams
     bool                             help{false};
     int                              threads{0};
     int                              batches{1};
-    arm_compute::graph::Target       target{arm_compute::graph::Target::SWITCH};
+    arm_compute::graph::Target       target{arm_compute::graph::Target::NEON};
     arm_compute::DataType            data_type{DataType::F32};
     arm_compute::DataLayout          data_layout{DataLayout::NHWC};
     bool                             enable_tuner{false};
