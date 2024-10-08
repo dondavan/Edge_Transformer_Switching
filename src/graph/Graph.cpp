@@ -90,6 +90,7 @@ EdgeID Graph::add_connection(NodeID source, size_t source_idx, NodeID sink, size
     }
 
     // Check if there is already a tensor associated with output if not create one
+    std::cout << "before " << _tensors.size() << std::endl;
     TensorID tid = source_node->output_id(source_idx);
     if (tid == NullTensorID)
     {
@@ -99,6 +100,7 @@ EdgeID Graph::add_connection(NodeID source, size_t source_idx, NodeID sink, size
         std::cout << "exist" << std::endl;
     }
     std::unique_ptr<Tensor> &tensor = _tensors[tid];
+    std::cout << "after " << _tensors.size() << std::endl;
 
     // Create connections
     EdgeID eid = _edges.size();
