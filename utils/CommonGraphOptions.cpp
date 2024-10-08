@@ -215,8 +215,6 @@ CommonGraphParams consume_common_graph_parameters(CommonGraphOptions &options)
         options.fast_math_hint->value() ? FastMathHint::Enabled : FastMathHint::Disabled;
     auto validation_range = parse_validation_range(options.validation_range->value());
 
-    std::cout << "consume_common_graph_parameters" << std::endl;
-    std::cout << options.target->value() << std::endl;
     CommonGraphParams common_params;
     common_params.help      = options.help->is_set() ? options.help->value() : false;
     common_params.threads   = options.threads->value();
