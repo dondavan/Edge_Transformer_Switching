@@ -50,6 +50,7 @@ inline ::std::ostream &operator<<(::std::ostream &os, const Target &target)
             break;
         case Target::CLVK:
             os << "CLVK";
+            break;
         case Target::SWITCH:
             os << "SWITCH";
             break;
