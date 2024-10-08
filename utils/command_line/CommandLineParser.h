@@ -130,6 +130,7 @@ inline void CommandLineParser::parse(int argc, char **argv)
         if (!success)
         {
             _invalid_options.push_back(option);
+            std::cout << option << std::endl;
         }
     };
 
