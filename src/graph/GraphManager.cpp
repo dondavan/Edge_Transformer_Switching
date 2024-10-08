@@ -70,6 +70,7 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
         ctx.set_config(config);
     }
 
+    std::cout << forced_target << std::endl;
     std::cout << "switching/src/graph/GraphManager.cpp force_target_to_graph start:" << std::endl;
     if (!is_target_supported(target))
     {
