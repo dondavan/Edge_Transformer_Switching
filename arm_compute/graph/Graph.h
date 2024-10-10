@@ -302,6 +302,15 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     auto   node = std::make_unique<NT>(std::forward<Ts>(args)...);
     node->set_graph(this);
     node->set_id(nid);
+    node->set_assigned_target(assigned_target);
+
+    if(node->assigned_target() == Target::NEON)
+    {
+        std::cout << "NEON" << std::endl;
+    }else
+    {
+        std::cout << "Still working" << std::endl;
+    }
 
     // Keep track of input nodes
     _tagged_nodes[node->type()].push_back(nid);
