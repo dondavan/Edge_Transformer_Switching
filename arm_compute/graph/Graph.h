@@ -320,15 +320,16 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     {
         output = create_tensor();
         _tensors[output]->desc().target = assigned_target;
+        
+        if( _tensors[output]->desc().target == Target::CL)
+        {
+            std::cout << "CL" << std::endl;
+        }else
+        {
+            std::cout << "Still working" << std::endl;
+        }
     }
 
-    if( _tensors[output]->desc().target == Target::CL)
-    {
-        std::cout << "CL" << std::endl;
-    }else
-    {
-        std::cout << "Still working" << std::endl;
-    }
 
     // Propagate node shape if possible
     node->forward_descriptors();
