@@ -1495,15 +1495,8 @@ class InputLayer final : public ILayer
     NodeID create_layer(IStream &s) override
     {
         NodeParams common_params = { name(), s.hints().target_hint };
-        _assigned_target = assigned_target();
-        if(_assigned_target != Target::UNSPECIFIED)
-        {
-            return GraphBuilder::add_input_node(s.graph(), common_params, _assigned_target, _desc, _accessors);
-        }
-        else
-        {
-            return GraphBuilder::add_input_node(s.graph(), common_params, _desc, _accessors);
-        }
+        common_params.target     = assigned_target();
+        return GraphBuilder::add_input_node(s.graph(), common_params, _desc, _accessors);
     }
 
     private:
@@ -1538,23 +1531,12 @@ class EmbeddingLayer final : public ILayer
     {
         NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input         = { s.tail_node(), 0 };
-        _assigned_target = assigned_target();
-        if(_assigned_target != Target::UNSPECIFIED)
-        {
-            return GraphBuilder::add_embedding_node(s.graph(), common_params, _assigned_target,
-                                                    input, _emb_info,
-                                                    std::move(_vocabs),
-                                                    std::move(_segments),
-                                                    std::move(_position));
-        }
-        else
-        {
-            return GraphBuilder::add_embedding_node(s.graph(), common_params,
-                                                    input, _emb_info,
-                                                    std::move(_vocabs),
-                                                    std::move(_segments),
-                                                    std::move(_position));
-        }
+        common_params.target      = assigned_target();
+        return GraphBuilder::add_embedding_node(s.graph(), common_params,
+                                                input, _emb_info,
+                                                std::move(_vocabs),
+                                                std::move(_segments),
+                                                std::move(_position));
     }
 
     private:
