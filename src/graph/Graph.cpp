@@ -119,6 +119,67 @@ EdgeID Graph::add_connection(NodeID source, size_t source_idx, NodeID sink, size
     return eid;
 }
 
+EdgeID Graph::add_connection(Target assigned_target, NodeID source, size_t source_idx, NodeID sink, size_t sink_idx)
+{
+    arm_compute::lock_guard<arm_compute::Mutex> lock(_mtx);
+
+    // Check if node index is valid, if node exists and finally if the connection index is valid
+    ARM_COMPUTE_ERROR_ON((source >= _nodes.size()) || (_nodes[source] == nullptr) ||
+                         (source_idx >= _nodes[source]->num_outputs()));
+    ARM_COMPUTE_ERROR_ON((sink >= _nodes.size()) || (_nodes[sink] == nullptr) ||
+                         (sink_idx >= _nodes[sink]->num_inputs()));
+
+    // Get nodes
+    std::unique_ptr<INode> &source_node = _nodes[source];
+    std::unique_ptr<INode> &sink_node   = _nodes[sink];
+
+    // Check for duplicate connections (Check only sink node)
+    Edge *sink_node_edge = sink_node->input_edge(sink_idx);
+    if ((sink_node_edge != nullptr) && (sink_node_edge->producer_id() == source) &&
+        (sink_node_edge->producer_idx() == source_idx) && (sink_node_edge->consumer_id() == sink) &&
+        (sink_node_edge->consumer_idx() == sink_idx))
+    {
+        return sink_node_edge->id();
+    }
+
+    // Check if there is already a tensor associated with output if not create one
+    TensorID tid = source_node->output_id(source_idx);
+    if (tid == NullTensorID)
+    {
+        tid = create_tensor();
+    }
+    std::unique_ptr<Tensor> &tensor = _tensors[tid];
+    tensor.get()->desc().target = assigned_target;    
+    if( tensor.get()->desc().target == Target::CL)
+    {
+        std::cout << "Connection created tensor CL" << std::endl;
+    }else
+    {
+        std::cout << "Connection created tensor Still working" << std::endl;
+    }
+
+    // Create connections
+    EdgeID eid = _edges.size();
+    auto   connection =
+        std::make_unique<Edge>(eid, source_node.get(), source_idx, sink_node.get(), sink_idx, tensor.get());
+    _edges.push_back(std::move(connection));
+
+    // Add connections to source and sink nodes
+    source_node->_output_edges.insert(eid);
+    sink_node->_input_edges[sink_idx] = eid;
+
+    // Set tensor output node
+    source_node->_outputs[source_idx] = tid;
+
+    // Bind tensor to the edge
+    tensor->bind_edge(eid);
+
+    // Try and propagate shapes in sink node
+    sink_node->forward_descriptors();
+
+    return eid;
+}
+
 EdgeID Graph::add_connection(NodeID source, size_t source_idx, NodeID sink, size_t sink_idx, Target assigned_target)
 {
     arm_compute::lock_guard<arm_compute::Mutex> lock(_mtx);

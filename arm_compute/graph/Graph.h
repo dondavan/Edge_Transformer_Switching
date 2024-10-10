@@ -111,6 +111,17 @@ public:
      * @return ID of this connection
      */
     EdgeID add_connection(NodeID source, size_t source_idx, NodeID sink, size_t sink_idx);
+     /** Adds a connection between two nodes with assigned target
+     *
+     * @param[in] assigned_target   Assigned execution target
+     * @param[in] source            ID of the source node
+     * @param[in] source_idx        Output index of the source node
+     * @param[in] sink              ID of the sink node
+     * @param[in] sink_idx          Input index of the sink node
+     *
+     * @return ID of this connection
+     */
+    EdgeID add_connection(Target assigned_target, NodeID source, size_t source_idx, NodeID sink, size_t sink_idx);
     /** Adds a connection between two nodes
      *
      * @param[in] source     ID of the source node

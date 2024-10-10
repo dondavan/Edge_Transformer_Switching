@@ -1012,24 +1012,24 @@ NodeID GraphBuilder::add_embedding_node(Graph              &g,
 
     // Create token embedding node and connect
     NodeID t_nid = g.add_node<TokenEmbeddingLayerNode>(assigned_target, emb_info);
-    g.add_connection(input.node_id, 0 /* text input*/, t_nid, 0);
-    g.add_connection(v_c_nid, 0, t_nid, 1);
+    g.add_connection(assigned_target, input.node_id, 0 /* text input*/, t_nid, 0);
+    g.add_connection(assigned_target, v_c_nid, 0, t_nid, 1);
 
     // Create segment embedding node
     NodeID s_nid = g.add_node<SegmentEmbeddingLayerNode>(assigned_target);
-    g.add_connection(input.node_id, 1 /* segment input*/, s_nid, 0);
-    g.add_connection(s_c_nid, 0, s_nid, 1);
+    g.add_connection(assigned_target, input.node_id, 1 /* segment input*/, s_nid, 0);
+    g.add_connection(assigned_target, s_c_nid, 0, s_nid, 1);
 
     NodeID p_nid = g.add_node<PositionEmbeddingLayerNode>(assigned_target);
-    g.add_connection(input.node_id, 0 /* text input*/, p_nid, 0);
-    g.add_connection(p_c_nid, 0, p_nid, 1);
+    g.add_connection(assigned_target, input.node_id, 0 /* text input*/, p_nid, 0);
+    g.add_connection(assigned_target, p_c_nid, 0, p_nid, 1);
 
     // Sum token embedding vector and segment embedding vector
     NodeID add_nid = g.add_node<EmbeddingSumLayerNode>(assigned_target,emb_info);
 
-    g.add_connection(t_nid, 0, add_nid, 0);
-    g.add_connection(s_nid, 0, add_nid, 1);
-    g.add_connection(p_nid, 0, add_nid, 2);
+    g.add_connection(assigned_target, t_nid, 0, add_nid, 0);
+    g.add_connection(assigned_target, s_nid, 0, add_nid, 1);
+    g.add_connection(assigned_target, p_nid, 0, add_nid, 2);
 
     set_node_params(g, t_nid, params);
     set_node_params(g, s_nid, params);
