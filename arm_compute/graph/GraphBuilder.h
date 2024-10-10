@@ -53,6 +53,18 @@ class GraphBuilder final
      */
     static NodeID
     add_const_node(Graph &g, NodeParams params, const TensorDescriptor &desc, ITensorAccessorUPtr accessor = nullptr);
+    /** Adds a Const node to the graph
+     *
+     * @param[in] g                 Graph to add the node to
+     * @param[in] params            Common node parameters
+     * @param[in] assigned_target   Assigned execution target
+     * @param[in] desc              Tensor descriptor of the node
+     * @param[in] accessor          (Optional) Accessor of the const node data
+     *
+     * @return Node ID of the created node, EmptyNodeID in case of error
+     */
+    static NodeID
+    add_const_node(Graph &g, NodeParams params, Target assigned_target, const TensorDescriptor &desc, ITensorAccessorUPtr accessor = nullptr);
     /** Adds an output layer node to the graph
      *
      * @param[in] g        Graph to add the node to
@@ -711,6 +723,27 @@ class GraphBuilder final
                                      ITensorAccessorUPtr vocabs   = nullptr,
                                      ITensorAccessorUPtr segments = nullptr,
                                      ITensorAccessorUPtr position = nullptr);
+    /** Adds an embedding layer to the graph
+     *
+     * @param[in] g          Graph to add the node to
+     * @param[in] params     Common node parameters
+     * @param[in] target     Assigned target of the node
+     * @param[in] input      Input to the token embedding layer node as a NodeID-Index pair
+     * @param[in] tkemb_info Token embedding layer parameters
+     * @param[in] vocabs     Pretrained vocabulary vector accessor
+     * @param[in] segments   Pretrained segments vector accessor
+     * @param[in] position   Pretrained position vector accessor
+     * 
+     * @return Node ID of the created node, EmptyNodeID in case of error
+     */
+    static NodeID add_embedding_node(Graph              &g,
+                                     NodeParams          params,
+                                     Target              assigned_target,
+                                     NodeIdxPair         input,
+                                     EmbeddingLayerInfo  tkemb_info,
+                                     ITensorAccessorUPtr vocabs   = nullptr,
+                                     ITensorAccessorUPtr segments = nullptr,
+                                     ITensorAccessorUPtr position = nullptr);
     /** Adds a feed forward layer node to the graph
      *
      * @param[in] g                  Graph to add the layer to
@@ -741,14 +774,14 @@ class GraphBuilder final
      * 
      * @return Node ID of the created node, EmptyNodeID in case of error
      */
-    static NodeID add_attention_linear_layer(Graph &g, NodeParams params, NodeIdxPair input, 
-                                                               LinearLayerInfo linear_info,
-                                                               ITensorAccessorUPtr query_weights,
-                                                               ITensorAccessorUPtr query_bias,
-                                                               ITensorAccessorUPtr key_weights,
-                                                               ITensorAccessorUPtr key_bias,
-                                                               ITensorAccessorUPtr value_weights,
-                                                               ITensorAccessorUPtr value_bias);
+    static NodeID add_attention_linear_layer(Graph &g, NodeParams params, NodeIdxPair input,
+                                             LinearLayerInfo     linear_info,
+                                             ITensorAccessorUPtr query_weights,
+                                             ITensorAccessorUPtr query_bias,
+                                             ITensorAccessorUPtr key_weights,
+                                             ITensorAccessorUPtr key_bias,
+                                             ITensorAccessorUPtr value_weights,
+                                             ITensorAccessorUPtr value_bias);
     /** Adds a multi-head attention layer to the graph
      *
      * @param[in] g         Graph to add the node to

@@ -76,6 +76,15 @@ NodeID add_const_node_with_name(
     return nid;
 }
 
+NodeID add_const_node_with_name(
+    Graph &g, NodeParams params,Target assigned_target, const std::string &name, const TensorDescriptor &desc, ITensorAccessorUPtr accessor)
+{
+    params.name = params.name.empty() ? "" : params.name + name;
+    auto nid    = GraphBuilder::add_const_node(g, params, assigned_target, desc, std::move(accessor));
+    set_node_params(g, nid, params);
+    return nid;
+}
+
 template <typename NT, typename... Args>
 NodeID create_simple_single_input_output_node(Graph &g, NodeParams &params, NodeIdxPair input, Args &&...args)
 {
@@ -114,6 +123,15 @@ NodeID
 GraphBuilder::add_const_node(Graph &g, NodeParams params, const TensorDescriptor &desc, ITensorAccessorUPtr accessor)
 {
     auto nid = g.add_node<ConstNode>(desc);
+    set_node_params(g, nid, params);
+    set_accessor_on_node(g, nid, true, 0, std::move(accessor));
+    return nid;
+}
+
+NodeID
+GraphBuilder::add_const_node(Graph &g, NodeParams params,Target assigned_target, const TensorDescriptor &desc, ITensorAccessorUPtr accessor)
+{
+    auto nid = g.add_node<ConstNode>(assigned_target, desc);
     set_node_params(g, nid, params);
     set_accessor_on_node(g, nid, true, 0, std::move(accessor));
     return nid;
@@ -959,6 +977,68 @@ NodeID GraphBuilder::add_embedding_node(Graph              &g,
     return add_nid;
 }
 
+NodeID GraphBuilder::add_embedding_node(Graph              &g,
+                                        NodeParams          params,
+                                        Target              assigned_target,
+                                        NodeIdxPair         input,
+                                        EmbeddingLayerInfo  emb_info,
+                                        ITensorAccessorUPtr vocabs_accessor,
+                                        ITensorAccessorUPtr segemnts_accessor,
+                                        ITensorAccessorUPtr position_accessor)
+{
+    check_nodeidx_pair(input, g);
+
+    // Get input tensor descriptor
+    const TensorDescriptor input_tensor_desc = get_tensor_descriptor(g, g.node(input.node_id)->outputs()[0]);
+
+    // Vocabulary const node output tensor descriptor
+    TensorDescriptor v_desc = input_tensor_desc;
+    // Reshape tensor to store weight with size of vocabulary and depth of d_model.
+    v_desc.shape = TensorShape(emb_info.d_model(), emb_info.d_vocab());
+
+    // Segment const node output tensor descriptor
+    TensorDescriptor s_desc = input_tensor_desc;
+    // Reshape tensor to store weight with size of vocabulary and depth of d_model.
+    s_desc.shape = TensorShape(emb_info.d_model(), emb_info.d_segment());
+
+    // Position const node output tensor descriptor
+    TensorDescriptor p_desc = input_tensor_desc;
+    // Reshape tensor to store weight with size of vocabulary and depth of d_model.
+    p_desc.shape = TensorShape(emb_info.d_model(), emb_info.d_position());
+
+    NodeID v_c_nid = add_const_node_with_name(g, params, assigned_target, "vocabs", v_desc, std::move(vocabs_accessor));
+    NodeID s_c_nid = add_const_node_with_name(g, params, assigned_target, "segements", s_desc, std::move(segemnts_accessor));
+    NodeID p_c_nid = add_const_node_with_name(g, params, assigned_target, "position", p_desc, std::move(position_accessor));
+
+    // Create token embedding node and connect
+    NodeID t_nid = g.add_node<TokenEmbeddingLayerNode>(emb_info);
+    g.add_connection(input.node_id, 0 /* text input*/, t_nid, 0);
+    g.add_connection(v_c_nid, 0, t_nid, 1);
+
+    // Create segment embedding node
+    NodeID s_nid = g.add_node<SegmentEmbeddingLayerNode>();
+    g.add_connection(input.node_id, 1 /* segment input*/, s_nid, 0);
+    g.add_connection(s_c_nid, 0, s_nid, 1);
+
+    NodeID p_nid = g.add_node<PositionEmbeddingLayerNode>();
+    g.add_connection(input.node_id, 0 /* text input*/, p_nid, 0);
+    g.add_connection(p_c_nid, 0, p_nid, 1);
+
+    // Sum token embedding vector and segment embedding vector
+    NodeID add_nid = g.add_node<EmbeddingSumLayerNode>(emb_info);
+
+    g.add_connection(t_nid, 0, add_nid, 0);
+    g.add_connection(s_nid, 0, add_nid, 1);
+    g.add_connection(p_nid, 0, add_nid, 2);
+
+    set_node_params(g, t_nid, params);
+    set_node_params(g, s_nid, params);
+    set_node_params(g, p_nid, params);
+    set_node_params(g, add_nid, params);
+
+    return add_nid;
+}
+
 NodeID GraphBuilder::add_linear_node(Graph &g, NodeParams params, NodeIdxPair input,
                                      LinearLayerInfo     ff_info,
                                      ITensorAccessorUPtr ff_weights,
@@ -994,14 +1074,14 @@ NodeID GraphBuilder::add_linear_node(Graph &g, NodeParams params, NodeIdxPair in
     return f_nid;
 }
 
-NodeID GraphBuilder::add_attention_linear_layer(Graph &g, NodeParams params, NodeIdxPair input, 
-                                                                  LinearLayerInfo linear_info,
-                                                                  ITensorAccessorUPtr query_weights,
-                                                                  ITensorAccessorUPtr query_bias,
-                                                                  ITensorAccessorUPtr key_weights,
-                                                                  ITensorAccessorUPtr key_bias,
-                                                                  ITensorAccessorUPtr value_weights,
-                                                                  ITensorAccessorUPtr value_bias)
+NodeID GraphBuilder::add_attention_linear_layer(Graph &g, NodeParams params, NodeIdxPair input,
+                                                LinearLayerInfo     linear_info,
+                                                ITensorAccessorUPtr query_weights,
+                                                ITensorAccessorUPtr query_bias,
+                                                ITensorAccessorUPtr key_weights,
+                                                ITensorAccessorUPtr key_bias,
+                                                ITensorAccessorUPtr value_weights,
+                                                ITensorAccessorUPtr value_bias)
 {
     check_nodeidx_pair(input, g);
 
@@ -1009,31 +1089,30 @@ NodeID GraphBuilder::add_attention_linear_layer(Graph &g, NodeParams params, Nod
     const TensorDescriptor input_tensor_desc = get_tensor_descriptor(g, g.node(input.node_id)->outputs()[0]);
 
     // Create weight and bias tensor shape
-    TensorDescriptor q_w_desc         = input_tensor_desc;
-    q_w_desc.shape                    = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
-    TensorDescriptor q_b_desc         = input_tensor_desc;
-    q_b_desc.shape                    = TensorShape(linear_info.d_linear_hidden());
+    TensorDescriptor q_w_desc = input_tensor_desc;
+    q_w_desc.shape            = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
+    TensorDescriptor q_b_desc = input_tensor_desc;
+    q_b_desc.shape            = TensorShape(linear_info.d_linear_hidden());
 
-    TensorDescriptor k_w_desc         = input_tensor_desc;
-    k_w_desc.shape                    = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
-    TensorDescriptor k_b_desc         = input_tensor_desc;
-    k_b_desc.shape                    = TensorShape(linear_info.d_linear_hidden());
+    TensorDescriptor k_w_desc = input_tensor_desc;
+    k_w_desc.shape            = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
+    TensorDescriptor k_b_desc = input_tensor_desc;
+    k_b_desc.shape            = TensorShape(linear_info.d_linear_hidden());
 
-    TensorDescriptor v_w_desc         = input_tensor_desc;
-    v_w_desc.shape                    = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
-    TensorDescriptor v_b_desc         = input_tensor_desc;
-    v_b_desc.shape                    = TensorShape(linear_info.d_linear_hidden());
-    
+    TensorDescriptor v_w_desc = input_tensor_desc;
+    v_w_desc.shape            = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
+    TensorDescriptor v_b_desc = input_tensor_desc;
+    v_b_desc.shape            = TensorShape(linear_info.d_linear_hidden());
+
     // Create weight and bias const node with npy tensor accessor
-    NodeID          q_w_nid  = add_const_node_with_name(g, params, "Query Weights", q_w_desc, std::move(query_weights));
-    NodeID          q_b_nid  = add_const_node_with_name(g, params, "Query Bias", q_b_desc, std::move(query_bias));
+    NodeID q_w_nid = add_const_node_with_name(g, params, "Query Weights", q_w_desc, std::move(query_weights));
+    NodeID q_b_nid = add_const_node_with_name(g, params, "Query Bias", q_b_desc, std::move(query_bias));
 
-    NodeID          k_w_nid  = add_const_node_with_name(g, params, "Key Weights", k_w_desc, std::move(key_weights));
-    NodeID          k_b_nid  = add_const_node_with_name(g, params, "Key Bias", k_b_desc, std::move(key_bias));
+    NodeID k_w_nid = add_const_node_with_name(g, params, "Key Weights", k_w_desc, std::move(key_weights));
+    NodeID k_b_nid = add_const_node_with_name(g, params, "Key Bias", k_b_desc, std::move(key_bias));
 
-    NodeID          v_w_nid  = add_const_node_with_name(g, params, "Value Weights", v_w_desc, std::move(value_weights));
-    NodeID          v_b_nid  = add_const_node_with_name(g, params, "Value Bias", v_b_desc, std::move(value_bias));
-
+    NodeID v_w_nid = add_const_node_with_name(g, params, "Value Weights", v_w_desc, std::move(value_weights));
+    NodeID v_b_nid = add_const_node_with_name(g, params, "Value Bias", v_b_desc, std::move(value_bias));
 
     NodeID attention_linear_nid = g.add_node<AttentionLinearNode>(linear_info);
 
@@ -1064,9 +1143,9 @@ NodeID GraphBuilder::add_scale_dot_production_node(Graph &g, NodeParams params, 
     /* Scale dot production Layer */
     NodeID sdp_nid = g.add_node<ScaleDotProductionAttentionNode>(sdpa_info);
 
-    g.add_connection(input.node_id, 0 /*query*/ , sdp_nid, 0);
-    g.add_connection(input.node_id, 1 /*key*/   , sdp_nid, 1);
-    g.add_connection(input.node_id, 2 /*value*/ , sdp_nid, 2);
+    g.add_connection(input.node_id, 0 /*query*/, sdp_nid, 0);
+    g.add_connection(input.node_id, 1 /*key*/, sdp_nid, 1);
+    g.add_connection(input.node_id, 2 /*value*/, sdp_nid, 2);
 
     set_node_params(g, sdp_nid, params);
 

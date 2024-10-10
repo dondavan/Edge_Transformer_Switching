@@ -1491,35 +1491,23 @@ class InputLayer final : public ILayer
                           { _accessors.push_back(std::move(accessor)); },
                           std::move(more_accessor)...);
     }
-    /** Construct an input layer.
-     *
-     * @param[in] desc     Description of input tensor.
-     * @param[in] accessor Accessor to get input tensor data from.
-     */
-    template <typename... Ts>
-    InputLayer(Target assigned_target, TensorDescriptor desc, ITensorAccessorUPtr accessor1, Ts &&...more_accessor)
-        : _assigned_target(assigned_target),_desc(desc), _accessors()
-    {
-        _accessors.push_back(std::move(accessor1));
-        utility::for_each([&](ITensorAccessorUPtr &&accessor)
-                          { _accessors.push_back(std::move(accessor)); },
-                          std::move(more_accessor)...);
-    }
 
     NodeID create_layer(IStream &s) override
     {
         NodeParams common_params = { name(), s.hints().target_hint };
-        if(_assigned_target!=Target::UNSPECIFIED)
+        _assigned_target = assigned_target();
+        if(_assigned_target != Target::UNSPECIFIED)
         {
             return GraphBuilder::add_input_node(s.graph(), common_params, _assigned_target, _desc, _accessors);
-        }else
+        }
+        else
         {
             return GraphBuilder::add_input_node(s.graph(), common_params, _desc, _accessors);
         }
     }
 
     private:
-    Target                           _assigned_target{Target::UNSPECIFIED};
+    Target                           _assigned_target{ Target::UNSPECIFIED };
     TensorDescriptor                 _desc;
     std::vector<ITensorAccessorUPtr> _accessors;
 };
@@ -1530,7 +1518,10 @@ class EmbeddingLayer final : public ILayer
     public:
     /** Construct a token embedding  layer.
      *
-     * @param[in] emb_info  Embedding layer info
+     * @param[in] emb_info            Embedding layer info.
+     * @param[in] vocabs              Vocabulary weight accessor.
+     * @param[in] segments            Segments   weight accessor.
+     * @param[in] position_accessor   Positional weight accessor.
      */
     EmbeddingLayer(const EmbeddingLayerInfo &emb_info,
                    ITensorAccessorUPtr       vocabs,
@@ -1547,13 +1538,27 @@ class EmbeddingLayer final : public ILayer
     {
         NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input         = { s.tail_node(), 0 };
-        return GraphBuilder::add_embedding_node(s.graph(), common_params, input, _emb_info,
-                                                std::move(_vocabs),
-                                                std::move(_segments),
-                                                std::move(_position));
+        _assigned_target = assigned_target();
+        if(_assigned_target != Target::UNSPECIFIED)
+        {
+            return GraphBuilder::add_embedding_node(s.graph(), common_params, _assigned_target,
+                                                    input, _emb_info,
+                                                    std::move(_vocabs),
+                                                    std::move(_segments),
+                                                    std::move(_position));
+        }
+        else
+        {
+            return GraphBuilder::add_embedding_node(s.graph(), common_params,
+                                                    input, _emb_info,
+                                                    std::move(_vocabs),
+                                                    std::move(_segments),
+                                                    std::move(_position));
+        }
     }
 
     private:
+    Target                    _assigned_target{ Target::UNSPECIFIED };
     const EmbeddingLayerInfo &_emb_info;
     ITensorAccessorUPtr       _vocabs;
     ITensorAccessorUPtr       _segments;
@@ -1563,121 +1568,124 @@ class EmbeddingLayer final : public ILayer
 /** LinearLayer */
 class LinearLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a feed forward layer.
      *
      * @param[in] info Feed Forward layer information
      */
-    LinearLayer(LinearLayerInfo   info,
-                ITensorAccessorUPtr         ff_weights,
-                ITensorAccessorUPtr         ff_bias) :  _info(info),
-                                                        _ff_weights(std::move(ff_weights)),
-                                                        _ff_bias(std::move(ff_bias))
+    LinearLayer(LinearLayerInfo     info,
+                ITensorAccessorUPtr ff_weights,
+                ITensorAccessorUPtr ff_bias)
+        : _info(info),
+          _ff_weights(std::move(ff_weights)),
+          _ff_bias(std::move(ff_bias))
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
-        return GraphBuilder::add_linear_node(s.graph(), common_params, input, _info, std::move( _ff_weights), std::move(_ff_bias));
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
+        return GraphBuilder::add_linear_node(s.graph(), common_params, input, _info, std::move(_ff_weights), std::move(_ff_bias));
     }
 
-private:
+    private:
     LinearLayerInfo     _info;
     ITensorAccessorUPtr _ff_weights;
-    ITensorAccessorUPtr _ff_bias;    
+    ITensorAccessorUPtr _ff_bias;
 };
 
 /** Multi Head Linear Layer */
 class AttentionLinearLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a linear layer computing Key, Value, Query
      *
      */
-    AttentionLinearLayer(LinearLayerInfo info,
-                ITensorAccessorUPtr           query_weights,
-                ITensorAccessorUPtr           query_bias,
-                ITensorAccessorUPtr           key_weights,
-                ITensorAccessorUPtr           key_bias,
-                ITensorAccessorUPtr           value_weights,
-                ITensorAccessorUPtr           value_bias) : _info(info),
-                                                            _query_weights(std::move(query_weights)),
-                                                            _query_bias(std::move(query_bias)),
-                                                            _key_weights(std::move(key_weights)),
-                                                            _key_bias(std::move(key_bias)),
-                                                            _value_weights(std::move(value_weights)),
-                                                            _value_bias(std::move(value_bias))
+    AttentionLinearLayer(LinearLayerInfo     info,
+                         ITensorAccessorUPtr query_weights,
+                         ITensorAccessorUPtr query_bias,
+                         ITensorAccessorUPtr key_weights,
+                         ITensorAccessorUPtr key_bias,
+                         ITensorAccessorUPtr value_weights,
+                         ITensorAccessorUPtr value_bias)
+        : _info(info),
+          _query_weights(std::move(query_weights)),
+          _query_bias(std::move(query_bias)),
+          _key_weights(std::move(key_weights)),
+          _key_bias(std::move(key_bias)),
+          _value_weights(std::move(value_weights)),
+          _value_bias(std::move(value_bias))
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_attention_linear_layer(s.graph(), common_params, input, _info,
-                                                                             std::move(_query_weights),
-                                                                             std::move(_query_bias),
-                                                                             std::move(_key_weights),
-                                                                             std::move(_key_bias),
-                                                                             std::move(_value_weights),
-                                                                             std::move(_value_bias));
+                                                        std::move(_query_weights),
+                                                        std::move(_query_bias),
+                                                        std::move(_key_weights),
+                                                        std::move(_key_bias),
+                                                        std::move(_value_weights),
+                                                        std::move(_value_bias));
     }
 
-private:
-    LinearLayerInfo _info;
+    private:
+    LinearLayerInfo     _info;
     ITensorAccessorUPtr _query_weights;
-    ITensorAccessorUPtr _query_bias;        
+    ITensorAccessorUPtr _query_bias;
     ITensorAccessorUPtr _key_weights;
-    ITensorAccessorUPtr _key_bias;        
+    ITensorAccessorUPtr _key_bias;
     ITensorAccessorUPtr _value_weights;
-    ITensorAccessorUPtr _value_bias;   
+    ITensorAccessorUPtr _value_bias;
 };
 
 /** ScaleDotProductionLayer */
-class ScaleDotProductionLayer final: public ILayer
+class ScaleDotProductionLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a multi-head attention layer.
      *
      * @param[in] mha_info      Multi head attention layer information
      */
-    ScaleDotProductionLayer(const ScaleDotProductionLayerInfo &mha_info) : _mha_info(mha_info)
+    ScaleDotProductionLayer(const ScaleDotProductionLayerInfo &mha_info)
+        : _mha_info(mha_info)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_scale_dot_production_node(s.graph(), common_params, input, _mha_info);
     }
 
-private:
+    private:
     const ScaleDotProductionLayerInfo &_mha_info;
-
 };
 
 /** LayerNormLayer */
 class LayerNormLayer final : public ILayer
 {
-public:
+    public:
     /** Construct a layer norm layer.
      *
      */
-    LayerNormLayer(LayerNormLayerInfo info) : _info(info)
+    LayerNormLayer(LayerNormLayerInfo info)
+        : _info(info)
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = {name(), s.hints().target_hint};
-        NodeIdxPair input         = {s.tail_node(), 0};
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
         return GraphBuilder::add_layer_norm_node(s.graph(), common_params, input, _info);
     }
 
-private:
+    private:
     LayerNormLayerInfo _info;
 };
 

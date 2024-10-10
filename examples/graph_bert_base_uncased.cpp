@@ -88,9 +88,9 @@ class GraphVanillaTransformerExample : public Example
         std::unique_ptr<IPreprocessor> at2_preproccessor = std::make_unique<atoiPreprocessor>();
 
         // Encode Input
-        graph << InputLayer(Target::CL, input_descriptor, get_token_accessor(common_params),
+        graph << InputLayer(input_descriptor, get_token_accessor(common_params),
                             get_segment_accessor(common_params.segment, move(at2_preproccessor)))
-                     .set_name("in1")
+                     .set_name("in1").set_target(Target::CL)
 
               << EmbeddingLayer(EmbeddingLayerInfo(d_model,
                                                    d_vocab,
@@ -101,7 +101,7 @@ class GraphVanillaTransformerExample : public Example
                                 get_weights_accessor(data_path, "token_embedding.npy", operation_layout),
                                 get_weights_accessor(data_path, "segment_embedding.npy", operation_layout),
                                 get_weights_accessor(data_path, "positional_embedding.npy", operation_layout))
-                     .set_name("tkemb1");
+                     .set_name("tkemb1").set_target(Target::CL);
 
         add_encoder_block(data_path, "layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
         add_encoder_block(data_path, "layer_1/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);

@@ -65,9 +65,29 @@ public:
     {
         return _name;
     }
+    /** Sets the name of the layer
+     *
+     * @param[in] name Name of the layer
+     *
+     * @return The layer object
+     */
+    ILayer &set_target(Target assigned_target)
+    {
+        _assigned_target = assigned_target;
+        return *this;
+    }
+    /** Layer assigned target accessor
+     *
+     * @return Returns the assigned target of the layer
+     */
+    const Target &assigned_target() const
+    {
+        return _assigned_target;
+    }
 
 private:
     std::string _name = {};
+    Target _assigned_target{Target::UNSPECIFIED};
 };
 } // namespace frontend
 } // namespace graph
