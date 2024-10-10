@@ -289,9 +289,9 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
 {
     arm_compute::lock_guard<arm_compute::Mutex> lock(_mtx);
 
-    if(assigned_target == Target::NEON)
+    if(assigned_target == Target::CL)
     {
-        std::cout << "NEON" << std::endl;
+        std::cout << "CL" << std::endl;
     }else
     {
         std::cout << "Still working" << std::endl;
@@ -304,9 +304,9 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     node->set_id(nid);
     node->set_assigned_target(assigned_target);
 
-    if(node->assigned_target() == Target::NEON)
+    if(node->assigned_target() == Target::CL)
     {
-        std::cout << "NEON" << std::endl;
+        std::cout << "CL" << std::endl;
     }else
     {
         std::cout << "Still working" << std::endl;
