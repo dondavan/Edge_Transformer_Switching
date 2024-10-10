@@ -1491,13 +1491,35 @@ class InputLayer final : public ILayer
                           { _accessors.push_back(std::move(accessor)); },
                           std::move(more_accessor)...);
     }
+    /** Construct an input layer.
+     *
+     * @param[in] desc     Description of input tensor.
+     * @param[in] accessor Accessor to get input tensor data from.
+     */
+    template <typename... Ts>
+    InputLayer(Target assigned_target, TensorDescriptor desc, ITensorAccessorUPtr accessor1, Ts &&...more_accessor)
+        : _assigned_target(assigned_target),_desc(desc), _accessors()
+    {
+        _accessors.push_back(std::move(accessor1));
+        utility::for_each([&](ITensorAccessorUPtr &&accessor)
+                          { _accessors.push_back(std::move(accessor)); },
+                          std::move(more_accessor)...);
+    }
+
     NodeID create_layer(IStream &s) override
     {
         NodeParams common_params = { name(), s.hints().target_hint };
-        return GraphBuilder::add_input_node(s.graph(), common_params, _desc, _accessors);
+        if(_assigned_target!=Target::UNSPECIFIED)
+        {
+            return GraphBuilder::add_input_node(s.graph(), common_params, _assigned_target, _desc, _accessors);
+        }else
+        {
+            return GraphBuilder::add_input_node(s.graph(), common_params, _desc, _accessors);
+        }
     }
 
     private:
+    Target                           _assigned_target{Target::UNSPECIFIED};
     TensorDescriptor                 _desc;
     std::vector<ITensorAccessorUPtr> _accessors;
 };

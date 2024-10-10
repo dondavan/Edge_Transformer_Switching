@@ -885,6 +885,18 @@ GraphBuilder::add_input_node(Graph &g, NodeParams params, const TensorDescriptor
     }
     return nid;
 }
+NodeID
+GraphBuilder::add_input_node(Graph &g, NodeParams params, Target assigned_target, const TensorDescriptor &desc, std::vector<ITensorAccessorUPtr> &accessors)
+{
+    auto nid = g.add_node<InputNode>(assigned_target, desc, accessors.size());
+
+    set_node_params(g, nid, params);
+    for(size_t idx = 0; idx < accessors.size(); idx++)
+    {
+        set_accessor_on_node(g, nid, true, idx, std::move(accessors[idx]));
+    }
+    return nid;
+}
 
 NodeID GraphBuilder::add_embedding_node(Graph              &g,
                                         NodeParams          params,

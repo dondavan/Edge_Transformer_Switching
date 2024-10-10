@@ -80,6 +80,20 @@ public:
      */
     template <typename NT, typename... Ts>
     NodeID add_node(Ts &&...args);
+    /** Adds a node with assigned target to the graph
+     *
+     * @note Models a single output node
+     *
+     * @tparam NT Node operation
+     * @tparam Ts Arguments to operation
+     *
+     * @param[in] assigned_target Assigned target for this node
+     * @param[in] args            Node arguments
+     *
+     * @return ID of the node
+     */
+    template <typename NT, typename... Ts>
+    NodeID add_node(Target assigned_target, Ts &&...args);
     /** Remove the node with the given ID
      *
      * @param[in] nid ID of the node to remove
@@ -97,6 +111,17 @@ public:
      * @return ID of this connection
      */
     EdgeID add_connection(NodeID source, size_t source_idx, NodeID sink, size_t sink_idx);
+    /** Adds a connection between two nodes
+     *
+     * @param[in] source     ID of the source node
+     * @param[in] source_idx Output index of the source node
+     * @param[in] sink       ID of the sink node
+     * @param[in] sink_idx   Input index of the sink node
+     * @param[in] target     Device target of this connection
+     *
+     * @return ID of this connection
+     */
+    EdgeID add_connection(NodeID source, size_t source_idx, NodeID sink, size_t sink_idx, Target target);
     /** Removes an edge (connection)
      *
      * @param[in] eid Connection to remove
@@ -258,6 +283,44 @@ inline NodeID Graph::add_node(Ts &&...args)
 
     return nid;
 }
+
+template <typename NT, typename... Ts>
+inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
+{
+    arm_compute::lock_guard<arm_compute::Mutex> lock(_mtx);
+
+    if(assigned_target == Target::NEON)
+    {
+        std::cout << "NEON" << std::endl;
+    }else
+    {
+        std::cout << "Still working" << std::endl;
+    }
+
+    // Create node
+    NodeID nid  = _nodes.size();
+    auto   node = std::make_unique<NT>(std::forward<Ts>(args)...);
+    node->set_graph(this);
+    node->set_id(nid);
+
+    // Keep track of input nodes
+    _tagged_nodes[node->type()].push_back(nid);
+
+    // Associate a new tensor with each output
+    for (auto &output : node->_outputs)
+    {
+        output = create_tensor();
+    }
+
+    // Propagate node shape if possible
+    node->forward_descriptors();
+
+    // Add node to the graph nodes
+    _nodes.push_back(std::move(node));
+
+    return nid;
+}
+
 } // namespace graph
 } // namespace arm_compute
 #endif /* ARM_COMPUTE_GRAPH_GRAPH_H */

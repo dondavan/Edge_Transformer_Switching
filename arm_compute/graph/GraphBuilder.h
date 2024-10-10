@@ -680,6 +680,18 @@ class GraphBuilder final
      */
     static NodeID
     add_input_node(Graph &g, NodeParams params, const TensorDescriptor &desc, std::vector<ITensorAccessorUPtr> &accessors);
+    /** Adds an input layer node with assigned target to the graph
+     *
+     * @param[in] g        Graph to add the node to
+     * @param[in] params   Common node parameters
+     * @param[in] target   Assigned target of the node
+     * @param[in] desc     Tensor descriptor of the Tensor
+     * @param[in] accessor (Optional) Accessor of the input node data
+     *
+     * @return Node ID of the created node, EmptyNodeID in case of error
+     */
+    static NodeID
+    add_input_node(Graph &g, NodeParams params, Target assigned_target, const TensorDescriptor &desc, std::vector<ITensorAccessorUPtr> &accessors);
     /** Adds an embedding layer to the graph
      *
      * @param[in] g          Graph to add the node to
