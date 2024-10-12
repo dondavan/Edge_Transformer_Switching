@@ -333,7 +333,7 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
         }else if( _tensors[output]->desc().target == Target::NEON)
         {
             std::cout << "Node tensor target NEON" << std::endl;
-        }
+        }else
         {
             std::cout << "Node tensor target  Still working" << std::endl;
         }
