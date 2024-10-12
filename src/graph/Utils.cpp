@@ -57,18 +57,27 @@ void force_target_to_graph(Graph &g, Target target)
     {
         if (node)
         {
-            /*
             if(node->assigned_target() == Target::CL)
             {
-                std::cout << "Node Target CL" << std::endl;
+                std::cout << "Pre-assigned Node Target CL" << std::endl;
             }else if (node->assigned_target() == Target::NEON)
             {
-                std::cout << "Node Target NEON" << std::endl;
+                std::cout << "Pre-assigned Node Target NEON" << std::endl;
             }else
             {
-                std::cout << "Node Target Still working" << std::endl;
-            }*/
+                std::cout << "Pre-assigned Node Target Still working" << std::endl;
+            }
             node->set_assigned_target(target);
+            if(node->assigned_target() == Target::CL)
+            {
+                std::cout << "Forced Pre-assigned Node Target CL" << std::endl;
+            }else if (node->assigned_target() == Target::NEON)
+            {
+                std::cout << "Forced Node Target NEON" << std::endl;
+            }else
+            {
+                std::cout << "Forced Node Target Still working" << std::endl;
+            }
         }
     }
 
@@ -77,7 +86,27 @@ void force_target_to_graph(Graph &g, Target target)
     {
         if (tensor)
         {
+            if(tensor->desc().target == Target::CL)
+            {
+                std::cout << "Pre-assigned tensor Target CL" << std::endl;
+            }else if (tensor->desc().target == Target::NEON)
+            {
+                std::cout << "Pre-assigned tensor Target NEON" << std::endl;
+            }else
+            {
+                std::cout << "Pre-assigned tensor Target Still working" << std::endl;
+            }
             tensor->desc().target = target;
+            if(tensor->desc().target == Target::CL)
+            {
+                std::cout << "Pre-assigned Node Target CL" << std::endl;
+            }else if (tensor->desc().target == Target::NEON)
+            {
+                std::cout << "Pre-assigned tensor Target NEON" << std::endl;
+            }else
+            {
+                std::cout << "Pre-assigned tensor Target Still working" << std::endl;
+            }
         }
     }
 }
