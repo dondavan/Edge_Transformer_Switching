@@ -149,17 +149,7 @@ EdgeID Graph::add_connection(Target assigned_target, NodeID source, size_t sourc
         tid = create_tensor();
     }
     std::unique_ptr<Tensor> &tensor = _tensors[tid];
-    tensor.get()->desc().target = assigned_target;    
-    if( tensor.get()->desc().target == Target::CL)
-    {
-        std::cout << "Connection created tensor CL" << std::endl;
-    }else if( tensor.get()->desc().target == Target::NEON)
-    {
-        std::cout << "Connection created tensor NEON" << std::endl;
-    }else
-    {
-        std::cout << "Connection created tensor Still working" << std::endl;
-    }
+    tensor.get()->desc().target = assigned_target;
 
     // Create connections
     EdgeID eid = _edges.size();

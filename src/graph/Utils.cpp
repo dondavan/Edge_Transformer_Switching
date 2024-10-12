@@ -57,6 +57,17 @@ void force_target_to_graph(Graph &g, Target target)
     {
         if (node)
         {
+            /*
+            if(node->assigned_target() == Target::CL)
+            {
+                std::cout << "Node Target CL" << std::endl;
+            }else if (node->assigned_target() == Target::NEON)
+            {
+                std::cout << "Node Target NEON" << std::endl;
+            }else
+            {
+                std::cout << "Node Target Still working" << std::endl;
+            }*/
             node->set_assigned_target(target);
         }
     }

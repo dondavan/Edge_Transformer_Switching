@@ -307,16 +307,6 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     node->set_id(nid);
     node->set_assigned_target(assigned_target);
 
-    if(node->assigned_target() == Target::CL)
-    {
-        std::cout << "Node Target CL" << std::endl;
-    }else if (node->assigned_target() == Target::NEON)
-    {
-        std::cout << "Node Target NEON" << std::endl;
-    }else
-    {
-        std::cout << "Node Target Still working" << std::endl;
-    }
 
     // Keep track of input nodes
     _tagged_nodes[node->type()].push_back(nid);
@@ -326,17 +316,6 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     {
         output = create_tensor();
         _tensors[output]->desc().target = assigned_target;
-        
-        if( _tensors[output]->desc().target == Target::CL)
-        {
-            std::cout << "Node tensor target CL" << std::endl;
-        }else if( _tensors[output]->desc().target == Target::NEON)
-        {
-            std::cout << "Node tensor target NEON" << std::endl;
-        }else
-        {
-            std::cout << "Node tensor target  Still working" << std::endl;
-        }
     }
 
     // Propagate node shape if possible
