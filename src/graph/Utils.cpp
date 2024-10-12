@@ -81,6 +81,10 @@ void force_target_to_graph(Graph &g, Target target)
         }
     }
 
+    std::cout << "**********************************************************" << std::endl;
+    std::cout << "**********************************************************" << std::endl;
+    std::cout << "**********************************************************" << std::endl;
+    
     auto &tensors = g.tensors();
     for (auto &tensor : tensors)
     {
