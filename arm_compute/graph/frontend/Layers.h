@@ -1605,6 +1605,7 @@ class AttentionLinearLayer final : public ILayer
     {
         NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input         = { s.tail_node(), 0 };
+        common_params.target      = assigned_target();
         return GraphBuilder::add_attention_linear_layer(s.graph(), common_params, input, _info,
                                                         std::move(_query_weights),
                                                         std::move(_query_bias),
