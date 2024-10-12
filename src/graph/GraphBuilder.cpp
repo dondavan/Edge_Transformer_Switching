@@ -90,8 +90,17 @@ NodeID create_simple_single_input_output_node(Graph &g, NodeParams &params, Node
 {
     check_nodeidx_pair(input, g);
 
-    NodeID nid = g.add_node<NT>(std::forward<Args>(args)...);
-    g.add_connection(input.node_id, input.index, nid, 0);
+    NodeID nid;
+    if(params.target != Target::UNSPECIFIED)
+    {
+        nid = g.add_node<NT>(params.target,std::forward<Args>(args)...);
+        g.add_connection(params.target,input.node_id, input.index, nid, 0);
+    }else
+    {
+        nid = g.add_node<NT>(std::forward<Args>(args)...);
+        g.add_connection(input.node_id, input.index, nid, 0); 
+    }
+
     set_node_params(g, nid, params);
 
     return nid;
@@ -517,10 +526,20 @@ NodeID GraphBuilder::add_elementwise_node(
     check_nodeidx_pair(input0, g);
     check_nodeidx_pair(input1, g);
 
-    NodeID nid = g.add_node<EltwiseLayerNode>(descriptors::EltwiseLayerDescriptor{ operation });
+    NodeID nid;
+    if(params.target != Target::UNSPECIFIED)
+    {  
+        nid = g.add_node<EltwiseLayerNode>(params.target, descriptors::EltwiseLayerDescriptor{ operation });
 
-    g.add_connection(input0.node_id, input0.index, nid, 0);
-    g.add_connection(input1.node_id, input1.index, nid, 1);
+        g.add_connection(params.target, input0.node_id, input0.index, nid, 0);
+        g.add_connection(params.target, input1.node_id, input1.index, nid, 1);
+    }else
+    {
+        nid = g.add_node<EltwiseLayerNode>(descriptors::EltwiseLayerDescriptor{ operation });
+
+        g.add_connection(input0.node_id, input0.index, nid, 0);
+        g.add_connection(input1.node_id, input1.index, nid, 1);
+    }
 
     set_node_params(g, nid, params);
 
@@ -1026,19 +1045,44 @@ NodeID GraphBuilder::add_linear_node(Graph &g, NodeParams params, NodeIdxPair in
     TensorDescriptor f_b_desc = input_tensor_desc;
     f_b_desc.shape            = ff_info.b_shape();
 
-    // Create weight and bias const node with npy tensor accessor
-    NodeID q_w_nid = add_const_node_with_name(g, params, "FF Weights", f_w_desc, std::move(ff_weights));
-    NodeID q_b_nid = add_const_node_with_name(g, params, "FF Bias", f_b_desc, std::move(ff_bias));
+    // Create weight and bias const node ids
+    NodeID q_w_nid, q_b_nid;
 
-    // Linear Nodes
-    NodeID f_nid = g.add_node<LinearLayerNode>(ff_info);
+    // Linear node id
+    NodeID f_nid;
 
-    // Connect input
-    g.add_connection(input.node_id, input.index, f_nid, 0);
+    if(params.target != Target::UNSPECIFIED)
+    {
+        // Create weight and bias const node with npy tensor accessor
+        q_w_nid = add_const_node_with_name(g, params, params.target, "FF Weights", f_w_desc, std::move(ff_weights));
+        q_b_nid = add_const_node_with_name(g, params, params.target, "FF Bias", f_b_desc, std::move(ff_bias));
 
-    // Connect weights and bias
-    g.add_connection(q_w_nid, 0, f_nid, 1);
-    g.add_connection(q_b_nid, 0, f_nid, 2);
+        // Linear Nodes
+        f_nid = g.add_node<LinearLayerNode>(params.target, ff_info);
+
+        // Connect input
+        g.add_connection(params.target, input.node_id, input.index, f_nid, 0);
+
+        // Connect weights and bias
+        g.add_connection(params.target, q_w_nid, 0, f_nid, 1);
+        g.add_connection(params.target, q_b_nid, 0, f_nid, 2);
+        
+    }else
+    {
+        // Create weight and bias const node with npy tensor accessor
+        q_w_nid = add_const_node_with_name(g, params, "FF Weights", f_w_desc, std::move(ff_weights));
+        q_b_nid = add_const_node_with_name(g, params, "FF Bias", f_b_desc, std::move(ff_bias));
+
+        // Linear Nodes
+        f_nid = g.add_node<LinearLayerNode>(ff_info);
+
+        // Connect input
+        g.add_connection(input.node_id, input.index, f_nid, 0);
+
+        // Connect weights and bias
+        g.add_connection(q_w_nid, 0, f_nid, 1);
+        g.add_connection(q_b_nid, 0, f_nid, 2);
+    }
 
     set_node_params(g, f_nid, params);
 
@@ -1147,12 +1191,24 @@ NodeID GraphBuilder::add_scale_dot_production_node(Graph &g, NodeParams params, 
 {
     check_nodeidx_pair(input, g);
 
-    /* Scale dot production Layer */
-    NodeID sdp_nid = g.add_node<ScaleDotProductionAttentionNode>(sdpa_info);
+    // Scale dot production node id
+    NodeID sdp_nid;
 
-    g.add_connection(input.node_id, 0 /*query*/, sdp_nid, 0);
-    g.add_connection(input.node_id, 1 /*key*/, sdp_nid, 1);
-    g.add_connection(input.node_id, 2 /*value*/, sdp_nid, 2);
+    if(params.target != Target::UNSPECIFIED)
+    {  
+        sdp_nid = g.add_node<ScaleDotProductionAttentionNode>(params.target, sdpa_info);
+
+        g.add_connection(params.target, input.node_id, 0 /*query*/, sdp_nid, 0);
+        g.add_connection(params.target, input.node_id, 1 /*key*/, sdp_nid, 1);
+        g.add_connection(params.target, input.node_id, 2 /*value*/, sdp_nid, 2);
+    }else
+    {
+        sdp_nid = g.add_node<ScaleDotProductionAttentionNode>(sdpa_info);
+
+        g.add_connection(input.node_id, 0 /*query*/, sdp_nid, 0);
+        g.add_connection(input.node_id, 1 /*key*/, sdp_nid, 1);
+        g.add_connection(input.node_id, 2 /*value*/, sdp_nid, 2);
+    }
 
     set_node_params(g, sdp_nid, params);
 
@@ -1162,9 +1218,17 @@ NodeID GraphBuilder::add_scale_dot_production_node(Graph &g, NodeParams params, 
 NodeID GraphBuilder::add_layer_norm_node(Graph &g, NodeParams params, NodeIdxPair input, LayerNormLayerInfo info)
 {
     check_nodeidx_pair(input, g);
-    NodeID l_nid = g.add_node<LayerNormNode>(info);
 
-    g.add_connection(input.node_id, 0, l_nid, 0);
+    NodeID l_nid;
+    if(params.target != Target::UNSPECIFIED)
+    {  
+        l_nid = g.add_node<LayerNormNode>(params.target, info);
+        g.add_connection(params.target, input.node_id, 0, l_nid, 0);
+    }else
+    {
+        l_nid = g.add_node<LayerNormNode>(info);
+        g.add_connection(input.node_id, 0, l_nid, 0);
+    }
 
     set_node_params(g, l_nid, params);
 

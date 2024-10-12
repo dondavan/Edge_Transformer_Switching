@@ -109,6 +109,7 @@ class ActivationLayer final : public ILayer
     {
         NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input         = { s.tail_node(), 0 };
+        common_params.target      = assigned_target();
         return GraphBuilder::add_activation_node(s.graph(), common_params, input, _act_info,
                                                  std::move(_out_quant_info));
     }
@@ -665,6 +666,7 @@ class EltwiseLayer final : public ILayer
         NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input0        = { _ss0.tail_node(), 0 };
         NodeIdxPair input1        = { _ss1.tail_node(), 0 };
+        common_params.target      = assigned_target();
 
         return GraphBuilder::add_elementwise_node(s.graph(), common_params, input0, input1, _op);
     }
@@ -1568,6 +1570,8 @@ class LinearLayer final : public ILayer
     {
         NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input         = { s.tail_node(), 0 };
+        common_params.target      = assigned_target();
+
         return GraphBuilder::add_linear_node(s.graph(), common_params, input, _info, std::move(_ff_weights), std::move(_ff_bias));
     }
 
@@ -1642,6 +1646,7 @@ class ScaleDotProductionLayer final : public ILayer
     {
         NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input         = { s.tail_node(), 0 };
+        common_params.target      = assigned_target();
         return GraphBuilder::add_scale_dot_production_node(s.graph(), common_params, input, _mha_info);
     }
 
@@ -1665,6 +1670,8 @@ class LayerNormLayer final : public ILayer
     {
         NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input         = { s.tail_node(), 0 };
+        common_params.target      = assigned_target();
+
         return GraphBuilder::add_layer_norm_node(s.graph(), common_params, input, _info);
     }
 
