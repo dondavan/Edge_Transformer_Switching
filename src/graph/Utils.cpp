@@ -70,7 +70,7 @@ void force_target_to_graph(Graph &g, Target target)
             node->set_assigned_target(target);
             if(node->assigned_target() == Target::CL)
             {
-                std::cout << "Forced Pre-assigned Node Target CL" << std::endl;
+                std::cout << "Forced Node Target CL" << std::endl;
             }else if (node->assigned_target() == Target::NEON)
             {
                 std::cout << "Forced Node Target NEON" << std::endl;
@@ -99,13 +99,13 @@ void force_target_to_graph(Graph &g, Target target)
             tensor->desc().target = target;
             if(tensor->desc().target == Target::CL)
             {
-                std::cout << "Pre-assigned Node Target CL" << std::endl;
+                std::cout << "Forced tensor Target CL" << std::endl;
             }else if (tensor->desc().target == Target::NEON)
             {
-                std::cout << "Pre-assigned tensor Target NEON" << std::endl;
+                std::cout << "Forced tensor Target NEON" << std::endl;
             }else
             {
-                std::cout << "Pre-assigned tensor Target Still working" << std::endl;
+                std::cout << "Forced tensor Target Still working" << std::endl;
             }
         }
     }
