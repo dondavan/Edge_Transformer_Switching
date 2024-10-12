@@ -300,14 +300,6 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
 {
     arm_compute::lock_guard<arm_compute::Mutex> lock(_mtx);
 
-    if(assigned_target == Target::CL)
-    {
-        std::cout << "CL" << std::endl;
-    }else
-    {
-        std::cout << "Still working" << std::endl;
-    }
-
     // Create node
     NodeID nid  = _nodes.size();
     auto   node = std::make_unique<NT>(std::forward<Ts>(args)...);
@@ -317,10 +309,10 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
 
     if(node->assigned_target() == Target::CL)
     {
-        std::cout << "CL" << std::endl;
+        std::cout << "Node Target CL" << std::endl;
     }else
     {
-        std::cout << "Still working" << std::endl;
+        std::cout << "Node Target Still working" << std::endl;
     }
 
     // Keep track of input nodes
@@ -334,13 +326,12 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
         
         if( _tensors[output]->desc().target == Target::CL)
         {
-            std::cout << "CL" << std::endl;
+            std::cout << "Node tensor target CL" << std::endl;
         }else
         {
-            std::cout << "Still working" << std::endl;
+            std::cout << "Node tensor target  Still working" << std::endl;
         }
     }
-
 
     // Propagate node shape if possible
     node->forward_descriptors();
