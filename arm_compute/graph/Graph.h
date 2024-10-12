@@ -310,6 +310,9 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     if(node->assigned_target() == Target::CL)
     {
         std::cout << "Node Target CL" << std::endl;
+    }else if (node->assigned_target() == Target::NEON)
+    {
+        std::cout << "Node Target NEON" << std::endl;
     }else
     {
         std::cout << "Node Target Still working" << std::endl;
@@ -327,7 +330,10 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
         if( _tensors[output]->desc().target == Target::CL)
         {
             std::cout << "Node tensor target CL" << std::endl;
-        }else
+        }else if( _tensors[output]->desc().target == Target::NEON)
+        {
+            std::cout << "Node tensor target NEON" << std::endl;
+        }
         {
             std::cout << "Node tensor target  Still working" << std::endl;
         }

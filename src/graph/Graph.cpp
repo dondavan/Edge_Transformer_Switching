@@ -153,6 +153,9 @@ EdgeID Graph::add_connection(Target assigned_target, NodeID source, size_t sourc
     if( tensor.get()->desc().target == Target::CL)
     {
         std::cout << "Connection created tensor CL" << std::endl;
+    }else if( tensor.get()->desc().target == Target::NEON)
+    {
+        std::cout << "Connection created tensor NEON" << std::endl;
     }else
     {
         std::cout << "Connection created tensor Still working" << std::endl;
