@@ -83,6 +83,7 @@ class OutputLayer final : public ILayer
     {
         NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input         = { s.tail_node(), _connection_idx };
+        common_params.target      = assigned_target();
         return GraphBuilder::add_output_node(s.graph(), common_params, input, std::move(_accessor));
     }
 

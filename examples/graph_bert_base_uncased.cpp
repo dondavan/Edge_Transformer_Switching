@@ -121,11 +121,11 @@ class GraphVanillaTransformerExample : public Example
         graph << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model),
                                              TensorShape(d_model)),
                              get_weights_accessor(data_path, "pooler_weight.npy"),
-                             get_weights_accessor(data_path, "pooler_bias.npy"))
+                             get_weights_accessor(data_path, "pooler_bias.npy")).set_target(Target::CL)
 
-              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f))
+              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f)).set_target(Target::CL)
 
-              << OutputLayer(get_output_accessor(common_params)).set_name("out1");
+              << OutputLayer(get_output_accessor(common_params)).set_name("out1").set_target(Target::NEON);
 
         // Finalize graph
         GraphConfig config;
