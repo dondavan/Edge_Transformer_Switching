@@ -77,10 +77,6 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
         forced_target = get_default_target();
         ARM_COMPUTE_LOG_GRAPH_INFO("Switching target from " << target << " to " << forced_target << std::endl);
     }
-    if(forced_target == Target::NEON)
-    {
-        std::cout << "AHHHHH" << std::endl;
-    }
     if(is_switching(forced_target))
     {
         std::cout << "Switching" << std::endl;
