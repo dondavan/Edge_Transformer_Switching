@@ -92,7 +92,6 @@ private:
 template <typename T>
 inline void BackendRegistry::add_backend(Target target)
 {
-    std::cout << "added " << std::endl;
     _registered_backends[target] = std::make_unique<T>();
 }
 } // namespace backends
