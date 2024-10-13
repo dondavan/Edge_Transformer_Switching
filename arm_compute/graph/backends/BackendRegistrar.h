@@ -52,7 +52,6 @@ public:
 template <typename T>
 inline BackendRegistrar<T>::BackendRegistrar(Target target)
 {
-    std::cout << "added " << std::endl;
     BackendRegistry::get().add_backend<T>(target);
 }
 } // namespace detail
