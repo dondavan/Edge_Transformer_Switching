@@ -77,7 +77,13 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
         forced_target = get_default_target();
         ARM_COMPUTE_LOG_GRAPH_INFO("Switching target from " << target << " to " << forced_target << std::endl);
     }
-    force_target_to_graph(graph, forced_target);
+    if(is_switching(forced_target))
+    {
+        check_target_on_graph(graph, forced_target);
+    }else
+    {
+        force_target_to_graph(graph, forced_target);
+    }
     std::cout << "switching/src/graph/GraphManager.cpp force_target_to_graph end:" << std::endl;
 
 

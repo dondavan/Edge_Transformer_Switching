@@ -37,6 +37,11 @@ bool is_target_supported(Target target)
            backends::BackendRegistry::get().find_backend(target)->is_backend_supported();
 }
 
+bool is_switching(Target target)
+{
+    return target == Target::SWITCH;
+}
+
 Target get_default_target()
 {
     if (is_target_supported(Target::NEON))
@@ -57,6 +62,28 @@ void force_target_to_graph(Graph &g, Target target)
     {
         if (node)
         {
+            node->set_assigned_target(target);
+        }
+    }
+
+    auto &tensors = g.tensors();
+    for (auto &tensor : tensors)
+    {
+        if (tensor)
+        {
+            tensor->desc().target = target;
+        }
+    }
+}
+
+void check_target_on_graph(Graph &g, Target target)
+{
+    auto &nodes = g.nodes();
+    for (auto &node : nodes)
+    {
+        if (node)
+        {
+            ARM_COMPUTE_ERROR_ON_MSG(node->assigned_target() == Target::UNSPECIFIED, "All node should be assigned targte when switching!");
             if(node->assigned_target() == Target::CL)
             {
                 std::cout << "Pre-assigned Node Target CL" << std::endl;
@@ -66,17 +93,6 @@ void force_target_to_graph(Graph &g, Target target)
             }else
             {
                 std::cout << "Pre-assigned Node Target Still working" << std::endl;
-            }
-            node->set_assigned_target(target);
-            if(node->assigned_target() == Target::CL)
-            {
-                std::cout << "Forced Node Target CL" << std::endl;
-            }else if (node->assigned_target() == Target::NEON)
-            {
-                std::cout << "Forced Node Target NEON" << std::endl;
-            }else
-            {
-                std::cout << "Forced Node Target Still working" << std::endl;
             }
         }
     }
@@ -90,6 +106,7 @@ void force_target_to_graph(Graph &g, Target target)
     {
         if (tensor)
         {
+            ARM_COMPUTE_ERROR_ON_MSG(tensor->desc().target == Target::UNSPECIFIED, "All node should be assigned targte when switching!");
             if(tensor->desc().target == Target::CL)
             {
                 std::cout << "Pre-assigned tensor Target CL" << std::endl;
@@ -99,17 +116,6 @@ void force_target_to_graph(Graph &g, Target target)
             }else
             {
                 std::cout << "Pre-assigned tensor Target Still working" << std::endl;
-            }
-            tensor->desc().target = target;
-            if(tensor->desc().target == Target::CL)
-            {
-                std::cout << "Forced tensor Target CL" << std::endl;
-            }else if (tensor->desc().target == Target::NEON)
-            {
-                std::cout << "Forced tensor Target NEON" << std::endl;
-            }else
-            {
-                std::cout << "Forced tensor Target Still working" << std::endl;
             }
         }
     }

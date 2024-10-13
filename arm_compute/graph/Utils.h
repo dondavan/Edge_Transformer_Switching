@@ -73,6 +73,13 @@ inline Status set_tensor_accessor(Tensor *tensor, std::unique_ptr<ITensorAccesso
  * @return True if target is support else false
  */
 bool is_target_supported(Target target);
+/** Checks if running switching
+ *
+ * @param[in] target Target to check
+ *
+ * @return True if using switching else false
+ */
+bool is_switching(Target target);
 /** Returns default target for execution
  *
  * @note If an OpenCL backend exists then OpenCL is returned,
@@ -88,6 +95,12 @@ Target get_default_target();
  * @param[in] target Target to force
  */
 void force_target_to_graph(Graph &g, Target target);
+/** Check pre-assigned target on all graph constructs
+ *
+ * @param[in] g      Graph to force target on
+ * @param[in] target Target to force
+ */
+void check_target_on_graph(Graph &g, Target target);
 /** Creates a default @ref PassManager
  *
  * @param[in] target Target to create the pass manager for
