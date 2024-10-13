@@ -78,6 +78,7 @@ void force_target_to_graph(Graph &g, Target target)
 
 void check_target_on_graph(Graph &g, Target target)
 {
+    ARM_COMPUTE_UNUSED(target);
     auto &nodes = g.nodes();
     for (auto &node : nodes)
     {
