@@ -79,6 +79,7 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
     }
     if(is_switching(forced_target))
     {
+        std::cout << "Switching" << std::endl;
         check_target_on_graph(graph, forced_target);
     }else
     {
