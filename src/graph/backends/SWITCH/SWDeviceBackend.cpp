@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "arm_compute/graph/backends/NEON/NEDeviceBackend.h"
+#include "arm_compute/graph/backends/SWITCH/SWDeviceBackend.h"
 
 #include "arm_compute/core/TensorInfo.h"
 #include "arm_compute/graph/backends/BackendRegistrar.h"
@@ -50,24 +50,24 @@ namespace graph
 namespace backends
 {
 /** Register CPU backend */
-static detail::BackendRegistrar<NEDeviceBackend> NEDeviceBackend_registrar(Target::NEON);
+static detail::BackendRegistrar<SWDeviceBackend> SWDeviceBackend_registrar(Target::SWITCH);
 
-NEDeviceBackend::NEDeviceBackend() : _allocator()
+SWDeviceBackend::SWDeviceBackend() : _allocator()
 {
 }
 
-void NEDeviceBackend::initialize_backend()
+void SWDeviceBackend::initialize_backend()
 {
     //Nothing to do
 }
 
-void NEDeviceBackend::release_backend_context(GraphContext &ctx)
+void SWDeviceBackend::release_backend_context(GraphContext &ctx)
 {
     //Nothing to do
     ARM_COMPUTE_UNUSED(ctx);
 }
 
-void NEDeviceBackend::setup_backend_context(GraphContext &ctx)
+void SWDeviceBackend::setup_backend_context(GraphContext &ctx)
 {
     // Set number of threads
     if (ctx.config().num_threads >= 0)
@@ -76,10 +76,10 @@ void NEDeviceBackend::setup_backend_context(GraphContext &ctx)
     }
 
     // Create function level memory manager
-    if (ctx.memory_management_ctx(Target::NEON) == nullptr)
+    if (ctx.memory_management_ctx(Target::SWITCH) == nullptr)
     {
         MemoryManagerContext mm_ctx;
-        mm_ctx.target      = Target::NEON;
+        mm_ctx.target      = Target::SWITCH;
         mm_ctx.intra_mm    = create_memory_manager(MemoryManagerAffinity::Offset);
         mm_ctx.cross_mm    = create_memory_manager(MemoryManagerAffinity::Offset);
         mm_ctx.cross_group = std::make_shared<MemoryGroup>(mm_ctx.cross_mm);
@@ -89,31 +89,31 @@ void NEDeviceBackend::setup_backend_context(GraphContext &ctx)
     }
 
     // Create function level weights manager
-    if (ctx.weights_management_ctx(Target::NEON) == nullptr)
+    if (ctx.weights_management_ctx(Target::SWITCH) == nullptr)
     {
         WeightsManagerContext wm_ctx;
-        wm_ctx.target = Target::NEON;
+        wm_ctx.target = Target::SWITCH;
         wm_ctx.wm     = create_weights_manager();
 
         ctx.insert_weights_management_ctx(std::move(wm_ctx));
     }
 }
 
-bool NEDeviceBackend::is_backend_supported()
+bool SWDeviceBackend::is_backend_supported()
 {
     return true;
 }
 
-IAllocator *NEDeviceBackend::backend_allocator()
+IAllocator *SWDeviceBackend::backend_allocator()
 {
     return &_allocator;
 }
 
-std::unique_ptr<ITensorHandle> NEDeviceBackend::create_tensor(const Tensor &tensor)
+std::unique_ptr<ITensorHandle> SWDeviceBackend::create_tensor(const Tensor &tensor)
 {
     // Get tensor descriptor
     const TensorDescriptor &tensor_desc = tensor.desc();
-    ARM_COMPUTE_ERROR_ON(tensor_desc.target != Target::NEON);
+    ARM_COMPUTE_ERROR_ON(tensor_desc.target != Target::SW);
 
     // Create backend tensor handle
     TensorInfo info(tensor_desc.shape, 1, tensor_desc.data_type, tensor_desc.quant_info);
@@ -123,7 +123,7 @@ std::unique_ptr<ITensorHandle> NEDeviceBackend::create_tensor(const Tensor &tens
 }
 
 std::unique_ptr<ITensorHandle>
-NEDeviceBackend::create_subtensor(ITensorHandle *parent, TensorShape shape, Coordinates coords, bool extend_parent)
+SWDeviceBackend::create_subtensor(ITensorHandle *parent, TensorShape shape, Coordinates coords, bool extend_parent)
 {
     if (parent == nullptr)
     {
@@ -133,24 +133,24 @@ NEDeviceBackend::create_subtensor(ITensorHandle *parent, TensorShape shape, Coor
     return std::make_unique<NESubTensorHandle>(parent, shape, coords, extend_parent);
 }
 
-std::unique_ptr<arm_compute::IFunction> NEDeviceBackend::configure_node(INode &node, GraphContext &ctx)
+std::unique_ptr<arm_compute::IFunction> SWDeviceBackend::configure_node(INode &node, GraphContext &ctx)
 {
     ARM_COMPUTE_LOG_GRAPH_VERBOSE("Configuring CPU node with ID : " << node.id() << std::endl);
-    ARM_COMPUTE_ERROR_ON(node.assigned_target() != Target::NEON);
+    ARM_COMPUTE_ERROR_ON(node.assigned_target() != Target::SW);
 
     // Configure node
     return NEFunctionFactory::create(&node, ctx);
 }
 
-arm_compute::Status NEDeviceBackend::validate_node(INode &node)
+arm_compute::Status SWDeviceBackend::validate_node(INode &node)
 {
     ARM_COMPUTE_LOG_GRAPH_VERBOSE("Validating CPU node with ID : " << node.id() << std::endl);
-    ARM_COMPUTE_ERROR_ON(node.assigned_target() != Target::NEON);
+    ARM_COMPUTE_ERROR_ON(node.assigned_target() != Target::SW);
 
     return NENodeValidator::validate(&node);
 }
 
-std::shared_ptr<arm_compute::IMemoryManager> NEDeviceBackend::create_memory_manager(MemoryManagerAffinity affinity)
+std::shared_ptr<arm_compute::IMemoryManager> SWDeviceBackend::create_memory_manager(MemoryManagerAffinity affinity)
 {
     std::shared_ptr<ILifetimeManager> lifetime_mgr = nullptr;
     if (affinity == MemoryManagerAffinity::Buffer)
@@ -167,13 +167,13 @@ std::shared_ptr<arm_compute::IMemoryManager> NEDeviceBackend::create_memory_mana
     return mm;
 }
 
-std::shared_ptr<arm_compute::IWeightsManager> NEDeviceBackend::create_weights_manager()
+std::shared_ptr<arm_compute::IWeightsManager> SWDeviceBackend::create_weights_manager()
 {
     auto weights_mgr = std::make_shared<IWeightsManager>();
     return weights_mgr;
 }
 
-void NEDeviceBackend::sync()
+void SWDeviceBackend::sync()
 {
     // nop
 }
