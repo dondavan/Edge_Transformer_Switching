@@ -33,6 +33,8 @@ namespace backends
 {
 BackendRegistry::BackendRegistry() : _registered_backends()
 {
+    std::cout << "_registered_backends" << std::endl;
+    std::cout << _registered_backends.size() << std::endl;
 }
 
 BackendRegistry &BackendRegistry::get()
