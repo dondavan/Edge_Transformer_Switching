@@ -1,6 +1,6 @@
 #include "arm_compute/runtime/CL/functions/CLAttentionLinearLayer.h"
 
-#include "arm_compute/core/CL/ICLTensor.h"
+#include "arm_compute/core/CL/ITensor.h"
 #include "arm_compute/core/KernelDescriptors.h"
 #include "arm_compute/core/Validate.h"
 
@@ -22,18 +22,18 @@ struct CLAttentionLinearLayer::Impl
     MemoryGroup      memory_group{};
     IWeightsManager *weights_manager{ nullptr };
 
-    const ICLTensor                  *query_input{ nullptr };
-    const ICLTensor                  *query_w{ nullptr };
-    const ICLTensor                  *query_b{ nullptr };
-    const ICLTensor                  *key_input{ nullptr };
-    const ICLTensor                  *key_w{ nullptr };
-    const ICLTensor                  *key_b{ nullptr };
-    const ICLTensor                  *value_input{ nullptr };
-    const ICLTensor                  *value_w{ nullptr };
-    const ICLTensor                  *value_b{ nullptr };
-    ICLTensor                        *query_output{ nullptr };
-    ICLTensor                        *key_output{ nullptr };
-    ICLTensor                        *value_output{ nullptr };
+    const ITensor                  *query_input{ nullptr };
+    const ITensor                  *query_w{ nullptr };
+    const ITensor                  *query_b{ nullptr };
+    const ITensor                  *key_input{ nullptr };
+    const ITensor                  *key_w{ nullptr };
+    const ITensor                  *key_b{ nullptr };
+    const ITensor                  *value_input{ nullptr };
+    const ITensor                  *value_w{ nullptr };
+    const ITensor                  *value_b{ nullptr };
+    ITensor                        *query_output{ nullptr };
+    ITensor                        *key_output{ nullptr };
+    ITensor                        *value_output{ nullptr };
 
     std::unique_ptr<opencl::ClLinear> query_kernel{ nullptr };
     std::unique_ptr<opencl::ClLinear> key_kernel{ nullptr };
@@ -50,10 +50,10 @@ CLAttentionLinearLayer::CLAttentionLinearLayer(std::shared_ptr<IMemoryManager> m
     _impl->weights_manager = weights_manager;
 }
 CLAttentionLinearLayer::~CLAttentionLinearLayer() = default;
-void CLAttentionLinearLayer::configure(const ICLTensor *query_input, const ICLTensor *query_w, const ICLTensor *query_b,
-                                       const ICLTensor *key_input, const ICLTensor *key_w, const ICLTensor *key_b,
-                                       const ICLTensor *value_input, const ICLTensor *value_w, const ICLTensor *value_b,
-                                       ICLTensor *query_output, ICLTensor *key_output, ICLTensor *value_output,
+void CLAttentionLinearLayer::configure(const ITensor *query_input, const ITensor *query_w, const ITensor *query_b,
+                                       const ITensor *key_input, const ITensor *key_w, const ITensor *key_b,
+                                       const ITensor *value_input, const ITensor *value_w, const ITensor *value_b,
+                                       ITensor *query_output, ITensor *key_output, ITensor *value_output,
                                        const LinearLayerInfo &linear_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), query_input, query_w, query_b,
@@ -62,10 +62,10 @@ void CLAttentionLinearLayer::configure(const ICLTensor *query_input, const ICLTe
               query_output, key_output, value_output, linear_info);
 }
 void CLAttentionLinearLayer::configure(const CLCompileContext &compile_context,
-                                       const ICLTensor *query_input, const ICLTensor *query_w, const ICLTensor *query_b,
-                                       const ICLTensor *key_input, const ICLTensor *key_w, const ICLTensor *key_b,
-                                       const ICLTensor *value_input, const ICLTensor *value_w, const ICLTensor *value_b,
-                                       ICLTensor *query_output, ICLTensor *key_output, ICLTensor *value_output,
+                                       const ITensor *query_input, const ITensor *query_w, const ITensor *query_b,
+                                       const ITensor *key_input, const ITensor *key_w, const ITensor *key_b,
+                                       const ITensor *value_input, const ITensor *value_w, const ITensor *value_b,
+                                       ITensor *query_output, ITensor *key_output, ITensor *value_output,
                                        const LinearLayerInfo &linear_info)
 {
     ARM_COMPUTE_ERROR_ON_NULLPTR(input, output);
@@ -108,9 +108,9 @@ void CLAttentionLinearLayer::configure(const CLCompileContext &compile_context,
 #endif
 }
 
-Status CLAttentionLinearLayer::validate(const ICLTensor *input,
-                                        const ICLTensor *weight,
-                                        const ICLTensor *bias, ICLTensor *output, const LinearLayerInfo &linear_info)
+Status CLAttentionLinearLayer::validate(const ITensor *input,
+                                        const ITensor *weight,
+                                        const ITensor *bias, ITensor *output, const LinearLayerInfo &linear_info)
 {
     ARM_COMPUTE_UNUSED(linear_info);
     return opencl::ClLinear::validate(input->info(), weight->info(), bias->info(), output->info(), 1.0f, 1.0f);
