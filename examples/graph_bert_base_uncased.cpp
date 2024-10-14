@@ -69,9 +69,9 @@ class GraphVanillaTransformerExample : public Example
         constexpr unsigned int d_vocab    = 30522U; // Vocaboary size
         constexpr unsigned int d_segemnt  = 2U;     // Sentence segmentation size
         constexpr unsigned int d_position = 512U;   // Pretrained positional encoding length
-        //constexpr unsigned int h          = 12U;    // Parallel attention (Heads)
-        //constexpr float        eps        = 1e-12;  // Layer normalization eplision
-        //constexpr unsigned int d_ff       = 3072U;  // Dim feedforward
+        constexpr unsigned int h          = 12U;    // Parallel attention (Heads)
+        constexpr float        eps        = 1e-12;  // Layer normalization eplision
+        constexpr unsigned int d_ff       = 3072U;  // Dim feedforward
 
         // Create input tensor
         const TensorShape src_tensor = TensorShape(common_params.input_len);
@@ -103,11 +103,25 @@ class GraphVanillaTransformerExample : public Example
                                 get_weights_accessor(data_path, "positional_embedding.npy", operation_layout))
                      .set_name("tkemb1").set_target(Target::NEON);
 
+        add_encoder_block(data_path, "layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_1/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_2/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_3/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_4/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_5/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+
+        add_encoder_block(data_path, "layer_6/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_7/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_8/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_9/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_10/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_11/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+
         // Pooler
         graph << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model),
                                              TensorShape(d_model)),
                              get_weights_accessor(data_path, "pooler_weight.npy"),
-                             get_weights_accessor(data_path, "pooler_bias.npy")).set_target(Target::NEON)
+                             get_weights_accessor(data_path, "pooler_bias.npy")).set_target(Target::CL)
 
               << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f)).set_target(Target::NEON)
 
@@ -167,7 +181,7 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "key_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "key_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
-                                    get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL)
+                                    get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::NEON)
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1").set_target(Target::NEON);
 
         graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention").set_target(Target::NEON);
