@@ -155,6 +155,9 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
                 case Target::NEON:
                     std::cout << "NEON" << std::endl;
                     break;
+                case Target::SWITCH:
+                    std::cout << "SWITCH" << std::endl;
+                    break;
                 default:
                     break;
             }
