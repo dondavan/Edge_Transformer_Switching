@@ -74,6 +74,36 @@ typename TargetInfo::TensorType *get_backing_tensor(arm_compute::graph::Tensor *
     return backing_tensor;
 }
 
+
+
+/** Returns backing tensor of a given tensor with assigned target
+ *
+ * @tparam TargetInfo Target information
+ *
+ * @param[in] tensor Tensor to extract the backing tensor from
+ *
+ * @return Backing tensor if present else nullptr
+ */
+template <typename TensorType>
+TensorType *get_backing_tensor_switching(arm_compute::graph::Tensor *tensor)
+{
+    TensorType *backing_tensor = nullptr;
+    if (tensor != nullptr)
+    {
+        ARM_COMPUTE_ERROR_ON(tensor->desc().target != TensorType);
+        // Get backing tensor handle
+        ITensorHandle *tensor_handle = tensor->handle();
+        // Get backing tensor
+        backing_tensor = (tensor_handle != nullptr)
+                             ? arm_compute::utils::cast::polymorphic_cast<TensorType *>(
+                                   &tensor_handle->tensor())
+                             : nullptr;
+    }
+
+    return backing_tensor;
+}
+
+
 template <typename TargetInfo>
 void validate_node(const INode &node, size_t num_expected_inputs, size_t num_expected_outputs)
 {
@@ -1840,6 +1870,52 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
 {
     validate_node<TargetInfo>(node, 9 /* expected inputs */, 3 /* expected outputs */);
 
+    std::cout << " attention linear 1" << std::endl;
+    // Extract IO and info
+    auto *query_input  = node.input(0)->desc().target == Target::CL ? 
+                            get_backing_tensor_switching<arm_compute::ICLTensor>(node.input(0)) : 
+                            get_backing_tensor_switching<arm_compute::ITensor>(node.input(0));
+    auto *query_w   = node.input(1)->desc().target == Target::CL ? 
+                            get_backing_tensor_switching<arm_compute::ICLTensor>(node.input(1)) : 
+                            get_backing_tensor_switching<arm_compute::ITensor>(node.input(1));
+    
+    std::cout << " attention linear eyahhhhhhhhh" << std::endl;
+    auto *query_b   = get_backing_tensor<TargetInfo>(node.input(2));
+    auto *key_input   = get_backing_tensor<TargetInfo>(node.input(3));
+    auto *key_w   = get_backing_tensor<TargetInfo>(node.input(4));
+    auto *key_b   = get_backing_tensor<TargetInfo>(node.input(5));
+    auto *value_input   = get_backing_tensor<TargetInfo>(node.input(6));
+    auto *value_w   = get_backing_tensor<TargetInfo>(node.input(7));
+    auto *value_b   = get_backing_tensor<TargetInfo>(node.input(8));
+
+    auto *query_output  = get_backing_tensor<TargetInfo>(node.output(0));
+    auto *key_output  = get_backing_tensor<TargetInfo>(node.output(1));
+    auto *value_output  = get_backing_tensor<TargetInfo>(node.output(2));
+    const LinearLayerInfo linear_info         = node.linear_info();
+
+    // Create and configure function
+    auto func = std::make_unique<AttentionLinearLayerFunction>();
+    func->configure(query_input,query_w,query_b,
+                    key_input,key_w,key_b,
+                    value_input,value_w,value_b,
+                    query_output,key_output,value_output,
+                    linear_info);
+    
+    std::cout << " attention linear 2" << std::endl;
+    // Log info
+    ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
+                                               << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
+                                               << " Input shape: " << input->info()->tensor_shape()
+                                               << " Output shape: " << output->info()->tensor_shape() << std::endl);
+
+    return func;
+}
+/*
+template <typename AttentionLinearLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &node)
+{
+    validate_node<TargetInfo>(node, 9  expected inputs , 3  expected outputs );
+
     // Extract IO and info
     typename TargetInfo::TensorType *query_input   = get_backing_tensor<TargetInfo>(node.input(0));
     typename TargetInfo::TensorType *query_w   = get_backing_tensor<TargetInfo>(node.input(1));
@@ -1870,7 +1946,7 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
 
     return func;
-}
+}*/
 
 /** Creates a backend scale dot production function
  *
