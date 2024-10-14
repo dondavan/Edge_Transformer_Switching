@@ -1839,7 +1839,7 @@ template <typename AttentionLinearLayerFunction, typename TargetInfo>
 std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &node)
 {
     validate_node<TargetInfo>(node, 9 /* expected inputs */, 3 /* expected outputs */);
-
+    std::cout << " Attention linear 1" << std::endl;
     // Extract IO and info
     typename TargetInfo::TensorType *query_input   = get_backing_tensor<TargetInfo>(node.input(0));
     typename TargetInfo::TensorType *query_w   = get_backing_tensor<TargetInfo>(node.input(1));
@@ -1855,6 +1855,8 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     typename TargetInfo::TensorType *key_output  = get_backing_tensor<TargetInfo>(node.output(1));
     typename TargetInfo::TensorType *value_output  = get_backing_tensor<TargetInfo>(node.output(2));
     const LinearLayerInfo linear_info         = node.linear_info();
+
+    std::cout << " Attention linear 2" << std::endl;
 
     // Create and configure function
     auto func = std::make_unique<AttentionLinearLayerFunction>();
