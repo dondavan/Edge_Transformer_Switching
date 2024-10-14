@@ -147,6 +147,17 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
         if (node != nullptr)
         {
             Target                     assigned_target = node->assigned_target();
+            switch (assigned_target)
+            {
+                case Target::CL:
+                    std::cout << "CL" << std::endl;
+                    break;
+                case Target::NEON:
+                    std::cout << "NEON" << std::endl;
+                    break;
+                default:
+                    break;
+            }
             backends::IDeviceBackend  &backend         = backends::BackendRegistry::get().get_backend(assigned_target);
             std::unique_ptr<IFunction> func            = backend.configure_node(*node, ctx);
             if (func != nullptr || is_utility_node(node))
