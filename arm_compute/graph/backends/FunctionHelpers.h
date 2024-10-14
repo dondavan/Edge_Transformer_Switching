@@ -1838,7 +1838,7 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
     validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
+    ITensor *input  = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
     ITensor *weight   = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
     ITensor *bias     = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
     ITensor *output   = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
