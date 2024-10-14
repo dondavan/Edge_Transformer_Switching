@@ -25,6 +25,7 @@ struct NETokenEmbeddingLayer::Impl
 NETokenEmbeddingLayer::NETokenEmbeddingLayer()
     : _impl(std::make_unique<Impl>())
 {
+    std::cout << "NETokenEmbeddingLayer::NETokenEmbeddingLayer" << std::endl;
 }
 
 NETokenEmbeddingLayer::~NETokenEmbeddingLayer() = default;

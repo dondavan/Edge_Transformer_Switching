@@ -30,6 +30,7 @@ struct NEScaleDotProductionAttentionLayer::Impl
 NEScaleDotProductionAttentionLayer::NEScaleDotProductionAttentionLayer()
     : _impl(std::make_unique<Impl>())
 {
+    std::cout << "NEScaleDotProductionAttentionLayer::NEScaleDotProductionAttentionLayer" << std::endl;
 }
 
 NEScaleDotProductionAttentionLayer::~NEScaleDotProductionAttentionLayer() = default;

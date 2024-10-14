@@ -48,6 +48,8 @@ CLAttentionLinearLayer::CLAttentionLinearLayer(std::shared_ptr<IMemoryManager> m
 {
     _impl->memory_group    = MemoryGroup(std::move(memory_manager));
     _impl->weights_manager = weights_manager;
+
+    std::cout << "CLAttentionLinearLayer::CLAttentionLinearLayer" << std::endl;
 }
 CLAttentionLinearLayer::~CLAttentionLinearLayer() = default;
 void CLAttentionLinearLayer::configure(const ICLTensor *query_input, const ICLTensor *query_w, const ICLTensor *query_b,

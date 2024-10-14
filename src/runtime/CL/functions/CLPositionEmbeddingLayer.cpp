@@ -27,6 +27,7 @@ struct CLPositionEmbeddingLayer::Impl
 CLPositionEmbeddingLayer::CLPositionEmbeddingLayer()
     : _impl(std::make_unique<Impl>())
 {
+    std::cout << "CLPositionEmbeddingLayer::CLPositionEmbeddingLayer" << std::endl;
 }
 
 CLPositionEmbeddingLayer::~CLPositionEmbeddingLayer() = default;

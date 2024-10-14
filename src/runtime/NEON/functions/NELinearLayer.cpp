@@ -25,6 +25,7 @@ struct  NELinearLayer::Impl
 
 NELinearLayer::NELinearLayer() : _impl(std::make_unique<Impl>())
 {
+    std::cout << "NELinearLayer::NELinearLayer" << std::endl;
 }
 NELinearLayer::~NELinearLayer() = default;
 

@@ -24,6 +24,7 @@ struct NESegmentEmbeddingLayer::Impl
 NESegmentEmbeddingLayer::NESegmentEmbeddingLayer()
     : _impl(std::make_unique<Impl>())
 {
+    std::cout << "NESegmentEmbeddingLayer::NESegmentEmbeddingLayer" << std::endl;
 }
 
 NESegmentEmbeddingLayer::~NESegmentEmbeddingLayer() = default;
