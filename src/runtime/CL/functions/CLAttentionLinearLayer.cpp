@@ -1,6 +1,6 @@
 #include "arm_compute/runtime/CL/functions/CLAttentionLinearLayer.h"
 
-#include "arm_compute/core/CL/ITensor.h"
+#include "arm_compute/core/CL/ICLTensor.h"
 #include "arm_compute/core/KernelDescriptors.h"
 #include "arm_compute/core/Validate.h"
 
