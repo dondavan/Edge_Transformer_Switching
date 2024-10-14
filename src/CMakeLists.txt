@@ -37,6 +37,7 @@ target_sources(
 	graph/Workload.cpp
 	graph/algorithms/TopologicalSort.cpp
 	graph/backends/BackendRegistry.cpp
+	graph/backends/SWITCH/SWDeviceBackend.cpp
 	graph/backends/NEON/NEDeviceBackend.cpp
 	graph/backends/NEON/NEFunctionFactory.cpp
 	graph/backends/NEON/NENodeValidator.cpp
