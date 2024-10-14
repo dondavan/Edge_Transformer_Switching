@@ -1838,11 +1838,10 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
     validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    
-    typename TargetInfo::TensorType *input    = get_backing_tensor<TargetInfo>(node.input(0));
-    typename TargetInfo::TensorType *weight   = get_backing_tensor<TargetInfo>(node.input(1));
-    typename TargetInfo::TensorType *bias     = get_backing_tensor<TargetInfo>(node.input(2));
-    typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
+    ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
+    ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
+    ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
+    ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
     const LinearLayerInfo linear_info         = node.linear_info();
 
     // Create function
@@ -1893,8 +1892,7 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
                     value_input,value_w,value_b,
                     query_output,key_output,value_output,
                     linear_info);
-    
-    std::cout << " attention linear 2" << std::endl;
+
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
                                                << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
