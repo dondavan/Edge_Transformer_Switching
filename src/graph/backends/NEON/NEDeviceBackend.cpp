@@ -51,7 +51,6 @@ namespace backends
 {
 /** Register CPU backend */
 static detail::BackendRegistrar<NEDeviceBackend> NEDeviceBackend_registrar(Target::NEON);
-static detail::BackendRegistrar<NEDeviceBackend> SWDeviceBackend_registrar(Target::SWITCH);
 
 NEDeviceBackend::NEDeviceBackend() : _allocator()
 {

@@ -23,15 +23,15 @@
  */
 #include "arm_compute/graph/GraphManager.h"
 
-#include "arm_compute/graph/algorithms/TopologicalSort.h"
-#include "arm_compute/graph/detail/CrossLayerMemoryManagerHelpers.h"
-#include "arm_compute/graph/detail/ExecutionHelpers.h"
 #include "arm_compute/graph/Graph.h"
 #include "arm_compute/graph/GraphContext.h"
 #include "arm_compute/graph/Logger.h"
 #include "arm_compute/graph/PassManager.h"
 #include "arm_compute/graph/TypePrinter.h"
 #include "arm_compute/graph/Utils.h"
+#include "arm_compute/graph/algorithms/TopologicalSort.h"
+#include "arm_compute/graph/detail/CrossLayerMemoryManagerHelpers.h"
+#include "arm_compute/graph/detail/ExecutionHelpers.h"
 
 #include "src/common/utils/Log.h"
 
@@ -39,7 +39,8 @@ namespace arm_compute
 {
 namespace graph
 {
-GraphManager::GraphManager() : _workloads()
+GraphManager::GraphManager()
+    : _workloads()
 {
 }
 
@@ -48,7 +49,7 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
     ARM_COMPUTE_LOG_INFO_WITH_FUNCNAME_ACL("Initiate graph configuration!");
 
     // Check if graph has been registered
-    if (_workloads.find(graph.id()) != std::end(_workloads))
+    if(_workloads.find(graph.id()) != std::end(_workloads))
     {
         ARM_COMPUTE_ERROR("Graph is already registered!");
     }
@@ -61,7 +62,7 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
 
     // In case CLVK is selected, use the CL backend and
     // update config
-    if (target == Target::CLVK)
+    if(target == Target::CLVK)
     {
         forced_target       = Target::CL;
         GraphConfig config  = ctx.config();
@@ -72,7 +73,7 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
 
     std::cout << forced_target << std::endl;
     std::cout << "switching/src/graph/GraphManager.cpp force_target_to_graph start:" << std::endl;
-    if (!is_target_supported(target))
+    if(!is_target_supported(target))
     {
         forced_target = get_default_target();
         ARM_COMPUTE_LOG_GRAPH_INFO("Switching target from " << target << " to " << forced_target << std::endl);
@@ -81,18 +82,17 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
     {
         std::cout << "Switching" << std::endl;
         check_target_on_graph(graph, forced_target);
-    }else
+    }
+    else
     {
         force_target_to_graph(graph, forced_target);
     }
     std::cout << "switching/src/graph/GraphManager.cpp force_target_to_graph end:" << std::endl;
 
-
     std::cout << "switching/src/graph/GraphManager.cpp setup_requested_backend_context start:" << std::endl;
     // Setup backend context
     setup_requested_backend_context(ctx, forced_target);
     std::cout << "switching/src/graph/GraphManager.cpp setup_requested_backend_context end:" << std::endl;
-
 
     std::cout << "switching/src/graph/GraphManager.cpp configure_all_tensors start:" << std::endl;
     // Configure all tensors
@@ -108,13 +108,11 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
     // Validate all nodes
     detail::validate_all_nodes(graph);
 
-
     std::cout << "switching/src/graph/GraphManager.cpp configure_all_nodes start:" << std::endl;
     // Configure all nodes
     auto workload = detail::configure_all_nodes(graph, ctx, topological_sorted_nodes);
     ARM_COMPUTE_ERROR_ON_MSG(workload.tasks.empty(), "Could not configure all nodes!");
     std::cout << "switching/src/graph/GraphManager.cpp configure_all_nodes end:" << std::endl;
-
 
     std::cout << "switching/src/graph/GraphManager.cpp Allocate const tensors and call accessors start:" << std::endl;
     // Allocate const tensors and call accessors
@@ -127,7 +125,7 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
 
     std::cout << "switching/src/graph/GraphManager.cpp Setup tensor memory start:" << std::endl;
     // Setup tensor memory (Allocate all tensors or setup transition manager)
-    if (ctx.config().use_transition_memory_manager)
+    if(ctx.config().use_transition_memory_manager)
     {
         detail::configure_transition_manager(graph, ctx, workload);
     }
@@ -153,27 +151,24 @@ void GraphManager::execute_graph(Graph &graph)
     auto it = _workloads.find(graph.id());
     ARM_COMPUTE_ERROR_ON_MSG(it == std::end(_workloads), "Graph is not registered!");
 
-    while (true)
+    while(true)
     {
-        
         std::cout << "switching/src/graph/GraphManager.cpp call_all_input_node_accessors start:" << std::endl;
         // Call input accessors
-        if (!detail::call_all_input_node_accessors(it->second))
+        if(!detail::call_all_input_node_accessors(it->second))
         {
             return;
         }
         std::cout << "switching/src/graph/GraphManager.cpp call_all_input_node_accessors end:" << std::endl;
-
 
         std::cout << "switching/src/graph/GraphManager.cpp call_all_tasks start:" << std::endl;
         // Run graph
         detail::call_all_tasks(it->second);
         std::cout << "switching/src/graph/GraphManager.cpp call_all_tasks end:" << std::endl;
 
-
         std::cout << "switching/src/graph/GraphManager.cpp call_all_output_node_accessors start:" << std::endl;
         // Call output accessors
-        if (!detail::call_all_output_node_accessors(it->second))
+        if(!detail::call_all_output_node_accessors(it->second))
         {
             return;
         }
