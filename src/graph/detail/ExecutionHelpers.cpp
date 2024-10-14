@@ -159,6 +159,7 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
                     std::cout << "SWITCH" << std::endl;
                     break;
                 default:
+                    std::cout << "Some other target" << std::endl;
                     break;
             }
             backends::IDeviceBackend  &backend         = backends::BackendRegistry::get().get_backend(assigned_target);
