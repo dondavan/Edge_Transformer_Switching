@@ -28,7 +28,6 @@ struct CLEmbeddingSumLayer::Impl
 CLEmbeddingSumLayer::CLEmbeddingSumLayer()
     : _impl(std::make_unique<Impl>())
 {
-    std::cout << "CLEmbeddingSumLayer::CLEmbeddingSumLayer" << std::endl;
 }
 
 CLEmbeddingSumLayer::~CLEmbeddingSumLayer() = default;

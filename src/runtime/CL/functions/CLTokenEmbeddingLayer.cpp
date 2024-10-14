@@ -27,7 +27,6 @@ struct CLTokenEmbeddingLayer::Impl
 CLTokenEmbeddingLayer::CLTokenEmbeddingLayer()
     : _impl(std::make_unique<Impl>())
 {
-    std::cout << "CLTokenEmbeddingLayer::CLTokenEmbeddingLayer" << std::endl;
 }
 
 CLTokenEmbeddingLayer::~CLTokenEmbeddingLayer() = default;

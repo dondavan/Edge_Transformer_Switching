@@ -37,8 +37,6 @@ CLLinearLayer::CLLinearLayer(std::shared_ptr<IMemoryManager> memory_manager,
 {
     _impl->memory_group    = MemoryGroup(std::move(memory_manager));
     _impl->weights_manager = weights_manager;
-    
-    std::cout << "CLLinearLayer::CLLinearLayer" << std::endl;
 }
 CLLinearLayer::~CLLinearLayer() = default;
 void CLLinearLayer::configure(const ICLTensor *input,

@@ -30,7 +30,6 @@ struct CLScaleDotProductionAttentionLayer::Impl
 CLScaleDotProductionAttentionLayer::CLScaleDotProductionAttentionLayer()
     : _impl(std::make_unique<Impl>())
 {
-    std::cout << "CLScaleDotProductionAttentionLayer::CLScaleDotProductionAttentionLayer" <<std::endl;
 }
 
 CLScaleDotProductionAttentionLayer::~CLScaleDotProductionAttentionLayer() = default;

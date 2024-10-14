@@ -25,7 +25,6 @@ struct CLLayerNormLayer::Impl
 CLLayerNormLayer::CLLayerNormLayer()
     : _impl(std::make_unique<Impl>())
 {
-    std::cout << "CLLayerNormLayer::CLLayerNormLayer" << std::endl;
 }
 CLLayerNormLayer::~CLLayerNormLayer() = default;
 

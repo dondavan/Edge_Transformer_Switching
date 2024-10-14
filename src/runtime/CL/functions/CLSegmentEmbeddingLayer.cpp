@@ -27,7 +27,6 @@ struct CLSegmentEmbeddingLayer::Impl
 CLSegmentEmbeddingLayer::CLSegmentEmbeddingLayer()
     : _impl(std::make_unique<Impl>())
 {
-    std::cout << "CLSegmentEmbeddingLayer::CLSegmentEmbeddingLayer" << std::endl;
 }
 
 CLSegmentEmbeddingLayer::~CLSegmentEmbeddingLayer() = default;
