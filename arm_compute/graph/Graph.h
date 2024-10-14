@@ -51,7 +51,7 @@ namespace graph
  */
 class Graph final
 {
-public:
+    public:
     Graph() = default;
     /** Constructor
      *
@@ -111,7 +111,7 @@ public:
      * @return ID of this connection
      */
     EdgeID add_connection(NodeID source, size_t source_idx, NodeID sink, size_t sink_idx);
-     /** Adds a connection between two nodes with assigned target
+    /** Adds a connection between two nodes with assigned target
      *
      * @param[in] assigned_target   Assigned execution target
      * @param[in] source            ID of the source node
@@ -247,7 +247,7 @@ public:
      */
     Tensor *tensor(TensorID id);
 
-private:
+    private:
     /** Creates a tensor object
      *
      * @param[in] desc Tensor descriptor
@@ -256,14 +256,14 @@ private:
      */
     TensorID create_tensor(const TensorDescriptor &desc = TensorDescriptor());
 
-private:
+    private:
     GraphID                                 _id           = GraphID(0); /**< Graph id */
     std::string                             _name         = {};         /**< Graph name */
     std::vector<std::unique_ptr<INode>>     _nodes        = {};         /**< Graph nodes */
     std::vector<std::unique_ptr<Edge>>      _edges        = {};         /**< Graph edges */
     std::vector<std::unique_ptr<Tensor>>    _tensors      = {};         /**< Graph tensors */
-    std::map<NodeType, std::vector<NodeID>> _tagged_nodes = {}; /**< Graph nodes map with the node type as key */
-    arm_compute::Mutex                      _mtx          = {}; /**< Mutex used for graph construction */
+    std::map<NodeType, std::vector<NodeID>> _tagged_nodes = {};         /**< Graph nodes map with the node type as key */
+    arm_compute::Mutex                      _mtx          = {};         /**< Mutex used for graph construction */
 };
 
 template <typename NT, typename... Ts>
@@ -281,7 +281,7 @@ inline NodeID Graph::add_node(Ts &&...args)
     _tagged_nodes[node->type()].push_back(nid);
 
     // Associate a new tensor with each output
-    for (auto &output : node->_outputs)
+    for(auto &output : node->_outputs)
     {
         output = create_tensor();
     }
@@ -307,14 +307,45 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     node->set_id(nid);
     node->set_assigned_target(assigned_target);
 
-
+    std::cout << nid;
+    switch (node->type())
+    {
+    case NodeType::SegmentEmbeddingLayer:
+        std::cout << " SegmentEmbeddingLayer" << std::endl;
+        break;
+    case NodeType::TokenEmbeddingLayer:
+        std::cout << " TokenEmbeddingLayer" << std::endl;
+        break;
+    case NodeType::EmbeddingSumLayer:
+        std::cout << " EmbeddingSumLayer" << std::endl;
+        break;
+    case NodeType::PositionEmbeddingLayer:
+        std::cout << " PositionEmbeddingLayer" << std::endl;
+        break;
+    case NodeType::LinearLayer:
+        std::cout << " LinearLayer" << std::endl;
+        break;
+    case NodeType::AttentionLinearLayer:
+        std::cout << " SegmentEmbeddingLayer" << std::endl;
+        break;
+    case NodeType::ScaleDotProductionAttentionLayer:
+        std::cout << " ScaleDotProductionAttentionLayer" << std::endl;
+        break;
+    case NodeType::LayerNormLayer:
+        std::cout << " LayerNormLayer" << std::endl;
+        break;
+    
+    default:
+        std::cout << " some node was created" << std::endl;
+        break;
+    }
     // Keep track of input nodes
     _tagged_nodes[node->type()].push_back(nid);
 
     // Associate a new tensor with each output
-    for (auto &output : node->_outputs)
+    for(auto &output : node->_outputs)
     {
-        output = create_tensor();
+        output                          = create_tensor();
         _tensors[output]->desc().target = assigned_target;
     }
 
