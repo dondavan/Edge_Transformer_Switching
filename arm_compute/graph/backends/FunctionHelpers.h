@@ -74,46 +74,6 @@ typename TargetInfo::TensorType *get_backing_tensor(arm_compute::graph::Tensor *
     return backing_tensor;
 }
 
-/** Returns backing tensor of a given tensor switching version
- *
- * @tparam TargetInfo Target information
- *
- * @param[in] tensor Tensor to extract the backing tensor from
- *
- * @return Backing tensor if present else nullptr
- */
-template <typename TargetInfo>
-typename TargetInfo::TensorType *get_backing_tensor_switching(arm_compute::graph::Tensor *tensor)
-{
-    typename TargetInfo::TensorType *backing_tensor = nullptr;
-    if (tensor != nullptr)
-    {
-        // Get backing tensor handle
-        ITensorHandle *tensor_handle = tensor->handle();
-        // Get backing tensor
-        switch (tensor->desc().target)
-        {
-            case Target::CL:
-                backing_tensor = (tensor_handle != nullptr)
-                                ? arm_compute::utils::cast::polymorphic_cast<arm_compute::ICLTensor *>(
-                                    &tensor_handle->tensor())
-                                : nullptr;
-                break;
-            case Target::NEON:
-                backing_tensor = (tensor_handle != nullptr)
-                                ? arm_compute::utils::cast::polymorphic_cast<arm_compute::ITensor *>(
-                                    &tensor_handle->tensor())
-                                : nullptr;
-                break;
-            default:
-                ARM_COMPUTE_ERROR("get_backing_tensor_switching: tensor type not supported")
-                break;
-        }
-    }
-
-    return backing_tensor;
-}
-
 template <typename TargetInfo>
 void validate_node(const INode &node, size_t num_expected_inputs, size_t num_expected_outputs)
 {
@@ -1879,10 +1839,9 @@ template <typename AttentionLinearLayerFunction, typename TargetInfo>
 std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &node)
 {
     validate_node<TargetInfo>(node, 9 /* expected inputs */, 3 /* expected outputs */);
-    std::cout << " Attention linear 1" << std::endl;
+
     // Extract IO and info
-    auto *query_input   = get_backing_tensor_switching<TargetInfo>(node.input(0));
-    std::cout << "yeahh " << std::endl;
+    typename TargetInfo::TensorType *query_input   = get_backing_tensor<TargetInfo>(node.input(0));
     typename TargetInfo::TensorType *query_w   = get_backing_tensor<TargetInfo>(node.input(1));
     typename TargetInfo::TensorType *query_b   = get_backing_tensor<TargetInfo>(node.input(2));
     typename TargetInfo::TensorType *key_input   = get_backing_tensor<TargetInfo>(node.input(3));
@@ -1896,8 +1855,6 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     typename TargetInfo::TensorType *key_output  = get_backing_tensor<TargetInfo>(node.output(1));
     typename TargetInfo::TensorType *value_output  = get_backing_tensor<TargetInfo>(node.output(2));
     const LinearLayerInfo linear_info         = node.linear_info();
-
-    std::cout << " Attention linear 2" << std::endl;
 
     // Create and configure function
     auto func = std::make_unique<AttentionLinearLayerFunction>();
