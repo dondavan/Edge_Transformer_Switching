@@ -185,7 +185,16 @@ void setup_requested_backend_context(GraphContext &ctx, Target target)
     {
         if(is_switching(target))
         {
-            std::cout << "Blalallalalallalalalla" << std::endl;
+            const auto &NEbackend = backends::BackendRegistry::get().find_backend(Target::NEON);
+            if (NEbackend->is_backend_supported())
+            {
+                NEbackend->setup_backend_context(ctx);
+            }
+            const auto &CLbackend = backends::BackendRegistry::get().find_backend(Target::CL);
+            if (CLbackend->is_backend_supported())
+            {
+                CLbackend->setup_backend_context(ctx);
+            }
         }else
         {
             const auto &backend = backends::BackendRegistry::get().find_backend(target);
