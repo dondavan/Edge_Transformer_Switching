@@ -85,22 +85,8 @@ void check_target_on_graph(Graph &g, Target target)
         if (node)
         {
             ARM_COMPUTE_ERROR_ON_MSG(node->assigned_target() == Target::UNSPECIFIED, "All node should be assigned targte when switching!");
-            if(node->assigned_target() == Target::CL)
-            {
-                std::cout << "Pre-assigned Node Target CL" << std::endl;
-            }else if (node->assigned_target() == Target::NEON)
-            {
-                std::cout << "Pre-assigned Node Target NEON" << std::endl;
-            }else
-            {
-                std::cout << "Pre-assigned Node Target Still working" << std::endl;
-            }
         }
     }
-
-    std::cout << "**********************************************************" << std::endl;
-    std::cout << "**********************************************************" << std::endl;
-    std::cout << "**********************************************************" << std::endl;
     
     auto &tensors = g.tensors();
     for (auto &tensor : tensors)
@@ -108,16 +94,6 @@ void check_target_on_graph(Graph &g, Target target)
         if (tensor)
         {
             ARM_COMPUTE_ERROR_ON_MSG(tensor->desc().target == Target::UNSPECIFIED, "All node should be assigned targte when switching!");
-            if(tensor->desc().target == Target::CL)
-            {
-                std::cout << "Pre-assigned tensor Target CL" << std::endl;
-            }else if (tensor->desc().target == Target::NEON)
-            {
-                std::cout << "Pre-assigned tensor Target NEON" << std::endl;
-            }else
-            {
-                std::cout << "Pre-assigned tensor Target Still working" << std::endl;
-            }
         }
     }
 }
