@@ -92,7 +92,7 @@ typename TargetInfo::TensorType *get_backing_tensor_switching(arm_compute::graph
         ITensorHandle *tensor_handle = tensor->handle();
         // Get backing tensor
         backing_tensor = (tensor_handle != nullptr)
-                             ? arm_compute::utils::cast::polymorphic_cast<tensor->desc().target>(
+                             ? arm_compute::utils::cast::polymorphic_cast<typename tensor->desc().target>(
                                    &tensor_handle->tensor())
                              : nullptr;
     }
