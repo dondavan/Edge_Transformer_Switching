@@ -85,7 +85,7 @@ typename TargetInfo::TensorType *get_backing_tensor(arm_compute::graph::Tensor *
  * @return Backing tensor if present else nullptr
  */
 template <typename TensorType>
-TensorType *get_backing_tensor_switching(arm_compute::graph::Tensor *tensor)
+TensorType *get_backing_tensor_from_TensorType(arm_compute::graph::Tensor *tensor)
 {
     TensorType *backing_tensor = nullptr;
     if (tensor != nullptr)
@@ -1870,27 +1870,20 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
 {
     validate_node<TargetInfo>(node, 9 /* expected inputs */, 3 /* expected outputs */);
 
-    std::cout << " attention linear 1" << std::endl;
     // Extract IO and info
-    arm_compute::ITensor *query_input  = node.input(0)->desc().target == Target::CL ? 
-                            get_backing_tensor_switching<arm_compute::ITensor>(node.input(0)) : 
-                            get_backing_tensor_switching<arm_compute::ITensor>(node.input(0));
-    arm_compute::ITensor *query_w   = node.input(1)->desc().target == Target::CL ? 
-                            get_backing_tensor_switching<arm_compute::ITensor>(node.input(1)) : 
-                            get_backing_tensor_switching<arm_compute::ITensor>(node.input(1));
-    
-    std::cout << " attention linear eyahhhhhhhhh" << std::endl;
-    auto *query_b   = get_backing_tensor<TargetInfo>(node.input(2));
-    auto *key_input   = get_backing_tensor<TargetInfo>(node.input(3));
-    auto *key_w   = get_backing_tensor<TargetInfo>(node.input(4));
-    auto *key_b   = get_backing_tensor<TargetInfo>(node.input(5));
-    auto *value_input   = get_backing_tensor<TargetInfo>(node.input(6));
-    auto *value_w   = get_backing_tensor<TargetInfo>(node.input(7));
-    auto *value_b   = get_backing_tensor<TargetInfo>(node.input(8));
+    ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
+    ITensor *query_w   = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
+    ITensor *query_b   = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
+    ITensor *key_input   = get_backing_tensor_from_TensorType<ITensor>(node.input(3));
+    ITensor *key_w   = get_backing_tensor_from_TensorType<ITensor>(node.input(4));
+    ITensor *key_b   = get_backing_tensor_from_TensorType<ITensor>(node.input(5));
+    ITensor *value_input   = get_backing_tensor_from_TensorType<ITensor>(node.input(6));
+    ITensor *value_w   = get_backing_tensor_from_TensorType<ITensor>(node.input(7));
+    ITensor *value_b   = get_backing_tensor_from_TensorType<ITensor>(node.input(8));
 
-    auto *query_output  = get_backing_tensor<TargetInfo>(node.output(0));
-    auto *key_output  = get_backing_tensor<TargetInfo>(node.output(1));
-    auto *value_output  = get_backing_tensor<TargetInfo>(node.output(2));
+    ITensor *query_output  = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
+    ITensor *key_output  = get_backing_tensor_from_TensorType<ITensor>(node.output(1));
+    ITensor *value_output  = get_backing_tensor_from_TensorType<ITensor>(node.output(2));
     const LinearLayerInfo linear_info         = node.linear_info();
 
     // Create and configure function
