@@ -195,6 +195,7 @@ std::unique_ptr<arm_compute::IFunction> CLDeviceBackend::configure_node(INode &n
     ARM_COMPUTE_LOG_GRAPH_VERBOSE("Configuring CL node with ID : " << node.id() << std::endl);
     ARM_COMPUTE_ERROR_ON(node.assigned_target() != Target::CL);
 
+    std::cout << "CLDeviceBackend::configure_node" << std::endl;
     // Configure node
     return CLFunctionFactory::create(&node, ctx);
 }
