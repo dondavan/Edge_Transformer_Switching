@@ -1839,9 +1839,9 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
 
     // Extract IO and info
     ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
-    ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
-    ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
-    ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
+    ITensor *weight   = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
+    ITensor *bias     = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
+    ITensor *output   = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
     const LinearLayerInfo linear_info         = node.linear_info();
 
     // Create function
