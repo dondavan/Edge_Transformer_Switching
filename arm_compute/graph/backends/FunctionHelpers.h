@@ -88,12 +88,11 @@ typename TargetInfo::TensorType *get_backing_tensor_switching(arm_compute::graph
     typename TargetInfo::TensorType *backing_tensor = nullptr;
     if (tensor != nullptr)
     {
-        ARM_COMPUTE_ERROR_ON(tensor->desc().target != TargetInfo::TargetType);
         // Get backing tensor handle
         ITensorHandle *tensor_handle = tensor->handle();
         // Get backing tensor
         backing_tensor = (tensor_handle != nullptr)
-                             ? arm_compute::utils::cast::polymorphic_cast<typename TargetInfo::TensorType *>(
+                             ? arm_compute::utils::cast::polymorphic_cast<tensor->desc().target>(
                                    &tensor_handle->tensor())
                              : nullptr;
     }
@@ -1868,7 +1867,7 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     validate_node<TargetInfo>(node, 9 /* expected inputs */, 3 /* expected outputs */);
     std::cout << " Attention linear 1" << std::endl;
     // Extract IO and info
-    typename TargetInfo::TensorType *query_input   = get_backing_tensor<TargetInfo>(node.input(0));
+    auto *query_input   = get_backing_tensor_switching<TargetInfo>(node.input(0));
     std::cout << "yeahh " << std::endl;
     typename TargetInfo::TensorType *query_w   = get_backing_tensor<TargetInfo>(node.input(1));
     typename TargetInfo::TensorType *query_b   = get_backing_tensor<TargetInfo>(node.input(2));
