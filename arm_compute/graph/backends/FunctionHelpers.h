@@ -74,6 +74,33 @@ typename TargetInfo::TensorType *get_backing_tensor(arm_compute::graph::Tensor *
     return backing_tensor;
 }
 
+/** Returns backing tensor of a given tensor switching version
+ *
+ * @tparam TargetInfo Target information
+ *
+ * @param[in] tensor Tensor to extract the backing tensor from
+ *
+ * @return Backing tensor if present else nullptr
+ */
+template <typename TargetInfo>
+typename TargetInfo::TensorType *get_backing_tensor_switching(arm_compute::graph::Tensor *tensor)
+{
+    typename TargetInfo::TensorType *backing_tensor = nullptr;
+    if (tensor != nullptr)
+    {
+        ARM_COMPUTE_ERROR_ON(tensor->desc().target != TargetInfo::TargetType);
+        // Get backing tensor handle
+        ITensorHandle *tensor_handle = tensor->handle();
+        // Get backing tensor
+        backing_tensor = (tensor_handle != nullptr)
+                             ? arm_compute::utils::cast::polymorphic_cast<typename TargetInfo::TensorType *>(
+                                   &tensor_handle->tensor())
+                             : nullptr;
+    }
+
+    return backing_tensor;
+}
+
 template <typename TargetInfo>
 void validate_node(const INode &node, size_t num_expected_inputs, size_t num_expected_outputs)
 {
