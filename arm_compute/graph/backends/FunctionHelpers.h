@@ -91,10 +91,24 @@ typename TargetInfo::TensorType *get_backing_tensor_switching(arm_compute::graph
         // Get backing tensor handle
         ITensorHandle *tensor_handle = tensor->handle();
         // Get backing tensor
-        backing_tensor = (tensor_handle != nullptr)
-                             ? arm_compute::utils::cast::polymorphic_cast<typename tensor->desc().target>(
+        switch (tensor->desc().target)
+        {
+        case Target::CL:
+            backing_tensor = (tensor_handle != nullptr)
+                             ? arm_compute::utils::cast::polymorphic_cast<arm_compute::ICLTensor *>(
                                    &tensor_handle->tensor())
                              : nullptr;
+            break;
+        case Target::NEON:
+            backing_tensor = (tensor_handle != nullptr)
+                             ? arm_compute::utils::cast::polymorphic_cast<arm_compute::ITensor *>(
+                                   &tensor_handle->tensor())
+                             : nullptr;
+            break;
+        default:
+            ARM_COMPUTE_ERROR("get_backing_tensor_switching: tensor type not supported")
+            break;
+        }
     }
 
     return backing_tensor;
