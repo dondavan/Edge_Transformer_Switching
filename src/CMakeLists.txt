@@ -31,6 +31,7 @@ target_sources(
 	graph/INode.cpp
 	graph/INodeVisitor.cpp
 	graph/PassManager.cpp
+	graph/SWDeviceBackend.cpp
 	graph/Tensor.cpp
 	graph/TypeLoader.cpp
 	graph/Utils.cpp
