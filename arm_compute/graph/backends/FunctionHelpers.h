@@ -1842,6 +1842,7 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     std::cout << " Attention linear 1" << std::endl;
     // Extract IO and info
     typename TargetInfo::TensorType *query_input   = get_backing_tensor<TargetInfo>(node.input(0));
+    std::cout << "yeahh " << std::endl;
     typename TargetInfo::TensorType *query_w   = get_backing_tensor<TargetInfo>(node.input(1));
     typename TargetInfo::TensorType *query_b   = get_backing_tensor<TargetInfo>(node.input(2));
     typename TargetInfo::TensorType *key_input   = get_backing_tensor<TargetInfo>(node.input(3));
