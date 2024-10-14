@@ -1872,11 +1872,11 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
 
     std::cout << " attention linear 1" << std::endl;
     // Extract IO and info
-    auto *query_input  = node.input(0)->desc().target == Target::CL ? 
-                            get_backing_tensor_switching<arm_compute::ICLTensor>(node.input(0)) : 
+    arm_compute::ITensor *query_input  = node.input(0)->desc().target == Target::CL ? 
+                            get_backing_tensor_switching<arm_compute::ITensor>(node.input(0)) : 
                             get_backing_tensor_switching<arm_compute::ITensor>(node.input(0));
-    auto *query_w   = node.input(1)->desc().target == Target::CL ? 
-                            get_backing_tensor_switching<arm_compute::ICLTensor>(node.input(1)) : 
+    arm_compute::ITensor *query_w   = node.input(1)->desc().target == Target::CL ? 
+                            get_backing_tensor_switching<arm_compute::ITensor>(node.input(1)) : 
                             get_backing_tensor_switching<arm_compute::ITensor>(node.input(1));
     
     std::cout << " attention linear eyahhhhhhhhh" << std::endl;
