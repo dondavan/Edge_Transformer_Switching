@@ -183,10 +183,16 @@ void setup_requested_backend_context(GraphContext &ctx, Target target)
 {
     if (backends::BackendRegistry::get().contains(target))
     {
-        const auto &backend = backends::BackendRegistry::get().find_backend(target);
-        if (backend->is_backend_supported())
+        if(is_switching(target))
         {
-            backend->setup_backend_context(ctx);
+            std::cout << "Blalallalalallalalalla" << std::endl;
+        }else
+        {
+            const auto &backend = backends::BackendRegistry::get().find_backend(target);
+            if (backend->is_backend_supported())
+            {
+                backend->setup_backend_context(ctx);
+            }
         }
     }
 }
