@@ -326,7 +326,7 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
         std::cout << " LinearLayer" << std::endl;
         break;
     case NodeType::AttentionLinearLayer:
-        std::cout << " SegmentEmbeddingLayer" << std::endl;
+        std::cout << " AttentionLinearLayer" << std::endl;
         break;
     case NodeType::ScaleDotProductionAttentionLayer:
         std::cout << " ScaleDotProductionAttentionLayer" << std::endl;
