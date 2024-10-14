@@ -147,6 +147,7 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
         if (node != nullptr)
         {
             Target                     assigned_target = node->assigned_target();
+            std::cout << node_id << std::endl;
             switch (assigned_target)
             {
                 case Target::CL:
