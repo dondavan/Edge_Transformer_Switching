@@ -24,7 +24,6 @@ struct NEPositionEmbeddingLayer::Impl
 NEPositionEmbeddingLayer::NEPositionEmbeddingLayer()
     : _impl(std::make_unique<Impl>())
 {
-    std::cout << "NEPositionEmbeddingLayer::NEPositionEmbeddingLayer" << std::endl;
 }
 
 NEPositionEmbeddingLayer::~NEPositionEmbeddingLayer() = default;

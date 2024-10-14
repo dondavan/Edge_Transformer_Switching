@@ -25,7 +25,6 @@ struct NEEmbeddingSumLayer::Impl
 NEEmbeddingSumLayer::NEEmbeddingSumLayer()
     : _impl(std::make_unique<Impl>())
 {
-    std::cout << "NEEmbeddingSumLayer::NEEmbeddingSumLayer" << std::endl;
 }
 
 NEEmbeddingSumLayer::~NEEmbeddingSumLayer() = default;

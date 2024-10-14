@@ -232,6 +232,7 @@ std::unique_ptr<IFunction> CLFunctionFactory::create(INode *node, GraphContext &
     switch (type)
     {
         case NodeType::ActivationLayer:
+            std::cout << "CL ActivationLayer" << std::endl;
             return detail::create_activation_layer<CLActivationLayer, CLTargetInfo>(
                 *polymorphic_downcast<ActivationLayerNode *>(node));
         case NodeType::ArgMinMaxLayer:
@@ -271,6 +272,7 @@ std::unique_ptr<IFunction> CLFunctionFactory::create(INode *node, GraphContext &
             return detail::create_detection_post_process_layer<CPPDetectionPostProcessLayer, CLTargetInfo>(
                 *polymorphic_downcast<DetectionPostProcessLayerNode *>(node));
         case NodeType::EltwiseLayer:
+            std::cout << "CL EltwiseLayer" << std::endl;
             return detail::create_eltwise_layer<CLEltwiseFunctions, CLTargetInfo>(
                 *polymorphic_downcast<EltwiseLayerNode *>(node));
         case NodeType::UnaryEltwiseLayer:
@@ -347,27 +349,35 @@ std::unique_ptr<IFunction> CLFunctionFactory::create(INode *node, GraphContext &
                 *polymorphic_downcast<StridedSliceLayerNode *>(node));
 
         case NodeType::TokenEmbeddingLayer:
+            std::cout << "CL TokenEmbeddingLayer" << std::endl;
             return detail::create_token_embedding_layer<CLTokenEmbeddingLayer, CLTargetInfo>(
                 *polymorphic_downcast<TokenEmbeddingLayerNode *>(node));
         case NodeType::SegmentEmbeddingLayer:
+            std::cout << "CL SegmentEmbeddingLayer" << std::endl;
             return detail::create_segment_embedding_layer<CLSegmentEmbeddingLayer, CLTargetInfo>(
                 *polymorphic_downcast<SegmentEmbeddingLayerNode *>(node));
         case NodeType::PositionEmbeddingLayer:
+            std::cout << "CL PositionEmbeddingLayer" << std::endl;
             return detail::create_position_embedding_layer<CLPositionEmbeddingLayer, CLTargetInfo>(
                 *polymorphic_downcast<PositionEmbeddingLayerNode *>(node));
         case NodeType::EmbeddingSumLayer:
+            std::cout << "CL EmbeddingSumLayer" << std::endl;
             return detail::create_embedding_sum_layer<CLEmbeddingSumLayer, CLTargetInfo>(
                 *polymorphic_downcast<EmbeddingSumLayerNode *>(node));
         case NodeType::LinearLayer:
+            std::cout << "CL LinearLayer" << std::endl;
             return detail::create_linear_layer<CLLinearLayer, CLTargetInfo>(
                 *polymorphic_downcast<LinearLayerNode *>(node));
-                case NodeType::LayerNormLayer:
+        case NodeType::LayerNormLayer:
+            std::cout << "CL LayerNormLayer" << std::endl;
             return detail::create_layer_norm_layer<CLLayerNormLayer, CLTargetInfo>(
                 *polymorphic_downcast<LayerNormNode *>(node));
         case NodeType::AttentionLinearLayer:
+            std::cout << "CL AttentionLinearLayer" << std::endl;
             return detail::create_attention_linear_layer<CLAttentionLinearLayer,CLTargetInfo>(
                 *polymorphic_downcast<AttentionLinearNode *>(node));
         case NodeType::ScaleDotProductionAttentionLayer:
+            std::cout << "CL ScaleDotProductionAttentionLayer" << std::endl;
             return detail::create_scale_dot_production_layer<CLScaleDotProductionAttentionLayer,CLTargetInfo>(
                 *polymorphic_downcast<ScaleDotProductionAttentionNode *>(node));
         default:

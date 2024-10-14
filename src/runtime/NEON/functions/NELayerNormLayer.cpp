@@ -23,7 +23,6 @@ struct  NELayerNormLayer::Impl
 
 NELayerNormLayer::NELayerNormLayer() : _impl(std::make_unique<Impl>())
 {
-    std::cout << "NELayerNormLayer::NELayerNormLayer" << std::endl;
 }
 NELayerNormLayer::~NELayerNormLayer() = default;
 

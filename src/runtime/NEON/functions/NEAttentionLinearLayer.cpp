@@ -34,7 +34,6 @@ struct NEAttentionLinearLayer::Impl
 NEAttentionLinearLayer::NEAttentionLinearLayer()
     : _impl(std::make_unique<Impl>())
 {
-    std::cout << "NEAttentionLinearLayer::NEAttentionLinearLayer" << std::endl;
 }
 
 NEAttentionLinearLayer::~NEAttentionLinearLayer() = default;

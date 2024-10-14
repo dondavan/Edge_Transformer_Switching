@@ -126,6 +126,7 @@ std::unique_ptr<IFunction> NEFunctionFactory::create(INode *node, GraphContext &
     switch (type)
     {
         case NodeType::ActivationLayer:
+            std::cout << "NE ActivationLayer" << std::endl;
             return detail::create_activation_layer<NEActivationLayer, NETargetInfo>(
                 *polymorphic_downcast<ActivationLayerNode *>(node));
         case NodeType::ArgMinMaxLayer:
@@ -162,6 +163,7 @@ std::unique_ptr<IFunction> NEFunctionFactory::create(INode *node, GraphContext &
             return detail::create_detection_post_process_layer<NEDetectionPostProcessLayer, NETargetInfo>(
                 *polymorphic_downcast<DetectionPostProcessLayerNode *>(node));
         case NodeType::EltwiseLayer:
+            std::cout << "NE EltwiseLayer" << std::endl;
             return detail::create_eltwise_layer<NEEltwiseFunctions, NETargetInfo>(
                 *polymorphic_downcast<EltwiseLayerNode *>(node));
         case NodeType::UnaryEltwiseLayer:
@@ -229,27 +231,35 @@ std::unique_ptr<IFunction> NEFunctionFactory::create(INode *node, GraphContext &
                 *polymorphic_downcast<StridedSliceLayerNode *>(node));
         
         case NodeType::TokenEmbeddingLayer:
+            std::cout << "NE TokenEmbeddingLayer" << std::endl;
             return detail::create_token_embedding_layer<NETokenEmbeddingLayer, NETargetInfo>(
                 *polymorphic_downcast<TokenEmbeddingLayerNode *>(node));
         case NodeType::SegmentEmbeddingLayer:
+            std::cout << "NE SegmentEmbeddingLayer" << std::endl;
             return detail::create_segment_embedding_layer<NESegmentEmbeddingLayer, NETargetInfo>(
                 *polymorphic_downcast<SegmentEmbeddingLayerNode *>(node));
         case NodeType::PositionEmbeddingLayer:
+            std::cout << "NE PositionEmbeddingLayer" << std::endl;
             return detail::create_position_embedding_layer<NEPositionEmbeddingLayer, NETargetInfo>(
                 *polymorphic_downcast<PositionEmbeddingLayerNode *>(node));
         case NodeType::EmbeddingSumLayer:
+            std::cout << "NE EmbeddingSumLayer" << std::endl;
             return detail::create_embedding_sum_layer<NEEmbeddingSumLayer, NETargetInfo>(
                 *polymorphic_downcast<EmbeddingSumLayerNode *>(node));
         case NodeType::LinearLayer:
+            std::cout << "NE LinearLayer" << std::endl;
             return detail::create_linear_layer<NELinearLayer, NETargetInfo>(
                 *polymorphic_downcast<LinearLayerNode *>(node));
         case NodeType::AttentionLinearLayer:
+            std::cout << "NE AttentionLinearLayer" << std::endl;
             return detail::create_attention_linear_layer<NEAttentionLinearLayer,NETargetInfo>(
                 *polymorphic_downcast<AttentionLinearNode *>(node));
         case NodeType::ScaleDotProductionAttentionLayer:
+            std::cout << "NE ScaleDotProductionAttentionLayer" << std::endl;
             return detail::create_scale_dot_production_layer<NEScaleDotProductionAttentionLayer,NETargetInfo>(
                 *polymorphic_downcast<ScaleDotProductionAttentionNode *>(node));
         case NodeType::LayerNormLayer:
+            std::cout << "NE LayerNormLayer" << std::endl;
             return detail::create_layer_norm_layer<NELayerNormLayer, NETargetInfo>(
                 *polymorphic_downcast<LayerNormNode *>(node));
         default:
