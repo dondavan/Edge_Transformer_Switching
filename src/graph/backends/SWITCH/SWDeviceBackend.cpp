@@ -45,7 +45,7 @@ namespace graph
 {
 namespace backends
 {
-/** Register CPU backend */
+/** Register SWITCHING backend */
 static detail::BackendRegistrar<SWDeviceBackend> SWDeviceBackend_registrar(Target::SWITCH);
 
 SWDeviceBackend::SWDeviceBackend() : _allocator()
