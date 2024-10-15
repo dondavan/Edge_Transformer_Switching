@@ -262,11 +262,13 @@ public:
 
     TensorTargetType tensor_target_type() const override
     {
-        return _tensor_target_type;
+        ARM_COMPUTE_ERROR_ON(_parent == nullptr);
+        return _parent->tensor_target_type();
     }
     ITensorInfo &set_tensor_target_type(TensorTargetType target_type) override
     {
-        _tensor_target_type = target_type;
+        ARM_COMPUTE_ERROR_ON(_parent == nullptr);
+        _parent->set_tensor_target_type(target_type);
         return *this;
     }
 
@@ -278,8 +280,6 @@ private:
     ValidRegion     _valid_region;
     bool            _extend_parent;
     bool            _lock_paddings;
-
-    TensorTargetType _tensor_target_type;
 };
 } // namespace arm_compute
 #endif // ACL_ARM_COMPUTE_CORE_SUBTENSORINFO_H
