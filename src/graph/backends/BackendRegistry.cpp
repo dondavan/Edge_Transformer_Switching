@@ -57,9 +57,6 @@ IDeviceBackend &BackendRegistry::get_backend(Target target)
 
 bool BackendRegistry::contains(Target target) const
 {
-
-    std::cout << "_registered_backends" << std::endl;
-    std::cout << _registered_backends.size() << std::endl;
     auto it = _registered_backends.find(target);
     return (it != _registered_backends.end());
 }
