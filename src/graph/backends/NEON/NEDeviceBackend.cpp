@@ -111,8 +111,6 @@ IAllocator *NEDeviceBackend::backend_allocator()
 
 std::unique_ptr<ITensorHandle> NEDeviceBackend::create_tensor(const Tensor &tensor)
 {
-
-    std::cout << "NEDeviceBackend::create_tensor " <<std::endl;
     // Get tensor descriptor
     const TensorDescriptor &tensor_desc = tensor.desc();
     ARM_COMPUTE_ERROR_ON(tensor_desc.target != Target::NEON);
@@ -120,6 +118,7 @@ std::unique_ptr<ITensorHandle> NEDeviceBackend::create_tensor(const Tensor &tens
     // Create backend tensor handle
     TensorInfo info(tensor_desc.shape, 1, tensor_desc.data_type, tensor_desc.quant_info);
     info.set_data_layout(tensor_desc.layout);
+    info.set_tensor_target_type(TensorTargetType::NEON);
 
     return std::make_unique<NETensorHandle>(info);
 }
