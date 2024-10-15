@@ -17,6 +17,13 @@ void CpuPositionEmbed::configure(const ITensorInfo *input, const ITensorInfo *po
 {
     ARM_COMPUTE_LOG_PARAMS(input, output);
 
+
+    std::cout << "CpuSegmentEmbed::configure start " << std::endl;
+    input->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    position->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    output->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    std::cout << "CpuSegmentEmbed::configure end " << std::endl;
+    
     auto k = std::make_unique<kernels::CpuPositionEmbeddingKernel>();
     k->configure(input, position, output);
     _kernel = std::move(k);

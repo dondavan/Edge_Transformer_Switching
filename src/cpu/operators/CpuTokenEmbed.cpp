@@ -18,6 +18,13 @@ void CpuTokenEmbed::configure(const ITensorInfo *input, const ITensorInfo *vocab
     ARM_COMPUTE_LOG_PARAMS(input, output, tkemb_info);
     ARM_COMPUTE_UNUSED(tkemb_info);
 
+
+    std::cout << "CpuTokenEmbed::configure start " << std::endl;
+    input->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    vocab->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    output->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    std::cout << "CpuTokenEmbed::configure end " << std::endl;
+
     auto k = std::make_unique<kernels::CpuVectorizeKernel>();
     k->configure(input, vocab, output);
     _kernel = std::move(k);

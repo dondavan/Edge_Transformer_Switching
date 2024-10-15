@@ -28,6 +28,12 @@ void CpuScaleDotProduction::configure(const ITensorInfo *query,
 {
     ARM_COMPUTE_LOG_PARAMS(key, value, query, output);
     
+    std::cout << "CpuScaleDotProduction::configure start " << std::endl;
+    query->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    key->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    value->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    output->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    std::cout << "CpuScaleDotProduction::configure end " << std::endl;
     // Query multi-Head reshape 
     TensorShape query_reshape = TensorShape(query->tensor_shape().x()/info.h(),
                                             info.h(),

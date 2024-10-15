@@ -36,6 +36,13 @@ void ClLinear::configure(const ClCompileContext &compile_context,
         cl_matmul::ClMatMulNativeKernelConfigurationFactory::create(gpu_target);
     MatMulKernelInfo kernel_info = kernel_config->configure(a, b, mat_info);
 
+    std::cout << "ClLinear::configure start " <<std::endl;
+    a->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    b->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    c->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    d->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl; 
+    std::cout << "ClLinear::configure end " <<std::endl;
+
     auto k = std::make_unique<kernels::ClLinearKernel>();
     k->set_target(gpu_target);
     k->configure(compile_context, a, b, c, d, alpha, beta, kernel_info);
