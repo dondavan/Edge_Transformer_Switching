@@ -2252,5 +2252,15 @@ private:
     unsigned int _h;
 };
 
+/**< Tensor target types */
+enum class TensorTargetType
+{
+    UNSPECIFIED,
+    NEON,
+    CL,
+    CLVK,
+    SWITCH,
+};
+
 } // namespace arm_compute
 #endif // ACL_ARM_COMPUTE_CORE_TYPES_H

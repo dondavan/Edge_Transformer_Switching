@@ -27,15 +27,15 @@
 #include "arm_compute/core/Error.h"
 #include "arm_compute/core/Helpers.h"
 #include "arm_compute/core/ITensorInfo.h"
-#include "arm_compute/graph/backends/FusedConvolutionBatchNormalizationFunction.h"
-#include "arm_compute/graph/backends/FusedDepthwiseConvolutionBatchNormalizationFunction.h"
-#include "arm_compute/graph/backends/Utils.h"
 #include "arm_compute/graph/Logger.h"
-#include "arm_compute/graph/nodes/Nodes.h"
 #include "arm_compute/graph/Tensor.h"
 #include "arm_compute/graph/TypePrinter.h"
 #include "arm_compute/graph/Types.h"
 #include "arm_compute/graph/Utils.h"
+#include "arm_compute/graph/backends/FusedConvolutionBatchNormalizationFunction.h"
+#include "arm_compute/graph/backends/FusedDepthwiseConvolutionBatchNormalizationFunction.h"
+#include "arm_compute/graph/backends/Utils.h"
+#include "arm_compute/graph/nodes/Nodes.h"
 
 #include "support/Cast.h"
 
@@ -59,22 +59,19 @@ template <typename TargetInfo>
 typename TargetInfo::TensorType *get_backing_tensor(arm_compute::graph::Tensor *tensor)
 {
     typename TargetInfo::TensorType *backing_tensor = nullptr;
-    if (tensor != nullptr)
+    if(tensor != nullptr)
     {
         ARM_COMPUTE_ERROR_ON(tensor->desc().target != TargetInfo::TargetType);
         // Get backing tensor handle
         ITensorHandle *tensor_handle = tensor->handle();
         // Get backing tensor
-        backing_tensor = (tensor_handle != nullptr)
-                             ? arm_compute::utils::cast::polymorphic_cast<typename TargetInfo::TensorType *>(
-                                   &tensor_handle->tensor())
-                             : nullptr;
+        backing_tensor = (tensor_handle != nullptr) ? arm_compute::utils::cast::polymorphic_cast<typename TargetInfo::TensorType *>(
+                                                          &tensor_handle->tensor()) :
+                                                      nullptr;
     }
 
     return backing_tensor;
 }
-
-
 
 /** Returns backing tensor of a given tensor with assigned target
  *
@@ -88,21 +85,19 @@ template <typename TensorType>
 TensorType *get_backing_tensor_from_TensorType(arm_compute::graph::Tensor *tensor)
 {
     TensorType *backing_tensor = nullptr;
-    if (tensor != nullptr)
+    if(tensor != nullptr)
     {
         ARM_COMPUTE_ERROR_ON(tensor->desc().target != TensorType);
         // Get backing tensor handle
         ITensorHandle *tensor_handle = tensor->handle();
         // Get backing tensor
-        backing_tensor = (tensor_handle != nullptr)
-                             ? arm_compute::utils::cast::polymorphic_cast<TensorType *>(
-                                   &tensor_handle->tensor())
-                             : nullptr;
+        backing_tensor = (tensor_handle != nullptr) ? arm_compute::utils::cast::polymorphic_cast<TensorType *>(
+                                                          &tensor_handle->tensor()) :
+                                                      nullptr;
     }
 
     return backing_tensor;
 }
-
 
 template <typename TargetInfo>
 void validate_node(const INode &node, size_t num_expected_inputs, size_t num_expected_outputs)
@@ -411,20 +406,20 @@ std::unique_ptr<arm_compute::IFunction> create_concatenate_layer(ConcatenateLaye
     ARM_COMPUTE_ERROR_ON(node.num_outputs() != 1);
 
     // Return nullptr if depth concatenate is switched off
-    if (!node.is_enabled())
+    if(!node.is_enabled())
     {
         return nullptr;
     }
 
     // Extract IO and info
     std::vector<typename TargetInfo::SrcTensorType *> inputs;
-    for (unsigned int i = 0; i < node.num_inputs(); ++i)
+    for(unsigned int i = 0; i < node.num_inputs(); ++i)
     {
         inputs.push_back(get_backing_tensor<TargetInfo>(node.input(i)));
     }
-    typename TargetInfo::TensorType *output = get_backing_tensor<TargetInfo>(node.output(0));
-    const DataLayout data_layout = node.output(0) != nullptr ? node.output(0)->desc().layout : DataLayout::UNKNOWN;
-    const size_t     concat_axis = get_dimension_idx(data_layout, node.concatenation_axis());
+    typename TargetInfo::TensorType *output      = get_backing_tensor<TargetInfo>(node.output(0));
+    const DataLayout                 data_layout = node.output(0) != nullptr ? node.output(0)->desc().layout : DataLayout::UNKNOWN;
+    const size_t                     concat_axis = get_dimension_idx(data_layout, node.concatenation_axis());
 
     // Create and configure function
     auto func = std::make_unique<ConcatenateLayerFunction>();
@@ -433,7 +428,7 @@ std::unique_ptr<arm_compute::IFunction> create_concatenate_layer(ConcatenateLaye
     // Log info
     const bool         is_quantized = is_data_type_quantized_asymmetric(output->info()->data_type());
     std::ostringstream qss;
-    if (is_quantized)
+    if(is_quantized)
     {
         qss << " Output QuantInfo: " << output->info()->quantization_info();
     }
@@ -468,7 +463,7 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
 
     const bool is_quantized = is_data_type_quantized_asymmetric(input->info()->data_type());
 
-    if (is_quantized)
+    if(is_quantized)
     {
         biases->info()->set_data_type(DataType::S32);
     }
@@ -484,7 +479,7 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
     std::unique_ptr<IFunction>      func;
     std::string                     func_name;
 
-    if (conv_algorithm == ConvolutionMethod::Winograd)
+    if(conv_algorithm == ConvolutionMethod::Winograd)
     {
         ARM_COMPUTE_ERROR_ON_MSG(num_groups != 1, "WinogradConvolutionLayer does not support grouping!");
         std::tie(func, func_name) =
@@ -492,13 +487,13 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
                 std::string("WinogradConvolutionLayer"), mm, input, weights, biases, output, conv_info, fused_act,
                 fast_math);
     }
-    else if (conv_algorithm == ConvolutionMethod::Direct)
+    else if(conv_algorithm == ConvolutionMethod::Direct)
     {
         ARM_COMPUTE_ERROR_ON_MSG(num_groups != 1, "DirectConvolutionLayer does not support grouping!");
         std::tie(func, func_name) = create_named_function<typename ConvolutionLayerFunctions::DirectConvolutionLayer>(
             std::string("DirectConvolutionLayer"), input, weights, biases, output, conv_info, fused_act);
     }
-    else if (conv_algorithm == ConvolutionMethod::GEMM)
+    else if(conv_algorithm == ConvolutionMethod::GEMM)
     {
         std::tie(func, func_name) =
             create_named_memory_managed_function<typename ConvolutionLayerFunctions::GEMMConvolutionLayer>(
@@ -515,7 +510,7 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
 
     // Log info
     std::ostringstream qss;
-    if (is_quantized)
+    if(is_quantized)
     {
         qss << " Input QuantInfo: " << input->info()->quantization_info()
             << " Weights QuantInfo: " << weights->info()->quantization_info()
@@ -592,7 +587,7 @@ std::unique_ptr<IFunction> create_depthwise_convolution_layer(DepthwiseConvoluti
 
     const bool is_quantized = is_data_type_quantized_asymmetric(input->info()->data_type());
 
-    if (is_quantized)
+    if(is_quantized)
     {
         biases->info()->set_data_type(DataType::S32);
     }
@@ -611,7 +606,7 @@ std::unique_ptr<IFunction> create_depthwise_convolution_layer(DepthwiseConvoluti
 
     // Log info
     std::ostringstream qss;
-    if (is_quantized)
+    if(is_quantized)
     {
         qss << " Input QuantInfo: " << input->info()->quantization_info()
             << " Weights QuantInfo: " << weights->info()->quantization_info()
@@ -816,28 +811,28 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
 
     std::unique_ptr<IFunction> func = nullptr;
     std::string                func_name;
-    if (eltwise_op == EltwiseOperation::Add)
+    if(eltwise_op == EltwiseOperation::Add)
     {
         std::tie(func, func_name) = create_named_function<typename EltwiseFunctions::Addition>(
             std::string("ArithmeticAddition"), input1, input2, output, convert_policy, act_info);
     }
-    else if (eltwise_op == EltwiseOperation::Sub)
+    else if(eltwise_op == EltwiseOperation::Sub)
     {
         std::tie(func, func_name) = create_named_function<typename EltwiseFunctions::Subtraction>(
             std::string("ArithmeticSubtraction"), input1, input2, output, convert_policy, act_info);
     }
-    else if (eltwise_op == EltwiseOperation::Mul)
+    else if(eltwise_op == EltwiseOperation::Mul)
     {
         std::tie(func, func_name) = create_named_function<typename EltwiseFunctions::Multiplication>(
             std::string("PixelWiseMultiplication"), input1, input2, output, 1.f, convert_policy, node.rounding_policy(),
             act_info);
     }
-    else if (eltwise_op == EltwiseOperation::Max)
+    else if(eltwise_op == EltwiseOperation::Max)
     {
         std::tie(func, func_name) = create_named_function<typename EltwiseFunctions::Maximum>(
             std::string("ElementwiseMaximum"), input1, input2, output, act_info);
     }
-    else if (eltwise_op == EltwiseOperation::Div)
+    else if(eltwise_op == EltwiseOperation::Div)
     {
         std::tie(func, func_name) = create_named_function<typename EltwiseFunctions::Division>(
             std::string("ArithmeticDivision"), input1, input2, output, act_info);
@@ -880,7 +875,7 @@ std::unique_ptr<IFunction> create_unary_eltwise_layer(UnaryEltwiseLayerNode &nod
 
     std::unique_ptr<IFunction> func = nullptr;
     std::string                func_name;
-    if (eltwise_op == UnaryEltwiseOperation::Exp)
+    if(eltwise_op == UnaryEltwiseOperation::Exp)
     {
         std::tie(func, func_name) =
             create_named_function<typename UnaryEltwiseFunctions::Exp>(std::string("Exp"), input, output);
@@ -970,7 +965,7 @@ std::unique_ptr<IFunction> create_fully_connected_layer(FullyConnectedLayerNode 
 
     // Log info
     std::ostringstream qss;
-    if (is_quantized)
+    if(is_quantized)
     {
         qss << " Input QuantInfo: " << input->info()->quantization_info()
             << " Weights QuantInfo: " << weights->info()->quantization_info()
@@ -1509,7 +1504,7 @@ std::unique_ptr<IFunction> create_resize_layer(ResizeLayerNode &node)
     // Create and configure function
     auto func = std::make_unique<ResizeLayerFunction>();
     func->configure(input, output,
-                    ScaleKernelInfo{policy, BorderMode::CONSTANT, PixelValue(), SamplingPolicy::CENTER, false, false});
+                    ScaleKernelInfo{ policy, BorderMode::CONSTANT, PixelValue(), SamplingPolicy::CENTER, false, false });
 
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
@@ -1648,7 +1643,7 @@ std::unique_ptr<arm_compute::IFunction> create_stack_layer(StackLayerNode &node)
 
     // Extract IO and info
     std::vector<typename TargetInfo::TensorType *> inputs;
-    for (unsigned int i = 0; i < node.num_inputs(); ++i)
+    for(unsigned int i = 0; i < node.num_inputs(); ++i)
     {
         inputs.push_back(get_backing_tensor<TargetInfo>(node.input(i)));
     }
@@ -1723,15 +1718,15 @@ std::unique_ptr<IFunction> create_token_embedding_layer(TokenEmbeddingLayerNode 
     validate_node<TargetInfo>(node, 2 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    
-    typename TargetInfo::TensorType *input    = get_backing_tensor<TargetInfo>(node.input(0));
-    typename TargetInfo::TensorType *vocab    = get_backing_tensor<TargetInfo>(node.input(1));
-    typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
-    const EmbeddingLayerInfo tkemb_info  = node.token_embedding_info();
+
+    typename TargetInfo::TensorType *input      = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *vocab      = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *output     = get_backing_tensor<TargetInfo>(node.output(0));
+    const EmbeddingLayerInfo         tkemb_info = node.token_embedding_info();
 
     // Create function
     auto func = std::make_unique<TokenEmbeddingLayerFunction>();
-    func->configure(input,vocab,output,tkemb_info);
+    func->configure(input, vocab, output, tkemb_info);
 
     ARM_COMPUTE_LOG_GRAPH_INFO(
         "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
@@ -1755,14 +1750,14 @@ std::unique_ptr<IFunction> create_segment_embedding_layer(SegmentEmbeddingLayerN
     validate_node<TargetInfo>(node, 2 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    
-    typename TargetInfo::TensorType *input    = get_backing_tensor<TargetInfo>(node.input(0));
-    typename TargetInfo::TensorType *segment  = get_backing_tensor<TargetInfo>(node.input(1));
-    typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
+
+    typename TargetInfo::TensorType *input   = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *segment = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
 
     // Create function
     auto func = std::make_unique<SegmentEmbeddingLayerFunction>();
-    func->configure(input,segment,output);
+    func->configure(input, segment, output);
 
     return func;
 }
@@ -1782,14 +1777,14 @@ std::unique_ptr<IFunction> create_position_embedding_layer(PositionEmbeddingLaye
     validate_node<TargetInfo>(node, 2 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    
+
     typename TargetInfo::TensorType *input    = get_backing_tensor<TargetInfo>(node.input(0));
-    typename TargetInfo::TensorType *position  = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *position = get_backing_tensor<TargetInfo>(node.input(1));
     typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
 
     // Create function
     auto func = std::make_unique<PositionEmbeddingLayerFunction>();
-    func->configure(input,position,output);
+    func->configure(input, position, output);
 
     return func;
 }
@@ -1809,19 +1804,18 @@ std::unique_ptr<IFunction> create_embedding_sum_layer(EmbeddingSumLayerNode &nod
     validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    typename TargetInfo::TensorType *token      = get_backing_tensor<TargetInfo>(node.input(0));
-    typename TargetInfo::TensorType *segment    = get_backing_tensor<TargetInfo>(node.input(1));
-    typename TargetInfo::TensorType *position   = get_backing_tensor<TargetInfo>(node.input(2));
-    typename TargetInfo::TensorType *output     = get_backing_tensor<TargetInfo>(node.output(0));
-    const EmbeddingLayerInfo info = node.embedding_sum_info();
+    typename TargetInfo::TensorType *token    = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *segment  = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *position = get_backing_tensor<TargetInfo>(node.input(2));
+    typename TargetInfo::TensorType *output   = get_backing_tensor<TargetInfo>(node.output(0));
+    const EmbeddingLayerInfo         info     = node.embedding_sum_info();
 
     // Create function
     auto func = std::make_unique<EmbeddingSumLayerFunction>();
-    func->configure(token,segment,position,output,info);
+    func->configure(token, segment, position, output, info);
 
     return func;
 }
-
 
 /** Creates a backend linear layer function
  *
@@ -1838,11 +1832,11 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
     validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    ITensor *input  = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
-    ITensor *weight   = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
-    ITensor *bias     = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
-    ITensor *output   = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
-    const LinearLayerInfo linear_info         = node.linear_info();
+    ITensor              *input       = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
+    ITensor              *weight      = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
+    ITensor              *bias        = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
+    ITensor              *output      = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
+    const LinearLayerInfo linear_info = node.linear_info();
 
     // Create function
     auto func = std::make_unique<LinearLayerFunction>();
@@ -1870,27 +1864,27 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     validate_node<TargetInfo>(node, 9 /* expected inputs */, 3 /* expected outputs */);
 
     // Extract IO and info
-    ITensor *query_input  = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
-    ITensor *query_w   = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
-    ITensor *query_b   = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
+    ITensor *query_input = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
+    ITensor *query_w     = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
+    ITensor *query_b     = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
     ITensor *key_input   = get_backing_tensor_from_TensorType<ITensor>(node.input(3));
-    ITensor *key_w   = get_backing_tensor_from_TensorType<ITensor>(node.input(4));
-    ITensor *key_b   = get_backing_tensor_from_TensorType<ITensor>(node.input(5));
-    ITensor *value_input   = get_backing_tensor_from_TensorType<ITensor>(node.input(6));
-    ITensor *value_w   = get_backing_tensor_from_TensorType<ITensor>(node.input(7));
-    ITensor *value_b   = get_backing_tensor_from_TensorType<ITensor>(node.input(8));
+    ITensor *key_w       = get_backing_tensor_from_TensorType<ITensor>(node.input(4));
+    ITensor *key_b       = get_backing_tensor_from_TensorType<ITensor>(node.input(5));
+    ITensor *value_input = get_backing_tensor_from_TensorType<ITensor>(node.input(6));
+    ITensor *value_w     = get_backing_tensor_from_TensorType<ITensor>(node.input(7));
+    ITensor *value_b     = get_backing_tensor_from_TensorType<ITensor>(node.input(8));
 
-    ITensor *query_output  = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
-    ITensor *key_output  = get_backing_tensor_from_TensorType<ITensor>(node.output(1));
-    ITensor *value_output  = get_backing_tensor_from_TensorType<ITensor>(node.output(2));
-    const LinearLayerInfo linear_info         = node.linear_info();
+    ITensor              *query_output = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
+    ITensor              *key_output   = get_backing_tensor_from_TensorType<ITensor>(node.output(1));
+    ITensor              *value_output = get_backing_tensor_from_TensorType<ITensor>(node.output(2));
+    const LinearLayerInfo linear_info  = node.linear_info();
 
     // Create and configure function
     auto func = std::make_unique<AttentionLinearLayerFunction>();
-    func->configure(query_input,query_w,query_b,
-                    key_input,key_w,key_b,
-                    value_input,value_w,value_b,
-                    query_output,key_output,value_output,
+    func->configure(query_input, query_w, query_b,
+                    key_input, key_w, key_b,
+                    value_input, value_w, value_b,
+                    query_output, key_output, value_output,
                     linear_info);
 
     // Log info
@@ -1953,15 +1947,15 @@ std::unique_ptr<IFunction> create_scale_dot_production_layer(ScaleDotProductionA
 {
     validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
 
-     // Extract IO and info
-    typename TargetInfo::TensorType *query   = get_backing_tensor<TargetInfo>(node.input(0));
-    typename TargetInfo::TensorType *key     = get_backing_tensor<TargetInfo>(node.input(1));
-    typename TargetInfo::TensorType *value   = get_backing_tensor<TargetInfo>(node.input(2));
-    typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
+    // Extract IO and info
+    typename TargetInfo::TensorType *query  = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *key    = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *value  = get_backing_tensor<TargetInfo>(node.input(2));
+    typename TargetInfo::TensorType *output = get_backing_tensor<TargetInfo>(node.output(0));
 
     // Create and configure function
     auto func = std::make_unique<ScaleDotProductionLayerFunction>();
-    func->configure(query,key,value,output,node.sdpa_info());
+    func->configure(query, key, value, output, node.sdpa_info());
 
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
@@ -1987,15 +1981,15 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
     validate_node<TargetInfo>(node, 1 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    typename TargetInfo::TensorType *input   = get_backing_tensor<TargetInfo>(node.input(0));
-    typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
+    typename TargetInfo::TensorType *input  = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *output = get_backing_tensor<TargetInfo>(node.output(0));
 
     ARM_COMPUTE_ERROR_ON(input == nullptr);
     ARM_COMPUTE_ERROR_ON(output == nullptr);
 
     // Create and configure function
     auto func = std::make_unique<LayerNormLayerFunction>();
-    func->configure(input,output,node.layer_norm_info());
+    func->configure(input, output, node.layer_norm_info());
 
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "

@@ -366,6 +366,16 @@ public:
         return std::pair<TensorShape, ValidRegion>(bc_shape, bc_valid_region);
     }
 
+    /** Get tensor target type
+     *
+     * @note Default tensor target is CPU(NEON)
+     * 
+     * @return Tensor type
+     */
+    virtual TensorTargetType tensor_target_type() const = 0;
+    /** Set tensor target type */
+    virtual ITensorInfo &set_tensor_target_type(TensorTargetType target_type) = 0;
+
 private:
     static constexpr int32_t _dynamic_dimension = -1;
     static constexpr int32_t _static_dimension  = 0;

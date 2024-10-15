@@ -325,6 +325,16 @@ public:
     }
     inline friend bool operator==(const TensorInfo &lhs, const TensorInfo &rhs);
 
+    TensorTargetType tensor_target_type() const override
+    {
+        return _tensor_target_type;
+    }
+    ITensorInfo &set_tensor_target_type(TensorTargetType target_type) override
+    {
+        _tensor_target_type = target_type;
+        return *this;
+    }
+
 private:
     /** Calculates strides, offset and total size resulting from the specified padding around the XY plane.
      *
@@ -348,6 +358,8 @@ private:
     bool             _are_values_constant;
     ITensorInfo::Id  _id;
     bool             _lock_paddings;
+
+    TensorTargetType _tensor_target_type;
 };
 
 /** Check whether two tensor info are equal.
