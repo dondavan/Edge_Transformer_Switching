@@ -151,16 +151,16 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
             switch (assigned_target)
             {
                 case Target::CL:
-                    std::cout << " CL" << std::endl;
+                    std::cout << " CL ";
                     break;
                 case Target::NEON:
-                    std::cout << " NEON" << std::endl;
+                    std::cout << " NEON ";
                     break;
                 case Target::SWITCH:
-                    std::cout << " SWITCH" << std::endl;
+                    std::cout << " SWITCH ";
                     break;
                 default:
-                    std::cout << " Some other target" << std::endl;
+                    std::cout << " Some other target ";
                     break;
             }
             backends::IDeviceBackend  &backend         = backends::BackendRegistry::get().get_backend(assigned_target);
