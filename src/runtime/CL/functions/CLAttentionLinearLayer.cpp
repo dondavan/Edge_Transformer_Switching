@@ -68,6 +68,9 @@ void CLAttentionLinearLayer::configure(const CLCompileContext &compile_context,
                                        ITensor *query_output, ITensor *key_output, ITensor *value_output,
                                        const LinearLayerInfo &linear_info)
 {
+
+    std::cout << "CLAttentionLinearLayer::configure start" << std::endl;
+
     ARM_COMPUTE_ERROR_ON_NULLPTR(input, output);
     ARM_COMPUTE_UNUSED(linear_info);
 
@@ -106,6 +109,8 @@ void CLAttentionLinearLayer::configure(const CLCompileContext &compile_context,
     measure_out << std::scientific << "CLAttentionLinearLayer::configure cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+std::cout << "CLAttentionLinearLayer::configure end" << std::endl;
+    
 }
 
 Status CLAttentionLinearLayer::validate(const ITensor *input,
