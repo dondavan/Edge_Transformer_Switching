@@ -66,7 +66,7 @@ void configure_all_tensors(Graph &g)
 
             auto nx_tensor_it = next(tensor_it, 1);
             // If next tensor is cl and current tensor is neon, change tensor type to cl
-            if(nx_tensor_it != tensors.end())
+            if(nx_tensor_it != tensors.end() && tensor->desc().target == Target::NEON)
             {
                 auto &nx_tensor = *nx_tensor_it;
                 nx_tensor->desc().target == Target::CL ? target = Target::CL : target = Target::NEON;
