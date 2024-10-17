@@ -54,9 +54,45 @@ void validate_all_nodes(Graph &g)
 }
 
 void configure_all_tensors(Graph &g)
-{
+{   
+
+    auto &nodes = g.nodes();
+    for (auto &node : nodes)
+    {
+        for(unsigned int i = 0; i < node.get()->num_outputs(); ++i)
+        {
+            Tensor *tensor = node.get()->output(i);
+            if(tensor != nullptr && !tensor->bound_edges().empty())
+            {
+                auto eids = tensor->bound_edges();
+                for(auto eid:eids)
+                {
+                    auto cnode = g.edge(eid)->consumer();
+                    if(cnode->assigned_target() == Target::CL)
+                    {
+                        tensor->desc().target = Target::CL;
+                        std::cout << " SWitched to tensor target CL";
+                    }
+                }
+            }
+        }
+    }
+
     auto &tensors = g.tensors();
 
+    for (auto &tensor : tensors)
+    {
+        if (tensor && tensor->handle() == nullptr)
+        {
+            Target                         target  = tensor->desc().target;
+            backends::IDeviceBackend      &backend = backends::BackendRegistry::get().get_backend(target);
+            std::unique_ptr<ITensorHandle> handle  = backend.create_tensor(*tensor);
+            ARM_COMPUTE_ERROR_ON_MSG(!handle, "Couldn't create backend handle!");
+            tensor->set_handle(std::move(handle));
+        }
+    }
+
+    /*
     for(auto tensor_it = tensors.begin(); tensor_it != tensors.end(); tensor_it++)
     {
         auto &tensor = *tensor_it;
@@ -76,20 +112,8 @@ void configure_all_tensors(Graph &g)
             ARM_COMPUTE_ERROR_ON_MSG(!handle, "Couldn't create backend handle!");
             tensor->set_handle(std::move(handle));
         }
-    }
-    /*
-    for (auto &tensor : tensors)
-    {
-        if (tensor && tensor->handle() == nullptr)
-        {
-            Target                         target  = tensor->desc().target;
-            backends::IDeviceBackend      &backend = backends::BackendRegistry::get().get_backend(target);
-            std::unique_ptr<ITensorHandle> handle  = backend.create_tensor(*tensor);
-            ARM_COMPUTE_ERROR_ON_MSG(!handle, "Couldn't create backend handle!");
-            tensor->set_handle(std::move(handle));
-        }
-    }
-    */
+    }*/
+
 }
 
 void allocate_all_input_tensors(INode &node)
