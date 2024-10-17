@@ -59,19 +59,42 @@ void configure_all_tensors(Graph &g)
     auto &nodes = g.nodes();
     for (auto &node : nodes)
     {
+        //Check output
         for(unsigned int i = 0; i < node.get()->num_outputs(); ++i)
         {
             Tensor *tensor = node.get()->output(i);
+
             if(tensor != nullptr && !tensor->bound_edges().empty())
             {
                 auto eids = tensor->bound_edges();
                 for(auto eid:eids)
                 {
                     auto cnode = g.edge(eid)->consumer();
-                    if(cnode->assigned_target() == Target::CL)
+                    auto pnode = g.edge(eid)->producer();
+                    if(cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL)
                     {
                         tensor->desc().target = Target::CL;
-                        std::cout << " SWitched to tensor target CL";
+                        std::cout << " Output SWitched to tensor target CL" << std::endl;
+                    }
+                }
+            }
+        }
+
+        for(unsigned int i = 0; i < node.get()->num_inputs(); ++i)
+        {
+            Tensor *tensor = node.get()->input(i);
+
+            if(tensor != nullptr && !tensor->bound_edges().empty())
+            {
+                auto eids = tensor->bound_edges();
+                for(auto eid:eids)
+                {
+                    auto cnode = g.edge(eid)->consumer();
+                    auto pnode = g.edge(eid)->producer();
+                    if(cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL)
+                    {
+                        tensor->desc().target = Target::CL;
+                        std::cout << " Input SWitched to tensor target CL" << std::endl;
                     }
                 }
             }
