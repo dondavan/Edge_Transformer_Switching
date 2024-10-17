@@ -69,7 +69,7 @@ void configure_all_tensors(Graph &g)
             if(nx_tensor_it != tensors.end() && tensor->desc().target == Target::NEON)
             {
                 auto &nx_tensor = *nx_tensor_it;
-                nx_tensor->desc().target == Target::CL ? target == Target::CL : target == Target::NEON;
+                nx_tensor->desc().target == Target::CL ? target = Target::CL : target = Target::NEON;
             }
             backends::IDeviceBackend      &backend = backends::BackendRegistry::get().get_backend(target);
             std::unique_ptr<ITensorHandle> handle  = backend.create_tensor(*tensor);
