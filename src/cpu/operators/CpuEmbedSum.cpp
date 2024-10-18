@@ -80,7 +80,8 @@ void CpuEmbedSum::run(ITensorPack &tensors)
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL output" << std::endl;
-        output = static_cast<ICLTensor *>(output);
+        auto output_cl = static_cast<ICLTensor *>(output);
+        output_cl->map(CLScheduler::get().queue());
         
         std::cout << "casted" << std::endl;
     }else
