@@ -70,10 +70,9 @@ void CpuEmbedSum::run(ITensorPack &tensors)
     output->info()->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
 
     CpuAuxTensorHandler aux_token_segemnt(offset_int_vec(TokenSegmentOutput), _tmp_token_segment, tensors, true);
-
     ITensorPack run_pack{ { ACL_SRC_0, token }, { ACL_SRC_1, segment }, { ACL_DST, aux_token_segemnt.get() } };
     NEScheduler::get().schedule_op(_add_kernel_1.get(), Window::DimY, _add_kernel_1->window(), run_pack);
-
+    std::cout << "CpuEmbedSum::run 1 " << std::endl;
     // Add position
     run_pack.add_const_tensor(ACL_SRC_0, aux_token_segemnt.get());
     run_pack.add_const_tensor(ACL_SRC_1, position);
