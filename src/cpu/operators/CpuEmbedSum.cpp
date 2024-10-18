@@ -73,6 +73,14 @@ void CpuEmbedSum::run(ITensorPack &tensors)
     ITensorPack run_pack{ { ACL_SRC_0, token }, { ACL_SRC_1, segment }, { ACL_DST, aux_token_segemnt.get() } };
     NEScheduler::get().schedule_op(_add_kernel_1.get(), Window::DimY, _add_kernel_1->window(), run_pack);
     std::cout << "CpuEmbedSum::run 1 " << std::endl;
+    
+    if(output->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        std::cout << "CL output" << std::endl;
+    }else
+    {
+        std::cout << "Ahhhhhhhhh" << std::endl;
+    }
     // Add position
     run_pack.add_const_tensor(ACL_SRC_0, aux_token_segemnt.get());
     run_pack.add_const_tensor(ACL_SRC_1, position);
