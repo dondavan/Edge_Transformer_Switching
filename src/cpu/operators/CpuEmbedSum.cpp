@@ -77,27 +77,6 @@ void CpuEmbedSum::run(ITensorPack &tensors)
     NEScheduler::get().schedule_op(_add_kernel_1.get(), Window::DimY, _add_kernel_1->window(), run_pack);
     std::cout << "CpuEmbedSum::run 1 " << std::endl;
     
-    if (access_data)
-    {
-        // Map tensor
-        _handle->map(true);
-
-        // Return in case of null backend buffer
-        if (_handle->tensor().buffer() == nullptr)
-        {
-            return false;
-        }
-    }
-
-    // Call accessor
-    bool retval = _accessor->access_tensor(_handle->tensor());
-
-    if (access_data)
-    {
-        // Unmap tensor
-        _handle->unmap();
-    }
-    
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL output" << std::endl;
