@@ -57,7 +57,7 @@ private:
 
     experimental::MemoryRequirements _aux_mem{Count};
 
-    TensorInfo _output;
+    TensorInfo _output{};
     size_t _split_dimension{Window::DimY};
 };
 } // namespace cpu
