@@ -113,19 +113,24 @@ void CpuLayerNormKernel::run_op(ITensorPack &tensors, const Window &window, cons
     ARM_COMPUTE_UNUSED(thread_info);
     const ITensor *src = tensors.get_const_tensor(TensorType::ACL_SRC);
     ITensor       *dst = tensors.get_tensor(TensorType::ACL_DST);
+    
+    ICLTensor * dst_cl;
     if(dst->info()->tensor_target_type() == TensorTargetType::CL)
     {
-        std::cout << "CL query" << std::endl;
-        auto dst_cl = static_cast<ICLTensor *>(dst);
+        dst_cl = static_cast<ICLTensor *>(dst);
         dst_cl->map(CLScheduler::get().queue());
-        
-        std::cout << "casted" << std::endl;
     }else
     {
-        std::cout << "Ahhhhhhhhh" << std::endl;
     }
     layer_norm_fp32(src, dst, window, _info.epsilon(), _info.gamma(), _info.beta(), _info.axis());
 
+    if(dst->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        std::cout << "CL "<< *reinterpret_cast<float *>(dst_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    }else
+    {
+        std::cout << "NEON "<< *reinterpret_cast<float *>(dst_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    }
     std::cout << "CpuLayerNormKernel::run_op end" << std::endl;
 }
 
