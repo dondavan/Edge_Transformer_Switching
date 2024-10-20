@@ -209,11 +209,14 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
     const ITensor *src1 = tensors.get_const_tensor(TensorType::ACL_SRC_1);
     ITensor *dst  = tensors.get_tensor(TensorType::ACL_DST);
 
+    ICLTensor * src0_cl;
+    ICLTensor * src1_cl;
+    ICLTensor * dst_cl;
     if(src0->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL src0" << std::endl;
         ITensor * src0_nc = const_cast<ITensor *>(src0);
-        auto src0_cl = static_cast<ICLTensor *>(src0_nc);
+        src0_cl = static_cast<ICLTensor *>(src0_nc);
         src0_cl->map(CLScheduler::get().queue());
 
         std::cout << "src0 " << *reinterpret_cast<float *>(src0->ptr_to_element(Coordinates(0,0,0))) << std::endl;
@@ -227,7 +230,7 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
     {
         std::cout << "CL src1" << std::endl;
         ITensor * src1_nc = const_cast<ITensor *>(src1);
-        auto src1_cl = static_cast<ICLTensor *>(src1_nc);
+        src1_cl = static_cast<ICLTensor *>(src1_nc);
         src1_cl->map(CLScheduler::get().queue());
 
         std::cout << "src1 " << *reinterpret_cast<float *>(src0->ptr_to_element(Coordinates(0,0,0))) << std::endl;
@@ -239,6 +242,19 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
 
     _run_method(src0, src1, dst, _policy, window);
 
+    if(dst->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        std::cout << "CL dst" << std::endl;
+        ITensor * dst_nc = const_cast<ITensor *>(dst);
+        dst_cl = static_cast<ICLTensor *>(dst_nc);
+        dst_cl->map(CLScheduler::get().queue());
+        std::cout << "dst " << *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+        dst_cl->unmap(CLScheduler::get().queue());
+    }
+    else
+    {
+        std::cout << "dst " << *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    }
     std::cout << "CpuAddKernel::run_op end" << std::endl;
 }
 
