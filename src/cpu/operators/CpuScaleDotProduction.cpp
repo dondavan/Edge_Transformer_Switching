@@ -275,6 +275,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 #endif
 
 
+    std::cout << "CpuScaleDotProduction::run 5.1" << std::endl;
+
     ITensorPack key_permute_pack{{ACL_SRC, reshaped_key.get()},{ACL_DST, permuted_key.get()}};
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
