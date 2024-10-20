@@ -113,6 +113,8 @@ CpuLinear::validate(const ITensorInfo *a,
 
 void CpuLinear::run(ITensorPack &tensors)
 {
+
+    std::cout << "CPU Linear start" << std::endl;
     ARM_COMPUTE_ERROR_ON_MSG(tensors.empty(), "No inputs provided");
     auto a = tensors.get_const_tensor(ACL_SRC_0);
     auto b = tensors.get_const_tensor(ACL_SRC_1);
@@ -169,8 +171,9 @@ void CpuLinear::run(ITensorPack &tensors)
         ITensorPack pack{ { ACL_SRC_0, temp_d.get() }, { ACL_SRC_1, c }, { ACL_DST, d } };
         NEScheduler::get().schedule_op(_add_bias.get(), Window::DimX, _add_bias->window(), pack);
     }
-    std::cout << "CPU Linear" << std::endl;
-    std::cout << *reinterpret_cast<float *>(d->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+
+    std::cout <<"output " << *reinterpret_cast<float *>(d->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    std::cout << "CPU Linear end" << std::endl;
 }
 
 } // namespace cpu
