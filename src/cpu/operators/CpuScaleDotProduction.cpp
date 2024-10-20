@@ -184,8 +184,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         std::cout << "Ahhhhhhhhh" << std::endl;
     }
 
-    std::cout << "CpuScaleDotProduction::run 2" << std::endl;
-
     if(key->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL key" << std::endl;
@@ -210,6 +208,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         std::cout << "Ahhhhhhhhh" << std::endl;
     }
 
+    std::cout << "CpuScaleDotProduction::run 2" << std::endl;
+
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CpuAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
     CpuAuxTensorHandler reshaped_key(offset_int_vec(KeyReshape), _reshaped_key, tensors);
@@ -227,6 +227,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     CpuAuxTensorHandler transposed1xW_value(offset_int_vec(Transposed1xWValue), _transposed1xW_value, tensors, true);
     CpuAuxTensorHandler gemmed_context(offset_int_vec(GemmedContext), _gemmed_context, tensors);
 
+
+    std::cout << "CpuScaleDotProduction::run 3" << std::endl;
     // Run Query multi-Head reshape 
     ITensorPack query_reshape_pack{{ACL_SRC_0, query},{ACL_DST, reshaped_query.get()}};
     //const auto query_split_dimension = _query_reshape_kernel->get_split_dimension();
@@ -242,6 +244,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "query_reshape cost: " << cost_time << std::endl;
 #endif
 
+    std::cout << "CpuScaleDotProduction::run 4" << std::endl;
 
     ITensorPack query_permute_pack{{ACL_SRC, reshaped_query.get()},{ACL_DST, permuted_query.get()}};
 #ifdef MEASURE_TIME
@@ -255,6 +258,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "query_permute_func cost: " << cost_time << std::endl;
 #endif
 
+    std::cout << "CpuScaleDotProduction::run 5" << std::endl;
 
     // Run Key multi-Head reshape 
     ITensorPack key_reshape_pack{{ACL_SRC_0, key},{ACL_DST, reshaped_key.get()}};
