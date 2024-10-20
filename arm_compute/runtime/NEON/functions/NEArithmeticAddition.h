@@ -75,8 +75,8 @@ public:
      * @param[in]  policy   Policy to use to handle overflow.
      * @param[in]  act_info (Optional) Activation layer information in case of a fused activation. Currently not supported.
      */
-    void configure(ITensor             *input1,
-                   ITensor             *input2,
+    void configure(const ITensor             *input1,
+                   const ITensor             *input2,
                    ITensor                   *output,
                    ConvertPolicy              policy,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());

@@ -205,14 +205,15 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
     ARM_COMPUTE_ERROR_ON(tensors.empty());
     ARM_COMPUTE_ERROR_ON(_run_method == nullptr);
 
-    ITensor *src0 = tensors.get_tensor(TensorType::ACL_SRC_0);
-    ITensor *src1 = tensors.get_tensor(TensorType::ACL_SRC_1);
+    const ITensor *src0 = tensors.get_const_tensor(TensorType::ACL_SRC_0);
+    const ITensor *src1 = tensors.get_const_tensor(TensorType::ACL_SRC_1);
     ITensor *dst  = tensors.get_tensor(TensorType::ACL_DST);
 
     if(src0->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL src0" << std::endl;
-        auto src0_cl = static_cast<ICLTensor *>(src0);
+        ITensor * src0_nc = const_cast<ITensor *>(src0);
+        auto src0_cl = static_cast<ICLTensor *>(src0_nc);
         src0_cl->map(CLScheduler::get().queue());
 
         std::cout << "casted" << std::endl;
@@ -225,7 +226,8 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
     if(src1->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL src1" << std::endl;
-        auto src1_cl = static_cast<ICLTensor *>(src1);
+        ITensor * src1_nc = const_cast<ITensor *>(src1);
+        auto src1_cl = static_cast<ICLTensor *>(src1_nc);
         src1_cl->map(CLScheduler::get().queue());
 
         std::cout << "casted" << std::endl;
