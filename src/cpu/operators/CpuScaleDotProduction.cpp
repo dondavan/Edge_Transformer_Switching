@@ -170,6 +170,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     auto value  = tensors.get_tensor(ACL_SRC_2);
     auto output = tensors.get_tensor(ACL_DST);
 
+    std::cout << "CpuScaleDotProduction::run 1" << std::endl;
+
     if(query->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL query" << std::endl;
