@@ -287,9 +287,13 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "key_permute_func cost: " << cost_time << std::endl;
 #endif
 
+    std::cout << "CpuScaleDotProduction::run 6" << std::endl;
+
 
     ITensorPack key_transpose_pack{{ACL_SRC, permuted_key.get()}, {ACL_DST, transposed_key.get()}};
     _key_transpose_func->run(key_transpose_pack);
+
+    std::cout << "CpuScaleDotProduction::run 7" << std::endl;
 
     // Run Value multi-Head reshape 
     ITensorPack value_reshape_pack{{ACL_SRC_0, value},{ACL_DST, reshaped_value.get()}};
@@ -318,6 +322,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "value_permute_func cost: " << cost_time << std::endl;
 #endif
 
+    std::cout << "CpuScaleDotProduction::run 8" << std::endl;
+
     // Run interleave kernel
     ITensorPack interleave_pack{{ACL_SRC, permuted_query.get()}, {ACL_DST, interleaved_query.get()}};
     NEScheduler::get().schedule_op(_query_interleave_kernel.get(), Window::DimY, _query_interleave_kernel->window(),
@@ -329,6 +335,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
                                     _key_transpose1xW_kernel->window(), transpose_pack);
 
 
+    std::cout << "CpuScaleDotProduction::run 9" << std::endl;
     // Run matrix multiply compute multi-head attention between Query and Key
     ITensorPack gemm_QK_pack{{ACL_SRC_0, interleaved_query.get()}, {ACL_SRC_1, transposed1xw_key.get()}, {ACL_DST, scaled_query_key.get()}};
 #ifdef MEASURE_TIME
@@ -342,6 +349,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "MMUL QK cost: " << cost_time << std::endl;
 #endif
 
+
+    std::cout << "CpuScaleDotProduction::run 10" << std::endl;
     ITensorPack softmax_pack = {{ACL_SRC, scaled_query_key.get()}, {ACL_DST, softmaxed_product.get()}};
     _softmax_func->run(softmax_pack);
 
@@ -368,6 +377,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "MMUL CV cost: " << cost_time << std::endl;
 #endif
 
+    std::cout << "CpuScaleDotProduction::run 11" << std::endl;
 
     // Concat all attention head together
     ITensorPack concat_permute_pack{{ACL_SRC, gemmed_context.get()},{ACL_DST, permuted_concat.get()}};
@@ -381,6 +391,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out.precision(5);
     measure_out << std::scientific << "concat_permute_func cost: " << cost_time << std::endl;
 #endif
+
+    std::cout << "CpuScaleDotProduction::run 12" << std::endl;
 
     ITensorPack concat_reshape_pack{{ACL_SRC_0, permuted_concat.get()},{ACL_DST, output}};
     //const auto concat_split_dimension = _concat_reshape_kernel->get_split_dimension();
