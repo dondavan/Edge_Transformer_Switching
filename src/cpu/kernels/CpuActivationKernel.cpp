@@ -34,6 +34,8 @@
 #include "src/cpu/kernels/activation/list.h"
 #include "src/cpu/kernels/logistic/list.h"
 
+#include "arm_compute/runtime/CL/CLTensor.h"
+
 #include <array>
 
 namespace arm_compute
@@ -358,6 +360,7 @@ size_t CpuActivationKernel::get_mws(const CPUInfo &platform, size_t thread_count
 
 void CpuActivationKernel::run_op(ITensorPack &tensors, const Window &window, const ThreadInfo &info)
 {
+    std::cout << "CpuActivationKernel::run_op" << std::endl;
     // Early exit on disabled activation
     if (!_act_info.enabled())
     {
@@ -374,7 +377,23 @@ void CpuActivationKernel::run_op(ITensorPack &tensors, const Window &window, con
     const ITensor *src = tensors.get_const_tensor(TensorType::ACL_SRC);
     ITensor       *dst = tensors.get_tensor(TensorType::ACL_DST);
 
+    if(src->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        std::cout << "CL src" << std::endl;
+        ITensor * src_nc = const_cast<ITensor *>(src);
+        auto src_cl = static_cast<ICLTensor *>(src_nc);
+        src_cl->map(CLScheduler::get().queue());
+
+        std::cout << "casted" << std::endl;
+    }
+    else
+    {
+        std::cout << "Ahhhhhhhhh" << std::endl;
+    }
+
     _run_method(src, dst, _act_info, window);
+
+    std::cout << "CpuActivationKernel::run_op" << std::endl;
 }
 
 const char *CpuActivationKernel::name() const
