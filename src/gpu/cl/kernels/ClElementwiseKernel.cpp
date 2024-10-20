@@ -333,6 +333,7 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
 
 void ClElementwiseKernel::run_op(ITensorPack &tensors, const Window &window, ::cl::CommandQueue &queue)
 {
+    std::cout << "ClElementwiseKernel::run_op start" << std::endl;
     ARM_COMPUTE_ERROR_ON_UNCONFIGURED_KERNEL(this);
     ARM_COMPUTE_ERROR_ON_INVALID_SUBWINDOW(ICLKernel::window(), window);
 
@@ -386,6 +387,8 @@ void ClElementwiseKernel::run_op(ITensorPack &tensors, const Window &window, ::c
         ARM_COMPUTE_UNUSED(collapsed.slide_window_slice_3D(slice_src1));
         ARM_COMPUTE_UNUSED(collapsed.slide_window_slice_3D(slice_src2));
     } while (collapsed.slide_window_slice_3D(slice));
+
+    std::cout << "ClElementwiseKernel::run_op end" << std::endl;
 }
 
 /** Logical binary */
