@@ -216,11 +216,11 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
         auto src0_cl = static_cast<ICLTensor *>(src0_nc);
         src0_cl->map(CLScheduler::get().queue());
 
-        std::cout << "casted" << std::endl;
+        std::cout << "src0 " << *reinterpret_cast<float *>(src0->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
     else
     {
-        std::cout << "Ahhhhhhhhh" << std::endl;
+        std::cout << "src0 " << *reinterpret_cast<float *>(src0->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
 
     if(src1->info()->tensor_target_type() == TensorTargetType::CL)
@@ -230,11 +230,11 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
         auto src1_cl = static_cast<ICLTensor *>(src1_nc);
         src1_cl->map(CLScheduler::get().queue());
 
-        std::cout << "casted" << std::endl;
+        std::cout << "src1 " << *reinterpret_cast<float *>(src0->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
     else
     {
-        std::cout << "Ahhhhhhhhh" << std::endl;
+        std::cout << "src1 " << *reinterpret_cast<float *>(src0->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
 
     _run_method(src0, src1, dst, _policy, window);
