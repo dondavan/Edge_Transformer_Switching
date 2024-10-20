@@ -109,7 +109,6 @@ Status CpuLayerNormKernel::validate(const ITensorInfo *input,
 
 void CpuLayerNormKernel::run_op(ITensorPack &tensors, const Window &window, const ThreadInfo &thread_info)
 {
-    std::cout << "CpuLayerNormKernel::run_op start" << std::endl;
     ARM_COMPUTE_UNUSED(thread_info);
     const ITensor *src = tensors.get_const_tensor(TensorType::ACL_SRC);
     ITensor       *dst = tensors.get_tensor(TensorType::ACL_DST);
@@ -123,16 +122,6 @@ void CpuLayerNormKernel::run_op(ITensorPack &tensors, const Window &window, cons
     {
     }
     layer_norm_fp32(src, dst, window, _info.epsilon(), _info.gamma(), _info.beta(), _info.axis());
-
-    if(dst->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        std::cout << "CL "<< *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    }else
-    {
-        std::cout << "NEON "<< *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    }
-
-    std::cout << "CpuLayerNormKernel::run_op end" << std::endl;
 }
 
 const char *CpuLayerNormKernel::name() const
