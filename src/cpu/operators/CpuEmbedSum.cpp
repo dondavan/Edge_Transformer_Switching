@@ -12,7 +12,6 @@
 #include "src/cpu/utils/CpuAuxTensorHandler.h"
 
 #include "arm_compute/runtime/CL/CLTensor.h"
-#include "support/Cast.h"
 
 namespace arm_compute
 {
@@ -88,6 +87,7 @@ void CpuEmbedSum::run(ITensorPack &tensors)
     {
         std::cout << "Ahhhhhhhhh" << std::endl;
     }
+
     // Add position
     run_pack.add_const_tensor(ACL_SRC_0, aux_token_segemnt.get());
     run_pack.add_const_tensor(ACL_SRC_1, position);

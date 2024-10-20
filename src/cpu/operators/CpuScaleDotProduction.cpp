@@ -10,6 +10,8 @@
 #include "src/core/helpers/MemoryHelpers.h"
 #include "src/cpu/utils/CpuAuxTensorHandler.h"
 
+#include "arm_compute/runtime/CL/CLTensor.h"
+
 #ifdef MEASURE_TIME
 #include <chrono>
 #include <fstream>
@@ -161,11 +163,48 @@ CpuScaleDotProduction::validate(const ITensorInfo *query, const ITensorInfo *key
 void CpuScaleDotProduction::run(ITensorPack &tensors)
 {
     ARM_COMPUTE_UNUSED(tensors);
+    std::cout << "CpuScaleDotProduction::run start" << std::endl;
 
-    auto query    = tensors.get_const_tensor(ACL_SRC_0);
-    auto key  = tensors.get_const_tensor(ACL_SRC_1);
-    auto value  = tensors.get_const_tensor(ACL_SRC_2);
+    auto query    = tensors.get_tensor(ACL_SRC_0);
+    auto key  = tensors.get_tensor(ACL_SRC_1);
+    auto value  = tensors.get_tensor(ACL_SRC_2);
     auto output = tensors.get_tensor(ACL_DST);
+
+    if(query->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        std::cout << "CL query" << std::endl;
+        auto query_cl = static_cast<ICLTensor *>(query);
+        query_cl->map(CLScheduler::get().queue());
+        
+        std::cout << "casted" << std::endl;
+    }else
+    {
+        std::cout << "Ahhhhhhhhh" << std::endl;
+    }
+
+    if(key->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        std::cout << "CL key" << std::endl;
+        auto query_cl = static_cast<ICLTensor *>(query);
+        query_cl->map(CLScheduler::get().queue());
+        
+        std::cout << "casted" << std::endl;
+    }else
+    {
+        std::cout << "Ahhhhhhhhh" << std::endl;
+    }
+
+    if(value->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        std::cout << "CL value" << std::endl;
+        auto query_cl = static_cast<ICLTensor *>(query);
+        query_cl->map(CLScheduler::get().queue());
+        
+        std::cout << "casted" << std::endl;
+    }else
+    {
+        std::cout << "Ahhhhhhhhh" << std::endl;
+    }
 
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CpuAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
@@ -348,6 +387,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "concat_reshape cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+
+    std::cout << "CpuScaleDotProduction::run end" << std::endl;
 }
 
 experimental::MemoryRequirements CpuScaleDotProduction::workspace() const
