@@ -170,13 +170,14 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     auto value  = tensors.get_tensor(ACL_SRC_2);
     auto output = tensors.get_tensor(ACL_DST);
 
-    std::cout << "CpuScaleDotProduction::run 1" << std::endl;
 
     if(query->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL query" << std::endl;
         auto query_cl = static_cast<ICLTensor *>(query);
         query_cl->map(CLScheduler::get().queue());
+
+        std::cout << *reinterpret_cast<float *>(query_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
         
         std::cout << "casted" << std::endl;
     }else
