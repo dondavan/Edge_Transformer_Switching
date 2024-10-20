@@ -1948,15 +1948,10 @@ std::unique_ptr<IFunction> create_scale_dot_production_layer(ScaleDotProductionA
     validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    //typename TargetInfo::TensorType *query  = get_backing_tensor<TargetInfo>(node.input(0));
-    //typename TargetInfo::TensorType *key    = get_backing_tensor<TargetInfo>(node.input(1));
-    //typename TargetInfo::TensorType *value  = get_backing_tensor<TargetInfo>(node.input(2));
-    //typename TargetInfo::TensorType *output = get_backing_tensor<TargetInfo>(node.output(0));
-
-    ITensor *query = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
-    ITensor *key = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
-    ITensor *value = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
-    ITensor *output = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
+    typename TargetInfo::TensorType *query  = get_backing_tensor<TargetInfo>(node.input(0));
+    typename TargetInfo::TensorType *key    = get_backing_tensor<TargetInfo>(node.input(1));
+    typename TargetInfo::TensorType *value  = get_backing_tensor<TargetInfo>(node.input(2));
+    typename TargetInfo::TensorType *output = get_backing_tensor<TargetInfo>(node.output(0));
 
     // Create and configure function
     auto func = std::make_unique<ScaleDotProductionLayerFunction>();
