@@ -210,7 +210,6 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
 
     ICLTensor *src0_cl;
     ICLTensor *src1_cl;
-    ICLTensor *dst_cl;
     if(src0->info()->tensor_target_type() == TensorTargetType::CL)
     {
         ITensor *src0_nc = const_cast<ITensor *>(src0);
