@@ -128,7 +128,7 @@ void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
     add_3d_tensor_nhw_argument(idx, dst);
 
     enqueue(queue, *this, window_collapsed, lws_hint());
-
+    dst->map(queue);
     std::cout << *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     std::cout << "GPULinearKernel::run_op end " <<std::endl;
 }
