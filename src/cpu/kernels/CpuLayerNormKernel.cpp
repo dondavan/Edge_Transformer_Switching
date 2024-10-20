@@ -126,12 +126,12 @@ void CpuLayerNormKernel::run_op(ITensorPack &tensors, const Window &window, cons
 
     if(dst->info()->tensor_target_type() == TensorTargetType::CL)
     {
-        dst_cl = static_cast<ICLTensor *>(dst);
-        std::cout << "CL "<< *reinterpret_cast<float *>(dst_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+        std::cout << "CL "<< *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }else
     {
-        std::cout << "NEON "<< *reinterpret_cast<float *>(dst_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+        std::cout << "NEON "<< *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
+
     std::cout << "CpuLayerNormKernel::run_op end" << std::endl;
 }
 
