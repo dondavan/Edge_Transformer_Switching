@@ -114,7 +114,7 @@ void CpuLayerNormKernel::run_op(ITensorPack &tensors, const Window &window, cons
     const ITensor *src = tensors.get_const_tensor(TensorType::ACL_SRC);
     ITensor       *dst = tensors.get_tensor(TensorType::ACL_DST);
     
-    ICLTensor * dst_cl;
+    ICLTensor * dst_cl = nullptr;
     if(dst->info()->tensor_target_type() == TensorTargetType::CL)
     {
         dst_cl = static_cast<ICLTensor *>(dst);
