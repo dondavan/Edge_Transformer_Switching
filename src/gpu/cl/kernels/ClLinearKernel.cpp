@@ -113,6 +113,9 @@ void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
     bias->info()->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
     dst->info()->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl; 
 
+
+    std::cout << *reinterpret_cast<float *>(lhs->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+
     unsigned int idx              = 0;
     Window       window_collapsed = window.collapse(ICLKernel::window(), Window::DimZ);
 
@@ -125,8 +128,6 @@ void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
     add_3d_tensor_nhw_argument(idx, dst);
 
     enqueue(queue, *this, window_collapsed, lws_hint());
-    dst->map(queue);
-    std::cout << *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     std::cout << "GPULinearKernel::run_op end " <<std::endl;
 }
 
