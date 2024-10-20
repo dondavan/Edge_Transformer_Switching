@@ -184,6 +184,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         std::cout << "Ahhhhhhhhh" << std::endl;
     }
 
+    std::cout << "CpuScaleDotProduction::run 2" << std::endl;
+
     if(key->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL key" << std::endl;
