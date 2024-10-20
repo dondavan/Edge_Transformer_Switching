@@ -34,9 +34,9 @@ NEScaleDotProductionAttentionLayer::NEScaleDotProductionAttentionLayer()
 
 NEScaleDotProductionAttentionLayer::~NEScaleDotProductionAttentionLayer() = default;
 
-void NEScaleDotProductionAttentionLayer::configure(const ITensor *query,
-                                                   const ITensor *key,
-                                                   const ITensor *value,
+void NEScaleDotProductionAttentionLayer::configure(ITensor *query,
+                                                   ITensor *key,
+                                                   ITensor *value,
                                                    ITensor *output,
                                                    const ScaleDotProductionLayerInfo& info)
 {
