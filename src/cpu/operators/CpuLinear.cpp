@@ -169,6 +169,7 @@ void CpuLinear::run(ITensorPack &tensors)
         ITensorPack pack{ { ACL_SRC_0, temp_d.get() }, { ACL_SRC_1, c }, { ACL_DST, d } };
         NEScheduler::get().schedule_op(_add_bias.get(), Window::DimX, _add_bias->window(), pack);
     }
+    std::cout << "CPU Linear" << std::endl;
     std::cout << *reinterpret_cast<float *>(d->ptr_to_element(Coordinates(0,0,0))) << std::endl;
 }
 

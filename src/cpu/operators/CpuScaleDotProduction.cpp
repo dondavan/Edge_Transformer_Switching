@@ -173,40 +173,35 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 
     if(query->info()->tensor_target_type() == TensorTargetType::CL)
     {
-        std::cout << "CL query" << std::endl;
         auto query_cl = static_cast<ICLTensor *>(query);
         query_cl->map(CLScheduler::get().queue());
 
-        std::cout << *reinterpret_cast<float *>(query_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-        
-        std::cout << "casted" << std::endl;
+        std::cout << "CL "<< *reinterpret_cast<float *>(query_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }else
     {
-        std::cout << "Ahhhhhhhhh" << std::endl;
+        std::cout << "NEON "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
 
     if(key->info()->tensor_target_type() == TensorTargetType::CL)
     {
-        std::cout << "CL key" << std::endl;
         auto key_cl = static_cast<ICLTensor *>(key);
         key_cl->map(CLScheduler::get().queue());
         
-        std::cout << "casted" << std::endl;
+        std::cout << "CL "<< *reinterpret_cast<float *>(key_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }else
     {
-        std::cout << "Ahhhhhhhhh" << std::endl;
+        std::cout << "NEON "<< *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
 
     if(value->info()->tensor_target_type() == TensorTargetType::CL)
     {
-        std::cout << "CL value" << std::endl;
         auto value_cl = static_cast<ICLTensor *>(value);
         value_cl->map(CLScheduler::get().queue());
         
-        std::cout << "casted" << std::endl;
+        std::cout << "CL "<< *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }else
     {
-        std::cout << "Ahhhhhhhhh" << std::endl;
+        std::cout << "NEON "<< *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
 
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
@@ -384,7 +379,16 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "concat_reshape cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
-
+    if(output->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        auto output_cl = static_cast<ICLTensor *>(output);
+        output_cl->map(CLScheduler::get().queue());
+        
+        std::cout << "CL output"<< *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    }else
+    {
+        std::cout << "NEON "<< *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    }
     std::cout << "CpuScaleDotProduction::run end" << std::endl;
 }
 
