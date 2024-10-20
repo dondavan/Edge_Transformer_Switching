@@ -187,8 +187,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     if(key->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL key" << std::endl;
-        auto query_cl = static_cast<ICLTensor *>(query);
-        query_cl->map(CLScheduler::get().queue());
+        auto key_cl = static_cast<ICLTensor *>(key);
+        key_cl->map(CLScheduler::get().queue());
         
         std::cout << "casted" << std::endl;
     }else
@@ -199,8 +199,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     if(value->info()->tensor_target_type() == TensorTargetType::CL)
     {
         std::cout << "CL value" << std::endl;
-        auto query_cl = static_cast<ICLTensor *>(query);
-        query_cl->map(CLScheduler::get().queue());
+        auto value_cl = static_cast<ICLTensor *>(value);
+        value_cl->map(CLScheduler::get().queue());
         
         std::cout << "casted" << std::endl;
     }else
