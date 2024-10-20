@@ -33,8 +33,8 @@ namespace arm_compute
 {
 struct NEArithmeticAddition::Impl
 {
-    const ITensor               *src_0{nullptr};
-    const ITensor               *src_1{nullptr};
+    ITensor               *src_0{nullptr};
+    ITensor               *src_1{nullptr};
     ITensor                     *dst{nullptr};
     std::unique_ptr<cpu::CpuAdd> op{nullptr};
 };
@@ -55,8 +55,8 @@ Status NEArithmeticAddition::validate(const ITensorInfo         *input1,
     return cpu::CpuAdd::validate(input1, input2, output, policy, act_info);
 }
 
-void NEArithmeticAddition::configure(const ITensor             *input1,
-                                     const ITensor             *input2,
+void NEArithmeticAddition::configure(ITensor             *input1,
+                                     ITensor             *input2,
                                      ITensor                   *output,
                                      ConvertPolicy              policy,
                                      const ActivationLayerInfo &act_info)
