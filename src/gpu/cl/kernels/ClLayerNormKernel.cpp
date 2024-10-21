@@ -74,6 +74,7 @@ Status ClLayerNormKernel::validate(const ITensorInfo *input,
 
 void ClLayerNormKernel::run_op(ITensorPack &tensors, const Window &window, cl::CommandQueue &queue)
 {
+    std::cout << "ClLayerNormKernel::run_op start" << std::endl;
     const ICLTensor *input =
         utils::cast::polymorphic_downcast<const ICLTensor *>(tensors.get_const_tensor(TensorType::ACL_SRC));
     ICLTensor *output = utils::cast::polymorphic_downcast<ICLTensor *>(tensors.get_tensor(TensorType::ACL_DST));
@@ -99,6 +100,8 @@ void ClLayerNormKernel::run_op(ITensorPack &tensors, const Window &window, cl::C
     _kernel.setArg<cl_float>(idx++, _info.beta());
 
     enqueue(queue, *this, slice);
+
+    std::cout << "ClLayerNormKernel::run_op start" << std::endl;
 }
 
 } // namespace kernels
