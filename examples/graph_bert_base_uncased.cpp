@@ -123,9 +123,9 @@ class GraphVanillaTransformerExample : public Example
                              get_weights_accessor(data_path, "pooler_weight.npy"),
                              get_weights_accessor(data_path, "pooler_bias.npy")).set_target(Target::CL)
 
-              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f)).set_target(Target::NEON)
+              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f)).set_target(Target::CL)
 
-              << OutputLayer(get_output_accessor(common_params)).set_name("out1").set_target(Target::NEON);
+              << OutputLayer(get_output_accessor(common_params)).set_name("out1").set_target(Target::CL);
 
         // Finalize graph
         GraphConfig config;
@@ -182,12 +182,12 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "key_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL)
-            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1").set_target(Target::NEON);
+            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1").set_target(Target::CL);
 
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention").set_target(Target::NEON);
+        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention").set_target(Target::CL);
 
         /* Self output */
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON);
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL);
 
         SubStream without_ff(graph);
         SubStream with_ff(graph);
@@ -202,7 +202,7 @@ class GraphVanillaTransformerExample : public Example
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::CL);
 
-        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("add_4_norm_ff").set_target(Target::NEON);
+        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("add_4_norm_ff").set_target(Target::CL);
 
         /* Output*/
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL);
