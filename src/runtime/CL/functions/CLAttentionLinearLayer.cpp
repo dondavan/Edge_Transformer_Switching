@@ -126,7 +126,6 @@ void CLAttentionLinearLayer::run()
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    std::cout << "CLAttentionLinearLayer::run start" << std::endl;
 
     // Q
     ITensorPack query_pack;
@@ -160,7 +159,6 @@ void CLAttentionLinearLayer::run()
     measure_out << std::scientific << "CLAttentionLinearLayer::run cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
-    std::cout << "CLAttentionLinearLayer::run end" << std::endl;
     
 }
 
