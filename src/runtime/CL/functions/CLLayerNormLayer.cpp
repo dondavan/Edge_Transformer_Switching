@@ -17,8 +17,8 @@ namespace arm_compute
 
 struct CLLayerNormLayer::Impl
 {
-    const ICLTensor                     *src{ nullptr };
-    ICLTensor                           *dst{ nullptr };
+    const ITensor                     *src{ nullptr };
+    ITensor                           *dst{ nullptr };
     std::unique_ptr<opencl::ClLayerNorm> op{ nullptr };
 };
 
@@ -28,15 +28,15 @@ CLLayerNormLayer::CLLayerNormLayer()
 }
 CLLayerNormLayer::~CLLayerNormLayer() = default;
 
-void CLLayerNormLayer::configure(const ICLTensor          *input,
-                                 ICLTensor                *output,
+void CLLayerNormLayer::configure(const ITensor          *input,
+                                 ITensor                *output,
                                  const LayerNormLayerInfo &LayerNorm_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input, output, LayerNorm_info);
 }
 void CLLayerNormLayer::configure(const CLCompileContext   &compile_context,
-                                 const ICLTensor          *input,
-                                 ICLTensor                *output,
+                                 const ITensor          *input,
+                                 ITensor                *output,
                                  const LayerNormLayerInfo &LayerNorm_info)
 {
 #ifdef MEASURE_TIME
