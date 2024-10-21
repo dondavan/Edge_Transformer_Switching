@@ -115,12 +115,14 @@ void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
 
     ICLTensor * lhs_nc = const_cast<ICLTensor *>(lhs);
     lhs_nc->map(queue);
+    /*
     ICLTensor * rhs_nc = const_cast<ICLTensor *>(rhs);
     rhs_nc->map(queue);
     ICLTensor * bias_nc = const_cast<ICLTensor *>(bias);
     bias_nc->map(queue);
 
     dst->map(queue);
+    */
 
     unsigned int idx              = 0;
     Window       window_collapsed = window.collapse(ICLKernel::window(), Window::DimZ);

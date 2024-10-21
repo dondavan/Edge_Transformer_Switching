@@ -65,7 +65,7 @@ void ClEmbSumKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
     const auto position = utils::cast::polymorphic_downcast<const ICLTensor *>(tensors.get_const_tensor(TensorType::ACL_SRC_2));
     auto       dst      = utils::cast::polymorphic_downcast<ICLTensor *>(tensors.get_tensor(TensorType::ACL_DST));
 
-
+    /*
     ICLTensor * token_nc = const_cast<ICLTensor *>(token);
     token_nc->map(queue);
     ICLTensor * segemnt_nc = const_cast<ICLTensor *>(segemnt);
@@ -74,6 +74,8 @@ void ClEmbSumKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
     position_nc->map(queue);
 
     dst->map(queue);
+    */
+
 
     // Set srcs
     unsigned int idx = 0;

@@ -78,11 +78,12 @@ void ClLayerNormKernel::run_op(ITensorPack &tensors, const Window &window, cl::C
         utils::cast::polymorphic_downcast<const ICLTensor *>(tensors.get_const_tensor(TensorType::ACL_SRC));
     ICLTensor *output = utils::cast::polymorphic_downcast<ICLTensor *>(tensors.get_tensor(TensorType::ACL_DST));
 
-
+    /*
     ICLTensor * input_nc = const_cast<ICLTensor *>(input);
     input_nc->map(queue);
 
     output->map(queue);
+    */
 
     Window window_in{ window };
     window_in.set(Window::DimX, Window::Dimension(0, _input->dimension(0), _input->dimension(0)));
