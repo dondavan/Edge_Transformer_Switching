@@ -197,6 +197,8 @@ CpuAddKernel::validate(const ITensorInfo *src0, const ITensorInfo *src1, const I
 
 void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const ThreadInfo &info)
 {
+
+    std::cout << "CpuAddKernel::run_op start" << std::endl;
     ARM_COMPUTE_UNUSED(info);
     ARM_COMPUTE_ERROR_ON_UNCONFIGURED_KERNEL(this);
     ARM_COMPUTE_ERROR_ON_INVALID_SUBWINDOW(ICpuKernel::window(), window);
@@ -232,7 +234,8 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
     }
 
     _run_method(src0, src1, dst, _policy, window);
-    
+
+    std::cout << "CpuAddKernel::run_op start" << std::endl;
 }
 
 const char *CpuAddKernel::name() const
