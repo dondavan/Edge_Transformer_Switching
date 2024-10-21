@@ -202,7 +202,7 @@ class GraphVanillaTransformerExample : public Example
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::CL);
 
-        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("add_4_norm_ff").set_target(Target::NEON);
+        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("add_4_norm_ff").set_target(Target::CL);
 
         /* Output*/
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL);
