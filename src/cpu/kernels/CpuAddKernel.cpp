@@ -225,6 +225,12 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
         src1_cl->map(CLScheduler::get().queue());
     }
 
+    if(dst->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        dst_cl          = static_cast<ICLTensor *>(dst);
+        dst_cl->map(CLScheduler::get().queue());
+    }
+
     _run_method(src0, src1, dst, _policy, window);
 
     if(dst->info()->tensor_target_type() == TensorTargetType::CL)
