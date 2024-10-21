@@ -113,6 +113,8 @@ void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
     bias->info()->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
     dst->info()->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl; 
 
+    ICLTensor * lhs_nc = const_cast<ICLTensor *>(lhs);
+    lhs_nc->map(queue);
     /*
     ICLTensor * rhs_nc = const_cast<ICLTensor *>(rhs);
     rhs_nc->map(queue);
