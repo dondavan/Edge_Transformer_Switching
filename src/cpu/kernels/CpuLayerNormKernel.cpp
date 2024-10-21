@@ -112,15 +112,23 @@ void CpuLayerNormKernel::run_op(ITensorPack &tensors, const Window &window, cons
     ARM_COMPUTE_UNUSED(thread_info);
     const ITensor *src = tensors.get_const_tensor(TensorType::ACL_SRC);
     ITensor       *dst = tensors.get_tensor(TensorType::ACL_DST);
-    
-    ICLTensor * dst_cl = nullptr;
+
+    ICLTensor *src_cl;
+    ICLTensor *dst_cl;
+
+    if(src->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *src_nc = const_cast<ITensor *>(src);
+        src_cl          = static_cast<ICLTensor *>(src_nc);
+        src_cl->map(CLScheduler::get().queue());
+    }
+
     if(dst->info()->tensor_target_type() == TensorTargetType::CL)
     {
         dst_cl = static_cast<ICLTensor *>(dst);
         dst_cl->map(CLScheduler::get().queue());
-    }else
-    {
     }
+
     layer_norm_fp32(src, dst, window, _info.epsilon(), _info.gamma(), _info.beta(), _info.axis());
 }
 

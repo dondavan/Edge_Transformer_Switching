@@ -11,6 +11,8 @@
 #include "src/core/helpers/MemoryHelpers.h"
 #include "src/cpu/utils/CpuAuxTensorHandler.h"
 
+#include "arm_compute/runtime/CL/CLTensor.h"
+
 namespace arm_compute
 {
 namespace cpu
@@ -119,6 +121,37 @@ void CpuLinear::run(ITensorPack &tensors)
     auto c = tensors.get_const_tensor(ACL_SRC_2);
     auto d = tensors.get_tensor(ACL_DST);
 
+    ICLTensor *a_cl;
+    ICLTensor *b_cl;
+    ICLTensor *c_cl;
+    ICLTensor *d_cl;
+    if(a->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *a_nc = const_cast<ITensor *>(a);
+        a_cl          = static_cast<ICLTensor *>(a_nc);
+        a_cl->map(CLScheduler::get().queue());
+    }
+
+    if(b->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *b_nc = const_cast<ITensor *>(b);
+        b_cl          = static_cast<ICLTensor *>(b_nc);
+        b_cl->map(CLScheduler::get().queue());
+    }
+    
+    if(c->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *c_nc = const_cast<ITensor *>(c);
+        c_cl          = static_cast<ICLTensor *>(c_nc);
+        c_cl->map(CLScheduler::get().queue());
+    }
+
+    if(d->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        d_cl = static_cast<ICLTensor *>(d);
+        d_cl->map(CLScheduler::get().queue());
+    }
+
     CpuAuxTensorHandler interleaved_a(offset_int_vec(InterleavedLHS), _tmp_a, tensors, true);
     CpuAuxTensorHandler pretransposed_b(offset_int_vec(PreTransposedRHS), _pretransposed_b, tensors, true);
     CpuAuxTensorHandler transposed1xw_b(offset_int_vec(Transposed1xWRHS), _tmp_b, tensors, true);
@@ -169,7 +202,6 @@ void CpuLinear::run(ITensorPack &tensors)
         ITensorPack pack{ { ACL_SRC_0, temp_d.get() }, { ACL_SRC_1, c }, { ACL_DST, d } };
         NEScheduler::get().schedule_op(_add_bias.get(), Window::DimX, _add_bias->window(), pack);
     }
-
 }
 
 } // namespace cpu
