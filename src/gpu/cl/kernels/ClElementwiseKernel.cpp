@@ -27,8 +27,8 @@
 #include "arm_compute/core/CL/ICLTensor.h"
 #include "arm_compute/core/Utils.h"
 #include "arm_compute/core/utils/ActivationFunctionUtils.h"
-#include "arm_compute/core/utils/helpers/AdjustVecSize.h"
 #include "arm_compute/core/utils/StringUtils.h"
+#include "arm_compute/core/utils/helpers/AdjustVecSize.h"
 
 #include "src/common/utils/Validate.h"
 #include "src/core/CL/CLValidate.h"
@@ -50,15 +50,19 @@ namespace
 constexpr unsigned int vector_size_byte_opencl = 16;
 
 std::map<ArithmeticOperation, std::string> supported_arithmetic_ops = {
-    {ArithmeticOperation::ADD, "ADD"},     {ArithmeticOperation::SUB, "SUB"},
-    {ArithmeticOperation::DIV, "DIV"},     {ArithmeticOperation::SQUARED_DIFF, "SQUARED_DIFF"},
-    {ArithmeticOperation::MIN, "MIN"},     {ArithmeticOperation::MAX, "MAX"},
-    {ArithmeticOperation::POWER, "POWER"}, {ArithmeticOperation::PRELU, "PRELU"},
+    { ArithmeticOperation::ADD, "ADD" },
+    { ArithmeticOperation::SUB, "SUB" },
+    { ArithmeticOperation::DIV, "DIV" },
+    { ArithmeticOperation::SQUARED_DIFF, "SQUARED_DIFF" },
+    { ArithmeticOperation::MIN, "MIN" },
+    { ArithmeticOperation::MAX, "MAX" },
+    { ArithmeticOperation::POWER, "POWER" },
+    { ArithmeticOperation::PRELU, "PRELU" },
 };
 
 std::map<ArithmeticOperation, std::string> supported_sat_arithmetic_ops = {
-    {ArithmeticOperation::ADD, "ADD"},
-    {ArithmeticOperation::SUB, "SUB"},
+    { ArithmeticOperation::ADD, "ADD" },
+    { ArithmeticOperation::SUB, "SUB" },
 };
 
 std::string
@@ -83,7 +87,7 @@ Status validate_in_place_output_shape(const bool         in_place,
                                       const ITensorInfo &dst,
                                       const TensorShape &out_shape)
 {
-    if (in_place)
+    if(in_place)
     {
         ARM_COMPUTE_RETURN_ERROR_ON_MSG(
             detail::have_different_dimensions(out_shape, src1_in_place ? src1.tensor_shape() : src2.tensor_shape(), 0),
@@ -115,7 +119,7 @@ Status validate_arguments_with_float_only_supported_rules(const ITensorInfo &src
     ARM_COMPUTE_RETURN_ERROR_ON_MSG(out_shape.total_size() == 0, "Inputs are not broadcast compatible");
 
     // Validate in case of configured dst
-    if (dst.total_size() > 0)
+    if(dst.total_size() > 0)
     {
         ARM_COMPUTE_RETURN_ERROR_ON_DATA_TYPE_CHANNEL_NOT_IN(&dst, 1, DataType::F16, DataType::F32);
         ARM_COMPUTE_RETURN_ERROR_ON_MISMATCHING_DATA_TYPES(&src1, &dst);
@@ -142,7 +146,7 @@ Status validate_arguments_divide_operation(const ITensorInfo *src1, const ITenso
     ARM_COMPUTE_RETURN_ERROR_ON_MSG(out_shape.total_size() == 0, "Inputs are not broadcast compatible");
 
     // Validate in case of configured dst
-    if (dst->total_size() > 0)
+    if(dst->total_size() > 0)
     {
         ARM_COMPUTE_RETURN_ERROR_ON_DATA_TYPE_CHANNEL_NOT_IN(dst, 1, DataType::F16, DataType::F32, DataType::S32);
         ARM_COMPUTE_RETURN_ERROR_ON_MISMATCHING_DATA_TYPES(src1, dst);
@@ -162,7 +166,7 @@ validate_arguments_with_arithmetic_rules(const ITensorInfo &src1, const ITensorI
                                                          DataType::F16, DataType::S32, DataType::F32);
     ARM_COMPUTE_RETURN_ERROR_ON_MISMATCHING_DATA_TYPES(&src1, &src2);
 
-    if (is_data_type_quantized_symmetric(src1.data_type()))
+    if(is_data_type_quantized_symmetric(src1.data_type()))
     {
         const int32_t in1_offset = src1.quantization_info().uniform().offset;
         const int32_t in2_offset = src2.quantization_info().uniform().offset;
@@ -178,7 +182,7 @@ validate_arguments_with_arithmetic_rules(const ITensorInfo &src1, const ITensorI
     ARM_COMPUTE_RETURN_ERROR_ON_MSG(out_shape.total_size() == 0, "Inputs are not broadcast compatible");
 
     // Validate in case of configured dst
-    if (dst.total_size() > 0)
+    if(dst.total_size() > 0)
     {
         ARM_COMPUTE_RETURN_ERROR_ON_MISMATCHING_DATA_TYPES(&src1, &dst);
         ARM_COMPUTE_RETURN_ERROR_ON_MSG(detail::have_different_dimensions(out_shape, dst.tensor_shape(), 0),
@@ -186,7 +190,7 @@ validate_arguments_with_arithmetic_rules(const ITensorInfo &src1, const ITensorI
         ARM_COMPUTE_RETURN_ON_ERROR(
             validate_in_place_output_shape(in_place, src1_in_place, src1, src2, dst, out_shape));
 
-        if (is_data_type_quantized_symmetric(dst.data_type()))
+        if(is_data_type_quantized_symmetric(dst.data_type()))
         {
             const int32_t offset = dst.quantization_info().uniform().offset;
             ARM_COMPUTE_RETURN_ERROR_ON_MSG(offset != 0, "For quantized symmetric, offset must be zero");
@@ -206,15 +210,12 @@ CLBuildOptions generate_build_options_with_arithmetic_rules(const ITensorInfo &s
         adjust_vec_size(vector_size_byte_opencl / dst.element_size(), dst.dimension(0));
 
     build_opts.add_option("-DDATA_TYPE=" + get_cl_type_from_data_type(src1.data_type()));
-    build_opts.add_option("-DVEC_SIZE_IN1=" +
-                          support::cpp11::to_string(src1.dimension(0) == 1 ? 1 : num_elems_processed_per_iteration));
-    build_opts.add_option("-DVEC_SIZE_IN2=" +
-                          support::cpp11::to_string(src2.dimension(0) == 1 ? 1 : num_elems_processed_per_iteration));
+    build_opts.add_option("-DVEC_SIZE_IN1=" + support::cpp11::to_string(src1.dimension(0) == 1 ? 1 : num_elems_processed_per_iteration));
+    build_opts.add_option("-DVEC_SIZE_IN2=" + support::cpp11::to_string(src2.dimension(0) == 1 ? 1 : num_elems_processed_per_iteration));
     build_opts.add_option("-DVEC_SIZE_OUT=" + support::cpp11::to_string(num_elems_processed_per_iteration));
-    build_opts.add_option("-DVEC_SIZE_LEFTOVER=" +
-                          support::cpp11::to_string(dst.dimension(0) % num_elems_processed_per_iteration));
+    build_opts.add_option("-DVEC_SIZE_LEFTOVER=" + support::cpp11::to_string(dst.dimension(0) % num_elems_processed_per_iteration));
     build_opts.add_option("-DOP=" + operation_string);
-    if (is_data_type_quantized(src1.data_type()))
+    if(is_data_type_quantized(src1.data_type()))
     {
         const UniformQuantizationInfo iq1info = src1.quantization_info().uniform();
         const UniformQuantizationInfo iq2info = src2.quantization_info().uniform();
@@ -248,7 +249,7 @@ std::pair<Status, Window> configure_window_arithmetic_common(ITensorInfo &dst)
 
 std::pair<Status, Window>
 validate_and_configure_window_for_arithmetic_operators(ITensorInfo &src1, ITensorInfo &src2, ITensorInfo &dst)
-{   
+{
     /*
     const std::pair<TensorShape, ValidRegion> broadcast_pair =
         ITensorInfo::broadcast_shape_and_valid_region(src1, src2);
@@ -256,7 +257,7 @@ validate_and_configure_window_for_arithmetic_operators(ITensorInfo &src1, ITenso
 
     auto_init_if_empty(dst, out_shape, 1, src1.data_type());
     */
-    ARM_COMPUTE_UNUSED(src1,src2);
+    ARM_COMPUTE_UNUSED(src1, src2);
 
     // Auto initialize dst if not initialized
     const TensorShape &dst_shape = TensorShape::broadcast_shape(src2.tensor_shape());
@@ -303,20 +304,20 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
                                            ITensorInfo            *src1,
                                            ITensorInfo            *src2,
                                            ITensorInfo            *dst)
-{    
+{
     // Configure kernel window
     auto win_config = validate_and_configure_window(*src1, *src2, *dst);
     ARM_COMPUTE_ERROR_THROW_ON(win_config.first);
 
     std::string kernel_name = "elementwise_operation_" + name();
-    if (is_data_type_quantized(src1->data_type()))
+    if(is_data_type_quantized(src1->data_type()))
     {
         kernel_name += "_quantized";
     }
 
     // Set kernel build options
     CLBuildOptions build_opts = generate_build_options(*src1, *src2, *dst);
-    if (_act_info.enabled())
+    if(_act_info.enabled())
     {
         build_opts.add_option("-DACTIVATION_TYPE=" + lower_string(string_from_activation_func(_act_info.activation())));
         build_opts.add_option("-DA_VAL=" + float_to_string_with_full_precision(_act_info.a()));
@@ -333,7 +334,6 @@ void ClElementwiseKernel::configure_common(const ClCompileContext &compile_conte
 
 void ClElementwiseKernel::run_op(ITensorPack &tensors, const Window &window, ::cl::CommandQueue &queue)
 {
-    std::cout << "ClElementwiseKernel::run_op start" << std::endl;
     ARM_COMPUTE_ERROR_ON_UNCONFIGURED_KERNEL(this);
     ARM_COMPUTE_ERROR_ON_INVALID_SUBWINDOW(ICLKernel::window(), window);
 
@@ -351,10 +351,10 @@ void ClElementwiseKernel::run_op(ITensorPack &tensors, const Window &window, ::c
 
     bool       can_collapse = true;
     const bool is_vector    = in_shape1.num_dimensions() == 1 || in_shape2.num_dimensions() == 1;
-    if (std::min(in_shape1.total_size(), in_shape2.total_size()) > 1 && !is_vector)
+    if(std::min(in_shape1.total_size(), in_shape2.total_size()) > 1 && !is_vector)
     {
         can_collapse = (std::min(in_shape1.num_dimensions(), in_shape2.num_dimensions()) > Window::DimZ);
-        for (size_t d = Window::DimZ; can_collapse && (d < out_shape.num_dimensions()); d++)
+        for(size_t d = Window::DimZ; can_collapse && (d < out_shape.num_dimensions()); d++)
         {
             can_collapse = (in_shape1[d] == in_shape2[d]);
         }
@@ -378,7 +378,7 @@ void ClElementwiseKernel::run_op(ITensorPack &tensors, const Window &window, ::c
         unsigned int idx = 0;
         add_3D_tensor_argument(idx, src_0, slice_src1);
         add_3D_tensor_argument(idx, src_1, slice_src2);
-        if (!in_place)
+        if(!in_place)
         {
             add_3D_tensor_argument(idx, dst, slice);
         }
@@ -386,9 +386,7 @@ void ClElementwiseKernel::run_op(ITensorPack &tensors, const Window &window, ::c
         enqueue(queue, *this, slice, lws_hint());
         ARM_COMPUTE_UNUSED(collapsed.slide_window_slice_3D(slice_src1));
         ARM_COMPUTE_UNUSED(collapsed.slide_window_slice_3D(slice_src2));
-    } while (collapsed.slide_window_slice_3D(slice));
-
-    std::cout << "ClElementwiseKernel::run_op end" << std::endl;
+    } while(collapsed.slide_window_slice_3D(slice));
 }
 
 /** Logical binary */
@@ -427,7 +425,7 @@ Status ClLogicalBinaryKernel::validate(LogicalOperation   op,
 
 std::string ClLogicalBinaryKernel::name()
 {
-    switch (_op)
+    switch(_op)
     {
         case LogicalOperation::And:
             return "AND";
@@ -472,7 +470,7 @@ void ClSaturatedArithmeticKernel::configure(const ClCompileContext    &compile_c
 {
     ARM_COMPUTE_ERROR_ON_NULLPTR(input1, input2, output);
     ARM_COMPUTE_ERROR_THROW_ON(ClSaturatedArithmeticKernel::validate(op, input1, input2, output, policy, act_info));
-    auto padding_info = get_padding_info({input1, input2, output});
+    auto padding_info = get_padding_info({ input1, input2, output });
 
     _policy   = policy;
     _op       = op;
@@ -541,7 +539,7 @@ void ClArithmeticKernel::configure(const ClCompileContext    &compile_context,
 {
     ARM_COMPUTE_ERROR_ON_NULLPTR(src1, src2, dst);
     ARM_COMPUTE_ERROR_THROW_ON(ClArithmeticKernel::validate(op, src1, src2, dst, act_info));
-    auto padding_info = get_padding_info({src1, src2, dst});
+    auto padding_info = get_padding_info({ src1, src2, dst });
 
     _op       = op;
     _act_info = act_info;
@@ -556,14 +554,14 @@ Status ClArithmeticKernel::validate(ArithmeticOperation        op,
                                     const ActivationLayerInfo &act_info)
 {
     ARM_COMPUTE_RETURN_ERROR_ON_NULLPTR(src1, src2, dst);
-    if (op == ArithmeticOperation::DIV)
+    if(op == ArithmeticOperation::DIV)
     {
         // Partial integer support S32/F32/F16
         ARM_COMPUTE_RETURN_ON_ERROR(validate_arguments_divide_operation(src1, src2, dst));
         ARM_COMPUTE_RETURN_ON_ERROR(
             validate_and_configure_window_for_division(*src1->clone(), *src2->clone(), *dst->clone()).first);
     }
-    else if (op == ArithmeticOperation::POWER)
+    else if(op == ArithmeticOperation::POWER)
     {
         // Power operators doesn't support integer arithmetic
         ARM_COMPUTE_RETURN_ON_ERROR(validate_arguments_with_float_only_supported_rules(*src1, *src2, *dst));
@@ -584,7 +582,7 @@ Status ClArithmeticKernel::validate(ArithmeticOperation        op,
 std::pair<Status, Window>
 ClArithmeticKernel::validate_and_configure_window(ITensorInfo &src1, ITensorInfo &src2, ITensorInfo &dst)
 {
-    if (_op == ArithmeticOperation::DIV || _op == ArithmeticOperation::POWER)
+    if(_op == ArithmeticOperation::DIV || _op == ArithmeticOperation::POWER)
     {
         // Division and Power operators don't support integer arithmetic
         return validate_and_configure_window_for_division(src1, src2, dst);

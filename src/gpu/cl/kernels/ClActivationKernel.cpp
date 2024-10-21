@@ -249,7 +249,6 @@ Status ClActivationKernel::validate(const ITensorInfo *src, const ITensorInfo *d
 
 void ClActivationKernel::run_op(ITensorPack &tensors, const Window &window, ::cl::CommandQueue &queue)
 {
-    std::cout << "ClActivationKernel::run_op start" << std::endl;
     ARM_COMPUTE_ERROR_ON_UNCONFIGURED_KERNEL(this);
     ARM_COMPUTE_ERROR_ON_INVALID_SUBWINDOW(ICLKernel::window(), window);
 
@@ -271,8 +270,6 @@ void ClActivationKernel::run_op(ITensorPack &tensors, const Window &window, ::cl
         }
         enqueue(queue, *this, slice, lws_hint());
     } while (collapsed.slide_window_slice_3D(slice));
-
-    std::cout << "ClActivationKernel::run_op end" << std::endl;
 }
 } // namespace kernels
 } // namespace opencl
