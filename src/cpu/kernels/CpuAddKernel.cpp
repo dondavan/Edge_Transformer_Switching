@@ -235,7 +235,7 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
 
     _run_method(src0, src1, dst, _policy, window);
 
-    std::cout << "CpuAddKernel::run_op start" << std::endl;
+    std::cout << "CpuAddKernel::run_op end" << std::endl;
 }
 
 const char *CpuAddKernel::name() const
