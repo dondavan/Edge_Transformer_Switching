@@ -75,6 +75,7 @@ void CpuEmbedSum::run(ITensorPack &tensors)
     run_pack.add_const_tensor(ACL_SRC_1, position);
     run_pack.add_tensor(ACL_DST, output);
     NEScheduler::get().schedule_op(_add_kernel_2.get(), Window::DimY, _add_kernel_2->window(), run_pack);
+}
 
 } // namespace cpu
 } // namespace arm_compute
