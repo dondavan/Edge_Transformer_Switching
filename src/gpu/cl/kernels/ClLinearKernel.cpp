@@ -99,7 +99,6 @@ Status ClLinearKernel::validate(const ITensorInfo *src, const ITensorInfo *vecto
 
 void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::CommandQueue &queue)
 {
-    std::cout << "GPULinearKernel::run_op start " <<std::endl;
     const ICLTensor *lhs =
         utils::cast::polymorphic_downcast<const ICLTensor *>(tensors.get_const_tensor(TensorType::ACL_SRC_0));
     const ICLTensor *rhs =
@@ -132,7 +131,6 @@ void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
     add_3d_tensor_nhw_argument(idx, dst);
 
     enqueue(queue, *this, window_collapsed, lws_hint());
-    std::cout << "GPULinearKernel::run_op end " <<std::endl;
 }
 
 } // namespace kernels
