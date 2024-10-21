@@ -82,7 +82,7 @@ void ClLinearKernel::configure(const CLCompileContext &compile_context,
     kernel_name += matmul_kernel_info.adj_lhs ? "_t" : "_nt";
     kernel_name += matmul_kernel_info.adj_rhs ? "_t" : "_nt";
 
-    // A macro guard to compile ONLY the kernel of interest
+    // A macro guard to compile ONLY the kernel of interest 
     build_opts.add_option("-D" + upper_string(kernel_name));
 
     // Create kernel
@@ -99,6 +99,7 @@ Status ClLinearKernel::validate(const ITensorInfo *src, const ITensorInfo *vecto
 
 void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::CommandQueue &queue)
 {
+    std::cout << "GPULinearKernel::run_op start " <<std::endl;
     const ICLTensor *lhs =
         utils::cast::polymorphic_downcast<const ICLTensor *>(tensors.get_const_tensor(TensorType::ACL_SRC_0));
     const ICLTensor *rhs =
@@ -107,6 +108,14 @@ void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
         tensors.get_const_tensor(TensorType::ACL_SRC_2)); // nullptr if bias is not present
     ICLTensor *dst = utils::cast::polymorphic_downcast<ICLTensor *>(tensors.get_tensor(TensorType::ACL_DST));
     ARM_COMPUTE_ERROR_ON_NULLPTR(lhs, rhs, dst);
+    lhs->info()->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    rhs->info()->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    bias->info()->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
+    dst->info()->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl; 
+
+    ICLTensor * test = const_cast<ICLTensor *>(lhs);
+    test->map(queue);
+    std::cout << *reinterpret_cast<float *>(test->ptr_to_element(Coordinates(0,0,0))) << std::endl;
 
     unsigned int idx              = 0;
     Window       window_collapsed = window.collapse(ICLKernel::window(), Window::DimZ);
@@ -120,6 +129,10 @@ void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
     add_3d_tensor_nhw_argument(idx, dst);
 
     enqueue(queue, *this, window_collapsed, lws_hint());
+    ICLTensor * test_dst = const_cast<ICLTensor *>(dst);
+    test_dst->map(queue);
+    std::cout << *reinterpret_cast<float *>(test->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    std::cout << "GPULinearKernel::run_op end " <<std::endl;
 }
 
 } // namespace kernels

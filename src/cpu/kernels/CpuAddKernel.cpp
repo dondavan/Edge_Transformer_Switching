@@ -232,7 +232,20 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
     }
 
     _run_method(src0, src1, dst, _policy, window);
-    
+
+    if(dst->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *dst_nc = const_cast<ITensor *>(dst);
+        dst_cl          = static_cast<ICLTensor *>(dst_nc);
+        dst_cl->map(CLScheduler::get().queue());
+        std::cout << "dst " << *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0, 0, 0))) << std::endl;
+        //dst_cl->unmap(CLScheduler::get().queue());
+    }
+    else
+    {
+        std::cout << "dst " << *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0, 0, 0))) << std::endl;
+    }
+    std::cout << "CpuAddKernel::run_op end" << std::endl;
 }
 
 const char *CpuAddKernel::name() const
