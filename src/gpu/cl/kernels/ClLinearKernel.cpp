@@ -115,7 +115,6 @@ void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
 
     ICLTensor * test = const_cast<ICLTensor *>(lhs);
     test->map(queue);
-    std::cout << *reinterpret_cast<float *>(test->ptr_to_element(Coordinates(0,0,0))) << std::endl;
 
     unsigned int idx              = 0;
     Window       window_collapsed = window.collapse(ICLKernel::window(), Window::DimZ);
