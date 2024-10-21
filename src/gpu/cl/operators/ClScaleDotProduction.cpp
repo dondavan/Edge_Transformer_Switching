@@ -15,7 +15,6 @@
 #include "src/runtime/heuristics/matmul_native/ClMatMulNativeKernelConfig.h"
 #include "src/runtime/heuristics/matmul_native/IClMatMulNativeKernelConfig.h"
 
-
 #ifdef MEASURE_TIME
 #include <chrono>
 #include <fstream>
@@ -26,11 +25,11 @@ namespace arm_compute
 namespace opencl
 {
 
-void ClScaleDotProduction::configure(const ClCompileContext                     &compile_context,
-                                     const ITensorInfo                          *query,
-                                     const ITensorInfo                          *key,
-                                     const ITensorInfo                          *value,
-                                     ITensorInfo                                *output,
+void ClScaleDotProduction::configure(const ClCompileContext            &compile_context,
+                                     const ITensorInfo                 *query,
+                                     const ITensorInfo                 *key,
+                                     const ITensorInfo                 *value,
+                                     ITensorInfo                       *output,
                                      const ScaleDotProductionLayerInfo &info)
 {
     ARM_COMPUTE_LOG_PARAMS(key, value, query, output);
@@ -115,14 +114,12 @@ void ClScaleDotProduction::configure(const ClCompileContext                     
     product_mm_kernel->set_target(gpu_target);
     product_mm_kernel->configure(compile_context, &_permuted_query, &_permuted_key, nullptr, &_scaled_query_key, scale, 0, mm_kernel_info_qk);
     _product_mm_kernel = std::move(product_mm_kernel);
-    
-    
+
     //  Softmax of previous product
     SoftmaxKernelInfo softmax_info{ 1.0f, false, query->data_type(), 0 };
     auto              softmax_kernel = std::make_unique<kernels::ClSoftmaxKernel>();
     softmax_kernel->configure(compile_context, _scaled_query_key, _softmaxed_product, softmax_info);
     _softmax_kernel = std::move(softmax_kernel);
-    
 
     // Specify whether transpose weights is necessary in matmul info
     const MatMulInfo mat_info_pv = MatMulInfo();
@@ -177,6 +174,21 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
     auto value  = tensors.get_const_tensor(ACL_SRC_2);
     auto output = tensors.get_tensor(ACL_DST);
 
+    ITensor   *query_nc = const_cast<ITensor *>(query);
+    ICLTensor *query_cl = static_cast<ICLTensor *>(query_nc);
+    query_cl->map(CLScheduler::get().queue());
+
+    ITensor   *key_nc = const_cast<ITensor *>(key);
+    ICLTensor *key_cl = static_cast<ICLTensor *>(key_nc);
+    key_cl->map(CLScheduler::get().queue());
+
+    ITensor   *value_nc = const_cast<ITensor *>(value);
+    ICLTensor *value_cl = static_cast<ICLTensor *>(value_nc);
+    value_cl->map(CLScheduler::get().queue());
+
+    ICLTensor *output_cl = static_cast<ICLTensor *>(output);
+    output_cl->map(CLScheduler::get().queue());
+
     CLAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CLAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
     CLAuxTensorHandler reshaped_key(offset_int_vec(KeyReshape), _reshaped_key, tensors);
@@ -195,9 +207,9 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
 #endif
     CLScheduler::get().enqueue_op(*_query_reshape_kernel, query_reshape_pack, true);
 #ifdef MEASURE_TIME
-    auto   end_time  = std::chrono::high_resolution_clock::now();
-    double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
-    std::ofstream measure_out("measure_output.txt",std::ios::app);
+    auto          end_time  = std::chrono::high_resolution_clock::now();
+    double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+    std::ofstream measure_out("measure_output.txt", std::ios::app);
     measure_out.precision(5);
     measure_out << std::scientific << "query_reshape cost: " << cost_time << std::endl;
 #endif
@@ -261,7 +273,6 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "value_permute_func cost: " << cost_time << std::endl;
 #endif
 
-
     // Run matrix multiply compute multi-head attention between Query and Key
     ITensorPack gemm_QK_pack{ { ACL_SRC_0, permuted_query.get() }, { ACL_SRC_1, permuted_key.get() }, { ACL_DST, scaled_query_key.get() } };
 #ifdef MEASURE_TIME
@@ -275,7 +286,6 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "MMUL QK cost: " << cost_time << std::endl;
 #endif
 
-    
     // Softmax scaled product
     ITensorPack softmax_pack = { { ACL_SRC, scaled_query_key.get() }, { ACL_DST, softmaxed_product.get() } };
 #ifdef MEASURE_TIME
@@ -288,7 +298,6 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
     measure_out.precision(5);
     measure_out << std::scientific << "softmax cost: " << cost_time << std::endl;
 #endif
-
 
     // Run matrix multiply compute multi-head attention between Context and Value
     ITensorPack gemm_context_pack{ { ACL_SRC_0, softmaxed_product.get() }, { ACL_SRC_1, permuted_value.get() }, { ACL_DST, gemmed_context.get() } };
