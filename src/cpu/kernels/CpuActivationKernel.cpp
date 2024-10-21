@@ -376,15 +376,22 @@ void CpuActivationKernel::run_op(ITensorPack &tensors, const Window &window, con
     const ITensor *src = tensors.get_const_tensor(TensorType::ACL_SRC);
     ITensor       *dst = tensors.get_tensor(TensorType::ACL_DST);
 
+    ICLTensor *src_cl;
+    ICLTensor *dst_cl;
     if(src->info()->tensor_target_type() == TensorTargetType::CL)
     {
-        ITensor * src_nc = const_cast<ITensor *>(src);
-        auto src_cl = static_cast<ICLTensor *>(src_nc);
+        ITensor *src_nc = const_cast<ITensor *>(src);
+        src_cl          = static_cast<ICLTensor *>(src_nc);
         src_cl->map(CLScheduler::get().queue());
     }
 
-    _run_method(src, dst, _act_info, window);
+    if(dst->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        dst_cl          = static_cast<ICLTensor *>(dst);
+        dst_cl->map(CLScheduler::get().queue());
+    }
 
+    _run_method(src, dst, _act_info, window);
 }
 
 const char *CpuActivationKernel::name() const
