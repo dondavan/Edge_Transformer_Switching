@@ -182,12 +182,12 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "key_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL)
-            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1").set_target(Target::NEON);
+            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1").set_target(Target::CL);
 
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention").set_target(Target::NEON);
+        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention").set_target(Target::CL);
 
         /* Self output */
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON);
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL);
 
         SubStream without_ff(graph);
         SubStream with_ff(graph);
