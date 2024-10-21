@@ -174,21 +174,6 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
     auto value  = tensors.get_const_tensor(ACL_SRC_2);
     auto output = tensors.get_tensor(ACL_DST);
 
-    ITensor   *query_nc = const_cast<ITensor *>(query);
-    ICLTensor *query_cl = static_cast<ICLTensor *>(query_nc);
-    query_cl->map(CLScheduler::get().queue());
-
-    ITensor   *key_nc = const_cast<ITensor *>(key);
-    ICLTensor *key_cl = static_cast<ICLTensor *>(key_nc);
-    key_cl->map(CLScheduler::get().queue());
-
-    ITensor   *value_nc = const_cast<ITensor *>(value);
-    ICLTensor *value_cl = static_cast<ICLTensor *>(value_nc);
-    value_cl->map(CLScheduler::get().queue());
-
-    ICLTensor *output_cl = static_cast<ICLTensor *>(output);
-    output_cl->map(CLScheduler::get().queue());
-
     CLAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CLAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
     CLAuxTensorHandler reshaped_key(offset_int_vec(KeyReshape), _reshaped_key, tensors);
