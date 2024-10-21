@@ -60,7 +60,6 @@ void ClLayerNormKernel::configure(const ClCompileContext &compile_context,
 
     // Create kernel
     _kernel = create_kernel(compile_context, kernel_name, build_opts.options());
-    std::cout << "layernormed" << std::endl;
 }
 
 Status ClLayerNormKernel::validate(const ITensorInfo *input,
