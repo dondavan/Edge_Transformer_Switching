@@ -239,7 +239,7 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
         dst_cl          = static_cast<ICLTensor *>(dst_nc);
         dst_cl->map(CLScheduler::get().queue());
         std::cout << "dst " << *reinterpret_cast<float *>(dst->ptr_to_element(Coordinates(0, 0, 0))) << std::endl;
-        //dst_cl->unmap(CLScheduler::get().queue());
+        dst_cl->unmap(CLScheduler::get().queue());
     }
     else
     {
