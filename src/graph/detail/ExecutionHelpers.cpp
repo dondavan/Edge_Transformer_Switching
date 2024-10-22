@@ -224,6 +224,7 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
             std::unique_ptr<IFunction> func    = backend.configure_node(*node, ctx);
             if(func != nullptr || is_utility_node(node))
             {
+                std::cout << node->name() << std::endl;
                 workload.tasks.emplace_back(ExecutionTask(std::move(func), node));
             }
         }
@@ -237,12 +238,14 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
             //workload.inputs.push_back(node->output(0));
             for(size_t idx = 0; idx < node->num_outputs(); idx++)
             {
+                std::cout << node->name() << std::endl;
                 workload.inputs.push_back(node->output(idx));
             }
         }
 
         if(node != nullptr && node->type() == NodeType::Output)
         {
+                std::cout << node->name() << std::endl;
             workload.outputs.push_back(node->input(0));
             continue;
         }
