@@ -22,18 +22,18 @@ struct CLAttentionLinearLayer::Impl
     MemoryGroup      memory_group{};
     IWeightsManager *weights_manager{ nullptr };
 
-    const ITensor                  *query_input{ nullptr };
-    const ITensor                  *query_w{ nullptr };
-    const ITensor                  *query_b{ nullptr };
-    const ITensor                  *key_input{ nullptr };
-    const ITensor                  *key_w{ nullptr };
-    const ITensor                  *key_b{ nullptr };
-    const ITensor                  *value_input{ nullptr };
-    const ITensor                  *value_w{ nullptr };
-    const ITensor                  *value_b{ nullptr };
-    ITensor                        *query_output{ nullptr };
-    ITensor                        *key_output{ nullptr };
-    ITensor                        *value_output{ nullptr };
+    const ITensor *query_input{ nullptr };
+    const ITensor *query_w{ nullptr };
+    const ITensor *query_b{ nullptr };
+    const ITensor *key_input{ nullptr };
+    const ITensor *key_w{ nullptr };
+    const ITensor *key_b{ nullptr };
+    const ITensor *value_input{ nullptr };
+    const ITensor *value_w{ nullptr };
+    const ITensor *value_b{ nullptr };
+    ITensor       *query_output{ nullptr };
+    ITensor       *key_output{ nullptr };
+    ITensor       *value_output{ nullptr };
 
     std::unique_ptr<opencl::ClLinear> query_kernel{ nullptr };
     std::unique_ptr<opencl::ClLinear> key_kernel{ nullptr };
@@ -68,9 +68,6 @@ void CLAttentionLinearLayer::configure(const CLCompileContext &compile_context,
                                        ITensor *query_output, ITensor *key_output, ITensor *value_output,
                                        const LinearLayerInfo &linear_info)
 {
-
-    std::cout << "CLAttentionLinearLayer::configure start" << std::endl;
-
     ARM_COMPUTE_ERROR_ON_NULLPTR(input, output);
     ARM_COMPUTE_UNUSED(linear_info);
 
@@ -109,8 +106,6 @@ void CLAttentionLinearLayer::configure(const CLCompileContext &compile_context,
     measure_out << std::scientific << "CLAttentionLinearLayer::configure cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
-std::cout << "CLAttentionLinearLayer::configure end" << std::endl;
-    
 }
 
 Status CLAttentionLinearLayer::validate(const ITensor *input,
@@ -159,7 +154,6 @@ void CLAttentionLinearLayer::run()
     measure_out << std::scientific << "CLAttentionLinearLayer::run cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
-    
 }
 
 } // namespace arm_compute
