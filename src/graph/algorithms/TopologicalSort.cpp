@@ -141,6 +141,7 @@ std::vector<NodeID> dfs(Graph &g)
         {
             visited[input] = true;
             stack.push(input);
+            std::cout << "node id: " << input << std::endl;
         }
     }
 
@@ -151,6 +152,7 @@ std::vector<NodeID> dfs(Graph &g)
         {
             visited[const_node] = true;
             stack.push(const_node);
+            std::cout << "node id: " << const_node << std::endl;
         }
     }
 
