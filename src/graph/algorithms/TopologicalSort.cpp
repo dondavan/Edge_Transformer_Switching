@@ -127,7 +127,7 @@ std::vector<NodeID> bfs(Graph &g)
 std::vector<NodeID> dfs(Graph &g)
 {
     std::vector<NodeID> dfs_order_vector;
-
+    std::cout <<"In total: " <<g.nodes().size() << std::endl;
     // Created visited vector
     std::vector<bool> visited(g.nodes().size(), false);
 
