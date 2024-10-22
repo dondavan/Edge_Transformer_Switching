@@ -343,6 +343,9 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     case NodeType::ActivationLayer:
         std::cout << " Activation" << std::endl;
         break;
+    case NodeType::Const:
+        std::cout << " Const" << std::endl;
+        break;
     
     default:
         std::cout << " some node was created" << std::endl;
