@@ -90,7 +90,7 @@ class GraphVanillaTransformerExample : public Example
         // Encode Input
         graph << InputLayer(input_descriptor, get_token_accessor(common_params),
                             get_segment_accessor(common_params.segment, move(at2_preproccessor)))
-                     .set_name("in1").set_target(Target::NEON)
+                     .set_name("in1").set_target(Target::CL)
 
               << EmbeddingLayer(EmbeddingLayerInfo(d_model,
                                                    d_vocab,
@@ -101,7 +101,7 @@ class GraphVanillaTransformerExample : public Example
                                 get_weights_accessor(data_path, "token_embedding.npy", operation_layout),
                                 get_weights_accessor(data_path, "segment_embedding.npy", operation_layout),
                                 get_weights_accessor(data_path, "positional_embedding.npy", operation_layout))
-                     .set_name("tkemb1").set_target(Target::NEON);
+                     .set_name("tkemb1").set_target(Target::CL);
 
         add_encoder_block(data_path, "layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
         add_encoder_block(data_path, "layer_1/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
@@ -123,9 +123,9 @@ class GraphVanillaTransformerExample : public Example
                              get_weights_accessor(data_path, "pooler_weight.npy"),
                              get_weights_accessor(data_path, "pooler_bias.npy")).set_target(Target::CL)
 
-              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f)).set_target(Target::NEON)
+              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f)).set_target(Target::CL)
 
-              << OutputLayer(get_output_accessor(common_params)).set_name("out1").set_target(Target::NEON);
+              << OutputLayer(get_output_accessor(common_params)).set_name("out1").set_target(Target::CL);
 
         // Finalize graph
         GraphConfig config;
@@ -184,10 +184,10 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL)
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1").set_target(Target::NEON);
 
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention").set_target(Target::NEON);
+        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention").set_target(Target::CL);
 
         /* Self output */
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON);
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL);
 
         SubStream without_ff(graph);
         SubStream with_ff(graph);
