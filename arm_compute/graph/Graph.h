@@ -276,7 +276,6 @@ inline NodeID Graph::add_node(Ts &&...args)
     auto   node = std::make_unique<NT>(std::forward<Ts>(args)...);
     node->set_graph(this);
     node->set_id(nid);
-    std::cout << node->name() << " added, number:" << nid << std::endl;
 
     // Keep track of input nodes
     _tagged_nodes[node->type()].push_back(nid);
@@ -307,8 +306,48 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     node->set_graph(this);
     node->set_id(nid);
     node->set_assigned_target(assigned_target);
-    std::cout << node.name() << " added, number:" << nid << std::endl;
 
+    std::cout << nid;
+    switch (node->type())
+    {
+    case NodeType::Input:
+        std::cout << " Input" << std::endl;
+        break;
+    case NodeType::SegmentEmbeddingLayer:
+        std::cout << " SegmentEmbeddingLayer" << std::endl;
+        break;
+    case NodeType::TokenEmbeddingLayer:
+        std::cout << " TokenEmbeddingLayer" << std::endl;
+        break;
+    case NodeType::EmbeddingSumLayer:
+        std::cout << " EmbeddingSumLayer" << std::endl;
+        break;
+    case NodeType::PositionEmbeddingLayer:
+        std::cout << " PositionEmbeddingLayer" << std::endl;
+        break;
+    case NodeType::LinearLayer:
+        std::cout << " LinearLayer" << std::endl;
+        break;
+    case NodeType::AttentionLinearLayer:
+        std::cout << " AttentionLinearLayer" << std::endl;
+        break;
+    case NodeType::ScaleDotProductionAttentionLayer:
+        std::cout << " ScaleDotProductionAttentionLayer" << std::endl;
+        break;
+    case NodeType::LayerNormLayer:
+        std::cout << " LayerNormLayer" << std::endl;
+        break;
+    case NodeType::EltwiseLayer:
+        std::cout << " EltwiseLayer" << std::endl;
+        break;
+    case NodeType::ActivationLayer:
+        std::cout << " Activation" << std::endl;
+        break;
+    
+    default:
+        std::cout << " some node was created" << std::endl;
+        break;
+    }
     // Keep track of input nodes
     _tagged_nodes[node->type()].push_back(nid);
 
