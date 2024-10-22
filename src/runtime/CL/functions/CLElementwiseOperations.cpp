@@ -32,17 +32,23 @@
 #include "src/gpu/cl/operators/ClElementwiseOperations.h"
 #include "src/gpu/cl/operators/ClSub.h"
 
+#ifdef MEASURE_TIME
+#include <chrono>
+#include <fstream>
+#endif
+
 namespace arm_compute
 {
 struct CLArithmeticAddition::Impl
 {
-    const ICLTensor               *src_0{nullptr};
-    const ICLTensor               *src_1{nullptr};
-    ICLTensor                     *dst{nullptr};
-    std::unique_ptr<opencl::ClAdd> op{nullptr};
+    const ICLTensor               *src_0{ nullptr };
+    const ICLTensor               *src_1{ nullptr };
+    ICLTensor                     *dst{ nullptr };
+    std::unique_ptr<opencl::ClAdd> op{ nullptr };
 };
 
-CLArithmeticAddition::CLArithmeticAddition() : _impl(std::make_unique<Impl>())
+CLArithmeticAddition::CLArithmeticAddition()
+    : _impl(std::make_unique<Impl>())
 {
 }
 CLArithmeticAddition::CLArithmeticAddition(CLArithmeticAddition &&)            = default;
@@ -80,23 +86,36 @@ Status CLArithmeticAddition::validate(const ITensorInfo         *input1,
 
 void CLArithmeticAddition::run()
 {
+#ifdef MEASURE_TIME
+    auto start_time = std::chrono::high_resolution_clock::now();
+#endif
     ITensorPack pack;
     pack.add_tensor(TensorType::ACL_SRC_0, _impl->src_0);
     pack.add_tensor(TensorType::ACL_SRC_1, _impl->src_1);
     pack.add_tensor(TensorType::ACL_DST, _impl->dst);
 
     _impl->op->run(pack);
+
+#ifdef MEASURE_TIME
+    auto          end_time  = std::chrono::high_resolution_clock::now();
+    double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+    std::ofstream measure_out("measure_output.txt", std::ios::app);
+    measure_out.precision(5);
+    measure_out << std::scientific << "CLArithmeticAddition::run cost: " << cost_time << std::endl;
+    measure_out.close();
+#endif
 }
 
 struct CLArithmeticSubtraction::Impl
 {
-    const ICLTensor               *src_0{nullptr};
-    const ICLTensor               *src_1{nullptr};
-    ICLTensor                     *dst{nullptr};
-    std::unique_ptr<opencl::ClSub> op{nullptr};
+    const ICLTensor               *src_0{ nullptr };
+    const ICLTensor               *src_1{ nullptr };
+    ICLTensor                     *dst{ nullptr };
+    std::unique_ptr<opencl::ClSub> op{ nullptr };
 };
 
-CLArithmeticSubtraction::CLArithmeticSubtraction() : _impl(std::make_unique<Impl>())
+CLArithmeticSubtraction::CLArithmeticSubtraction()
+    : _impl(std::make_unique<Impl>())
 {
 }
 CLArithmeticSubtraction::CLArithmeticSubtraction(CLArithmeticSubtraction &&)            = default;
@@ -147,13 +166,14 @@ void CLArithmeticSubtraction::run()
 
 struct CLArithmeticDivision::Impl
 {
-    const ICLTensor                               *src_0{nullptr};
-    const ICLTensor                               *src_1{nullptr};
-    ICLTensor                                     *dst{nullptr};
-    std::unique_ptr<opencl::ClElementwiseDivision> op{nullptr};
+    const ICLTensor                               *src_0{ nullptr };
+    const ICLTensor                               *src_1{ nullptr };
+    ICLTensor                                     *dst{ nullptr };
+    std::unique_ptr<opencl::ClElementwiseDivision> op{ nullptr };
 };
 
-CLArithmeticDivision::CLArithmeticDivision() : _impl(std::make_unique<Impl>())
+CLArithmeticDivision::CLArithmeticDivision()
+    : _impl(std::make_unique<Impl>())
 {
 }
 CLArithmeticDivision::CLArithmeticDivision(CLArithmeticDivision &&)            = default;
@@ -201,13 +221,14 @@ void CLArithmeticDivision::run()
 
 struct CLElementwiseMax::Impl
 {
-    const ICLTensor                          *src_0{nullptr};
-    const ICLTensor                          *src_1{nullptr};
-    ICLTensor                                *dst{nullptr};
-    std::unique_ptr<opencl::ClElementwiseMax> op{nullptr};
+    const ICLTensor                          *src_0{ nullptr };
+    const ICLTensor                          *src_1{ nullptr };
+    ICLTensor                                *dst{ nullptr };
+    std::unique_ptr<opencl::ClElementwiseMax> op{ nullptr };
 };
 
-CLElementwiseMax::CLElementwiseMax() : _impl(std::make_unique<Impl>())
+CLElementwiseMax::CLElementwiseMax()
+    : _impl(std::make_unique<Impl>())
 {
 }
 CLElementwiseMax::CLElementwiseMax(CLElementwiseMax &&)            = default;
@@ -255,13 +276,14 @@ void CLElementwiseMax::run()
 
 struct CLElementwiseMin::Impl
 {
-    const ICLTensor                          *src_0{nullptr};
-    const ICLTensor                          *src_1{nullptr};
-    ICLTensor                                *dst{nullptr};
-    std::unique_ptr<opencl::ClElementwiseMin> op{nullptr};
+    const ICLTensor                          *src_0{ nullptr };
+    const ICLTensor                          *src_1{ nullptr };
+    ICLTensor                                *dst{ nullptr };
+    std::unique_ptr<opencl::ClElementwiseMin> op{ nullptr };
 };
 
-CLElementwiseMin::CLElementwiseMin() : _impl(std::make_unique<Impl>())
+CLElementwiseMin::CLElementwiseMin()
+    : _impl(std::make_unique<Impl>())
 {
 }
 CLElementwiseMin::CLElementwiseMin(CLElementwiseMin &&)            = default;
@@ -309,13 +331,14 @@ void CLElementwiseMin::run()
 
 struct CLElementwiseSquaredDiff::Impl
 {
-    const ICLTensor                                  *src_0{nullptr};
-    const ICLTensor                                  *src_1{nullptr};
-    ICLTensor                                        *dst{nullptr};
-    std::unique_ptr<opencl::ClElementwiseSquaredDiff> op{nullptr};
+    const ICLTensor                                  *src_0{ nullptr };
+    const ICLTensor                                  *src_1{ nullptr };
+    ICLTensor                                        *dst{ nullptr };
+    std::unique_ptr<opencl::ClElementwiseSquaredDiff> op{ nullptr };
 };
 
-CLElementwiseSquaredDiff::CLElementwiseSquaredDiff() : _impl(std::make_unique<Impl>())
+CLElementwiseSquaredDiff::CLElementwiseSquaredDiff()
+    : _impl(std::make_unique<Impl>())
 {
 }
 CLElementwiseSquaredDiff::CLElementwiseSquaredDiff(CLElementwiseSquaredDiff &&)            = default;
@@ -363,13 +386,14 @@ void CLElementwiseSquaredDiff::run()
 
 struct CLElementwisePower::Impl
 {
-    const ICLTensor                            *src_0{nullptr};
-    const ICLTensor                            *src_1{nullptr};
-    ICLTensor                                  *dst{nullptr};
-    std::unique_ptr<opencl::ClElementwisePower> op{nullptr};
+    const ICLTensor                            *src_0{ nullptr };
+    const ICLTensor                            *src_1{ nullptr };
+    ICLTensor                                  *dst{ nullptr };
+    std::unique_ptr<opencl::ClElementwisePower> op{ nullptr };
 };
 
-CLElementwisePower::CLElementwisePower() : _impl(std::make_unique<Impl>())
+CLElementwisePower::CLElementwisePower()
+    : _impl(std::make_unique<Impl>())
 {
 }
 CLElementwisePower::CLElementwisePower(CLElementwisePower &&)            = default;
