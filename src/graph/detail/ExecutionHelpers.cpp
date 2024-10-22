@@ -61,9 +61,9 @@ void validate_all_nodes(Graph &g)
 
 void configure_all_tensors(Graph &g)
 {   
-
+/*
     auto &nodes = g.nodes();
-    /*
+    
     for (auto &node : nodes)
     {
         //Upgrade NEON output tensor to CL tensor
