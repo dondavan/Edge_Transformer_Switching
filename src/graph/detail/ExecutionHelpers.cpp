@@ -74,7 +74,6 @@ void configure_all_tensors(Graph &g)
                     if(cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL)
                     {
                         tensor->desc().target = Target::CL;
-                        std::cout << " Output SWitched to tensor target CL" << std::endl;
                     }
                 }
             }
@@ -95,27 +94,6 @@ void configure_all_tensors(Graph &g)
                     if(cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL)
                     {
                         tensor->desc().target = Target::CL;
-                        std::cout << " Input SWitched to tensor target CL" << std::endl;
-                    }
-                }
-            }
-        }
-
-        for(unsigned int i = 0; i < node.get()->num_inputs(); ++i)
-        {
-            Tensor *tensor = node.get()->input(i);
-
-            if(tensor != nullptr && !tensor->bound_edges().empty())
-            {
-                auto eids = tensor->bound_edges();
-                for(auto eid:eids)
-                {
-                    auto cnode = g.edge(eid)->consumer();
-                    auto pnode = g.edge(eid)->producer();
-                    if(cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL)
-                    {
-                        tensor->desc().target = Target::CL;
-                        std::cout << " Input SWitched to tensor target CL" << std::endl;
                     }
                 }
             }
@@ -236,22 +214,6 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
         if(node != nullptr)
         {
             Target assigned_target = node->assigned_target();
-            std::cout << node_id;
-            switch(assigned_target)
-            {
-                case Target::CL:
-                    std::cout << " CL ";
-                    break;
-                case Target::NEON:
-                    std::cout << " NEON ";
-                    break;
-                case Target::SWITCH:
-                    std::cout << " SWITCH ";
-                    break;
-                default:
-                    std::cout << " Some other target ";
-                    break;
-            }
             backends::IDeviceBackend  &backend = backends::BackendRegistry::get().get_backend(assigned_target);
             std::unique_ptr<IFunction> func    = backend.configure_node(*node, ctx);
             if(func != nullptr || is_utility_node(node))
