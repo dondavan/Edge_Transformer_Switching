@@ -371,6 +371,33 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "concat_reshape cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+
+    if(query->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *query_nc = const_cast<ITensor *>(query);
+        query_cl          = static_cast<ICLTensor *>(query_nc);
+        query_cl->unmap(CLScheduler::get().queue());
+    }
+
+    if(key->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *key_nc = const_cast<ITensor *>(key);
+        key_cl          = static_cast<ICLTensor *>(key_nc);
+        key_cl->unmap(CLScheduler::get().queue());
+    }
+
+    if(value->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *value_nc = const_cast<ITensor *>(value);
+        value_cl          = static_cast<ICLTensor *>(value_nc);
+        value_cl->unmap(CLScheduler::get().queue());
+    }
+
+    if(output->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        output_cl          = static_cast<ICLTensor *>(output);
+        output_cl->unmap(CLScheduler::get().queue());
+    }
 }
 
 experimental::MemoryRequirements CpuScaleDotProduction::workspace() const
