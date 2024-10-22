@@ -61,9 +61,8 @@ void validate_all_nodes(Graph &g)
 
 void configure_all_tensors(Graph &g)
 {   
-/*
+
     auto &nodes = g.nodes();
-    
     for (auto &node : nodes)
     {
         //Upgrade NEON output tensor to CL tensor
@@ -106,7 +105,7 @@ void configure_all_tensors(Graph &g)
             }
         }
     }
-    */
+
     auto &tensors = g.tensors();
 
     for (auto &tensor : tensors)
@@ -121,7 +120,7 @@ void configure_all_tensors(Graph &g)
         }
     }
 
-    
+    /*
     for(auto tensor_it = tensors.begin(); tensor_it != tensors.end(); tensor_it++)
     {
         auto &tensor = *tensor_it;
@@ -141,7 +140,7 @@ void configure_all_tensors(Graph &g)
             ARM_COMPUTE_ERROR_ON_MSG(!handle, "Couldn't create backend handle!");
             tensor->set_handle(std::move(handle));
         }
-    }
+    }*/
 
 }
 
