@@ -59,7 +59,7 @@ void configure_all_tensors(Graph &g)
     auto &nodes = g.nodes();
     for (auto &node : nodes)
     {
-        //Check output
+        //Upgrade NEON output tensor to CL tensor
         for(unsigned int i = 0; i < node.get()->num_outputs(); ++i)
         {
             Tensor *tensor = node.get()->output(i);
@@ -75,6 +75,27 @@ void configure_all_tensors(Graph &g)
                     {
                         tensor->desc().target = Target::CL;
                         std::cout << " Output SWitched to tensor target CL" << std::endl;
+                    }
+                }
+            }
+        }
+        
+        //Upgrade NEON input tensor to CL tensor
+        for(unsigned int i = 0; i < node.get()->num_inputs(); ++i)
+        {
+            Tensor *tensor = node.get()->input(i);
+
+            if(tensor != nullptr && !tensor->bound_edges().empty())
+            {
+                auto eids = tensor->bound_edges();
+                for(auto eid:eids)
+                {
+                    auto cnode = g.edge(eid)->consumer();
+                    auto pnode = g.edge(eid)->producer();
+                    if(cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL)
+                    {
+                        tensor->desc().target = Target::CL;
+                        std::cout << " Input SWitched to tensor target CL" << std::endl;
                     }
                 }
             }
