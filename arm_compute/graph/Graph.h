@@ -307,38 +307,6 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     node->set_id(nid);
     node->set_assigned_target(assigned_target);
 
-    std::cout << nid;
-    switch (node->type())
-    {
-    case NodeType::SegmentEmbeddingLayer:
-        std::cout << " SegmentEmbeddingLayer" << std::endl;
-        break;
-    case NodeType::TokenEmbeddingLayer:
-        std::cout << " TokenEmbeddingLayer" << std::endl;
-        break;
-    case NodeType::EmbeddingSumLayer:
-        std::cout << " EmbeddingSumLayer" << std::endl;
-        break;
-    case NodeType::PositionEmbeddingLayer:
-        std::cout << " PositionEmbeddingLayer" << std::endl;
-        break;
-    case NodeType::LinearLayer:
-        std::cout << " LinearLayer" << std::endl;
-        break;
-    case NodeType::AttentionLinearLayer:
-        std::cout << " AttentionLinearLayer" << std::endl;
-        break;
-    case NodeType::ScaleDotProductionAttentionLayer:
-        std::cout << " ScaleDotProductionAttentionLayer" << std::endl;
-        break;
-    case NodeType::LayerNormLayer:
-        std::cout << " LayerNormLayer" << std::endl;
-        break;
-    
-    default:
-        std::cout << " some node was created" << std::endl;
-        break;
-    }
     // Keep track of input nodes
     _tagged_nodes[node->type()].push_back(nid);
 
