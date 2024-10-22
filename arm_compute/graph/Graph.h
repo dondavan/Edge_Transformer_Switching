@@ -276,7 +276,7 @@ inline NodeID Graph::add_node(Ts &&...args)
     auto   node = std::make_unique<NT>(std::forward<Ts>(args)...);
     node->set_graph(this);
     node->set_id(nid);
-    std::cout << node.name() << " added, number:" << nid << std::endl;
+    std::cout << node->name() << " added, number:" << nid << std::endl;
 
     // Keep track of input nodes
     _tagged_nodes[node->type()].push_back(nid);
