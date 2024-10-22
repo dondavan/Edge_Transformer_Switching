@@ -95,7 +95,7 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
 
     std::cout << "switching/src/graph/GraphManager.cpp configure_all_tensors start:" << std::endl;
     // Configure all tensors
-    //detail::configure_all_tensors(graph);
+    detail::configure_all_tensors(graph);
     std::cout << "switching/src/graph/GraphManager.cpp configure_all_tensors end:" << std::endl;
 
     // Apply backend mutating passes
@@ -199,16 +199,6 @@ void GraphManager::execute_graph(Graph &graph)
         {
             return;
         }
-
-#ifdef MEASURE_TIME
-        auto   output_end_time  = std::chrono::high_resolution_clock::now();
-        double output_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(output_end_time - output_start_time).count();
-
-        measure_out.precision(5);
-        measure_out << std::scientific << "Output cost: " << output_cost_time << std::endl;
-
-        measure_out.close();
-#endif
         std::cout << "switching/src/graph/GraphManager.cpp call_all_output_node_accessors end:" << std::endl;
     }
 }
