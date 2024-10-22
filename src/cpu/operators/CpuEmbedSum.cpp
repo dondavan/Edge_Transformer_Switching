@@ -23,13 +23,6 @@ void CpuEmbedSum::configure(const ITensorInfo        *token,
                             ITensorInfo              *output,
                             const EmbeddingLayerInfo &emb_info)
 {
-    std::cout << "CpuEmbedSum::configure start " << std::endl;
-    token->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
-    segemnt->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
-    position->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
-    output->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
-    std::cout << "CpuEmbedSum::configure end " << std::endl;
-
     _add_kernel_1 = std::make_unique<kernels::CpuAddKernel>();
     _add_kernel_2 = std::make_unique<kernels::CpuAddKernel>();
 

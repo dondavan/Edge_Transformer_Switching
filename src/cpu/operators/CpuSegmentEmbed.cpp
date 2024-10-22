@@ -17,13 +17,6 @@ void CpuSegmentEmbed::configure(const ITensorInfo *input, const ITensorInfo *seg
 {
     ARM_COMPUTE_LOG_PARAMS(input, output);
 
-
-    std::cout << "CpuSegmentEmbed::configure start " << std::endl;
-    input->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
-    segment->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
-    output->tensor_target_type() == TensorTargetType::CL? std::cout << "CL tensor" << std::endl : std::cout << "NEON tensor" << std::endl;
-    std::cout << "CpuSegmentEmbed::configure end " << std::endl;
-
     auto k = std::make_unique<kernels::CpuVectorizeKernel>();
     k->configure(input, segment, output);
     _kernel = std::move(k);
