@@ -179,6 +179,7 @@ std::vector<NodeID> dfs(Graph &g)
             if (!visited[e->consumer_id()] && detail::all_inputs_are_visited(e->consumer(), visited))
             {
                 stack.push(e->consumer_id());
+                std::cout << "     consumer_id: " << e->consumer_id() <<std::endl;
             }
         }
     }
