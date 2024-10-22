@@ -95,7 +95,7 @@ void GraphManager::finalize_graph(Graph &graph, GraphContext &ctx, PassManager &
 
     std::cout << "switching/src/graph/GraphManager.cpp configure_all_tensors start:" << std::endl;
     // Configure all tensors
-    detail::configure_all_tensors(graph);
+    //detail::configure_all_tensors(graph);
     std::cout << "switching/src/graph/GraphManager.cpp configure_all_tensors end:" << std::endl;
 
     // Apply backend mutating passes
