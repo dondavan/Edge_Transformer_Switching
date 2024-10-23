@@ -191,9 +191,6 @@ void GraphManager::execute_graph(Graph &graph)
 
         std::cout << "switching/src/graph/GraphManager.cpp call_all_output_node_accessors start:" << std::endl;
 
-#ifdef MEASURE_TIME
-        auto output_start_time = std::chrono::high_resolution_clock::now();
-#endif
         // Call output accessors
         if(!detail::call_all_output_node_accessors(it->second))
         {
