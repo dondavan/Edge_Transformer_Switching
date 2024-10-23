@@ -178,19 +178,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         query_cl->map(CLScheduler::get().queue());
     }
 
-    if(key->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        ITensor *key_nc = const_cast<ITensor *>(key);
-        key_cl          = static_cast<ICLTensor *>(key_nc);
-        key_cl->map(CLScheduler::get().queue(),false);
-    }
-
-    if(value->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        ITensor *value_nc = const_cast<ITensor *>(value);
-        value_cl          = static_cast<ICLTensor *>(value_nc);
-        value_cl->map(CLScheduler::get().queue(),false);
-    }
 
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
     {
@@ -199,8 +186,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     }
 
     std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout<< "key: "<< *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout<< "value: "<< *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
 
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
