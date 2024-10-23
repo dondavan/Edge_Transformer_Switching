@@ -182,6 +182,7 @@ std::vector<NodeID> dfs(Graph &g)
             ARM_COMPUTE_ERROR_ON(e == nullptr);
             if (!visited[e->consumer_id()] && detail::all_inputs_are_visited(e->consumer(), visited))
             {
+                // visited[e->consumer_id()] = true; was added
                 visited[e->consumer_id()] = true;
                 stack.push(e->consumer_id());
                 std::cout << "     consumer_id: " << e->consumer_id() <<std::endl;
