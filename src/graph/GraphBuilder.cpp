@@ -1209,8 +1209,8 @@ NodeID GraphBuilder::add_scale_dot_production_node(Graph &g, NodeParams params, 
         sdp_nid = g.add_node<ScaleDotProductionAttentionNode>(params.target, sdpa_info);
 
         g.add_connection(params.target, input.node_id, 0 /*query*/, sdp_nid, 0);
-        g.add_connection(params.target, input.node_id, 1 /*key*/, sdp_nid, 1);
-        g.add_connection(params.target, input.node_id, 2 /*value*/, sdp_nid, 2);
+        g.add_connection(params.target, input.node_id, 0 /*key*/, sdp_nid, 1);
+        g.add_connection(params.target, input.node_id, 0 /*value*/, sdp_nid, 2);
     }else
     {
         sdp_nid = g.add_node<ScaleDotProductionAttentionNode>(sdpa_info);
