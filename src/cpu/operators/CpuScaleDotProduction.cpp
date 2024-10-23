@@ -167,19 +167,47 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     ICLTensor *key_cl;
     ICLTensor *value_cl;
     ICLTensor *output_cl;
-
-    ITensor * query_cp = tensors.get_tensor(ACL_DST);
-
+    
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    query_cp->copy_from(*query);
+    if(query->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *query_nc = const_cast<ITensor *>(query);
+        query_cl          = static_cast<ICLTensor *>(query_nc);
+        query_cl->map(CLScheduler::get().queue());
+    }
+
+    if(key->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *key_nc = const_cast<ITensor *>(key);
+        key_cl          = static_cast<ICLTensor *>(key_nc);
+        key_cl->map(CLScheduler::get().queue(),false);
+    }
+
+    if(value->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *value_nc = const_cast<ITensor *>(value);
+        value_cl          = static_cast<ICLTensor *>(value_nc);
+        value_cl->map(CLScheduler::get().queue(),false);
+    }
+
+    if(output->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        output_cl          = static_cast<ICLTensor *>(output);
+        output_cl->map(CLScheduler::get().queue(),false);
+    }
+
+    std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+    std::cout<< "key: "<< *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+    std::cout<< "value: "<< *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
     std::ofstream measure_out("measure_output.txt",std::ios::app);
     measure_out.precision(5);
-    measure_out << std::scientific << "cp cost: " << cost_time << std::endl;
+    measure_out << std::scientific << "mapping cost: " << cost_time << std::endl;
 #endif
 
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
