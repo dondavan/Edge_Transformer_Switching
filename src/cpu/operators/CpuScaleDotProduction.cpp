@@ -189,7 +189,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *value_nc = const_cast<ITensor *>(value);
         value_cl          = static_cast<ICLTensor *>(value_nc);
-        value_cl->map(CLScheduler::get().queue(),false);
+        value_cl->map(CLScheduler::get().queue(),true);
     }
 
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
