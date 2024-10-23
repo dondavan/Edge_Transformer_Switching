@@ -168,6 +168,9 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     ICLTensor *value_cl;
     ICLTensor *output_cl;
 
+#ifdef MEASURE_TIME
+    auto start_time = std::chrono::high_resolution_clock::now();
+#endif
     if(query->info()->tensor_target_type() == TensorTargetType::CL)
     {
         ITensor *query_nc = const_cast<ITensor *>(query);
@@ -195,6 +198,13 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         output_cl->map(CLScheduler::get().queue());
     }
 
+#ifdef MEASURE_TIME
+    auto   end_time  = std::chrono::high_resolution_clock::now();
+    double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+    std::ofstream measure_out("measure_output.txt",std::ios::app);
+    measure_out.precision(5);
+    measure_out << std::scientific << "mapping cost: " << cost_time << std::endl;
+#endif
 
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CpuAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
