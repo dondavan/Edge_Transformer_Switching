@@ -185,7 +185,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         output_cl->map(CLScheduler::get().queue(),false);
     }
 
-    std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
 
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
