@@ -142,16 +142,6 @@ EdgeID Graph::add_connection(Target assigned_target, NodeID source, size_t sourc
         return sink_node_edge->id();
     }
 
-    // Check for duplicate connections (Source node)
-    std::set<EdgeID> source_node_edges = source_node->output_edges();
-    for(EdgeID source_output_edge : source_node_edges)
-    {
-        if (_edges[source_output_edge].get()->consumer_id()==sink)
-        {
-            return sink_node_edge->id();
-        }
-    }
-
     // Check if there is already a tensor associated with output if not create one
     TensorID tid = source_node->output_id(source_idx);
     if (tid == NullTensorID)
