@@ -175,7 +175,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *query_nc = const_cast<ITensor *>(query);
         query_cl          = static_cast<ICLTensor *>(query_nc);
-        query_cl->map(CLScheduler::get().queue(),false);
+        query_cl->map(CLScheduler::get().queue(),true);
     }
 
     if(key->info()->tensor_target_type() == TensorTargetType::CL)
