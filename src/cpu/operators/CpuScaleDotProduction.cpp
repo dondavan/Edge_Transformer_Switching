@@ -185,17 +185,17 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         key_cl->map(CLScheduler::get().queue(),false);
     }
 
+    if(output->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        output_cl          = static_cast<ICLTensor *>(output);
+        output_cl->map(CLScheduler::get().queue(),false);
+    }
+    
     if(value->info()->tensor_target_type() == TensorTargetType::CL)
     {
         ITensor *value_nc = const_cast<ITensor *>(value);
         value_cl          = static_cast<ICLTensor *>(value_nc);
         value_cl->map(CLScheduler::get().queue(),true);
-    }
-
-    if(output->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        output_cl          = static_cast<ICLTensor *>(output);
-        output_cl->map(CLScheduler::get().queue(),false);
     }
 
 #ifdef MEASURE_TIME
