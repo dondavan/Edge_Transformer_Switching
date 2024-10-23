@@ -177,10 +177,12 @@ std::vector<NodeID> dfs(Graph &g)
         for (const auto &eid : arm_compute::utils::iterable::reverse_iterate(node->output_edges()))
         {
             std::cout << "    output eid"<<eid<<std::endl;
+
             const Edge *e = g.edge(eid);
             ARM_COMPUTE_ERROR_ON(e == nullptr);
             if (!visited[e->consumer_id()] && detail::all_inputs_are_visited(e->consumer(), visited))
             {
+                visited[e->consumer_id()] = true;
                 stack.push(e->consumer_id());
                 std::cout << "     consumer_id: " << e->consumer_id() <<std::endl;
             }
