@@ -168,9 +168,9 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     ICLTensor *value_cl;
     ICLTensor *output_cl;
 
-    ITensor *query_cp;
-    ITensor *key_cp;
-    ITensor *value_cp;
+    ITensor *query_cp = nullptr;
+    ITensor *key_cp = nullptr;
+    ITensor *value_cp = nullptr;
 
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
