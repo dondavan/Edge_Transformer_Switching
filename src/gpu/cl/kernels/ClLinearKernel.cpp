@@ -108,9 +108,9 @@ void ClLinearKernel::run_op(ITensorPack &tensors, const Window &window, cl::Comm
     ICLTensor *dst = utils::cast::polymorphic_downcast<ICLTensor *>(tensors.get_tensor(TensorType::ACL_DST));
     ARM_COMPUTE_ERROR_ON_NULLPTR(lhs, rhs, dst);
 
+ /*
     ICLTensor * lhs_nc = const_cast<ICLTensor *>(lhs);
     lhs_nc->map(queue);
-    /*
     ICLTensor * rhs_nc = const_cast<ICLTensor *>(rhs);
     rhs_nc->map(queue);
     ICLTensor * bias_nc = const_cast<ICLTensor *>(bias);
