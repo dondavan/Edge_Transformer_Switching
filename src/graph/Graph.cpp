@@ -133,13 +133,23 @@ EdgeID Graph::add_connection(Target assigned_target, NodeID source, size_t sourc
     std::unique_ptr<INode> &source_node = _nodes[source];
     std::unique_ptr<INode> &sink_node   = _nodes[sink];
 
-    // Check for duplicate connections (Check only sink node)
+    // Check for duplicate connections (Check sink node)
     Edge *sink_node_edge = sink_node->input_edge(sink_idx);
     if ((sink_node_edge != nullptr) && (sink_node_edge->producer_id() == source) &&
         (sink_node_edge->producer_idx() == source_idx) && (sink_node_edge->consumer_id() == sink) &&
         (sink_node_edge->consumer_idx() == sink_idx))
     {
         return sink_node_edge->id();
+    }
+
+    // Check for duplicate connections (Source node)
+    std::set<EdgeID> source_node_edges = source_node->output_edges();
+    for(EdgeID source_output_edge : source_node_edges)
+    {
+        if (_edges[source_output_edge].get()->consumer_id()==sink)
+        {
+            return sink_node_edge->id();
+        }
     }
 
     // Check if there is already a tensor associated with output if not create one
