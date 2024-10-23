@@ -168,16 +168,12 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     ICLTensor *value_cl;
     ICLTensor *output_cl;
 
-    ITensor * query_cp = new arm_compute::Tensor;
-    ITensor * key_cp = new arm_compute::Tensor;
-    ITensor * value_cp = new arm_compute::Tensor;
+    ITensor * query_cp = tensors.get_tensor(ACL_DST);
 
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
     query_cp->copy_from(*query);
-    key_cp->copy_from(*query);
-    value_cp->copy_from(*query);
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
