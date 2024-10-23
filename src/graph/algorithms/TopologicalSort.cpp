@@ -141,7 +141,6 @@ std::vector<NodeID> dfs(Graph &g)
         {
             visited[input] = true;
             stack.push(input);
-            std::cout << "node id: " << input << std::endl;
         }
     }
 
@@ -152,7 +151,6 @@ std::vector<NodeID> dfs(Graph &g)
         {
             visited[const_node] = true;
             stack.push(const_node);
-            std::cout << "node id: " << const_node << std::endl;
         }
     }
 
@@ -162,7 +160,6 @@ std::vector<NodeID> dfs(Graph &g)
         // Pop a node from stack and process
         NodeID n = stack.top();
         dfs_order_vector.push_back(n);
-        std::cout << "node id: " << n << std::endl;
         stack.pop();
 
         // Mark node as visited
@@ -176,8 +173,6 @@ std::vector<NodeID> dfs(Graph &g)
         // Reverse iterate to push branches from right to left and pop on the opposite order
         for (const auto &eid : arm_compute::utils::iterable::reverse_iterate(node->output_edges()))
         {
-            std::cout << "    output eid"<<eid<<std::endl;
-
             const Edge *e = g.edge(eid);
             ARM_COMPUTE_ERROR_ON(e == nullptr);
             if (!visited[e->consumer_id()] && detail::all_inputs_are_visited(e->consumer(), visited))
@@ -185,7 +180,6 @@ std::vector<NodeID> dfs(Graph &g)
                 // visited[e->consumer_id()] = true; was added
                 visited[e->consumer_id()] = true;
                 stack.push(e->consumer_id());
-                std::cout << "     consumer_id: " << e->consumer_id() <<std::endl;
             }
         }
     }
