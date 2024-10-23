@@ -182,20 +182,20 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *key_nc = const_cast<ITensor *>(key);
         key_cl          = static_cast<ICLTensor *>(key_nc);
-        key_cl->map(CLScheduler::get().queue());
+        key_cl->map(CLScheduler::get().queue(),false);
     }
 
     if(value->info()->tensor_target_type() == TensorTargetType::CL)
     {
         ITensor *value_nc = const_cast<ITensor *>(value);
         value_cl          = static_cast<ICLTensor *>(value_nc);
-        value_cl->map(CLScheduler::get().queue());
+        value_cl->map(CLScheduler::get().queue(),false);
     }
 
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
     {
         output_cl          = static_cast<ICLTensor *>(output);
-        output_cl->map(CLScheduler::get().queue());
+        output_cl->map(CLScheduler::get().queue(),false);
     }
 
     std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
