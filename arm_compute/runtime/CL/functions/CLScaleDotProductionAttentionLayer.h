@@ -14,6 +14,8 @@ namespace arm_compute
 class CLCompileContext;
 class ICLTensor;
 class ICLTensorInfo;
+class ITensor;
+class ITensorInfo;
 
 class CLScaleDotProductionAttentionLayer : public IFunction
 {
