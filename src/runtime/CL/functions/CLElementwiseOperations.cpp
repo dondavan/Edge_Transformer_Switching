@@ -112,12 +112,12 @@ void CLArithmeticAddition::run()
     pack.add_tensor(TensorType::ACL_SRC_1, _impl->src_1);
     pack.add_tensor(TensorType::ACL_DST, _impl->dst);
 
+    _impl->op->run(pack);
+
 
     std::cout<< "src_0_cl after: "<< *reinterpret_cast<float *>(src_0_cl->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "src_1_cl after: "<< *reinterpret_cast<float *>(src_1_cl->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "dst_cl after: "<< *reinterpret_cast<float *>(dst_cl->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-
-    _impl->op->run(pack);
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
