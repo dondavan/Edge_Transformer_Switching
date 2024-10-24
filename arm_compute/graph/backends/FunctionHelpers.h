@@ -822,7 +822,7 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
         element_wise_recurrence.input1 = input1;
     }
 
-    std::cout << "node.recurrence() "<< node.recurrence() << std::endl
+    std::cout << "node.recurrence() "<< node.recurrence() << std::endl;
 
     std::cout << "element_wise input1 id: " << element_wise_recurrence.input1->info()->id() << std::endl;
 
