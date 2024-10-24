@@ -2134,48 +2134,49 @@ class LinearLayerInfo final
 /** Layer Normalization Layer Information Class */
 class LayerNormLayerInfo final
 {
-public:
+    public:
     /** Constructor
      * 
      * @param[in] axis      Axix to perform normalization along
      * @param[in] epsilon   Lower bound value for the normalization
      */
-    LayerNormLayerInfo(int axis = 0/*Window::DimX*/,
+    LayerNormLayerInfo(int   axis    = 0 /*Window::DimX*/,
                        float epsilon = 1e-5,
-                       float gamma = 1.0,
-                       float beta = 0): _axis(axis),
-                                        _epsilon(epsilon),
-                                        _gamma(gamma),
-                                        _beta(beta)
+                       float gamma   = 1.0,
+                       float beta    = 0)
+        : _axis(axis),
+          _epsilon(epsilon),
+          _gamma(gamma),
+          _beta(beta)
     {
     }
 
     /** Get normalization axis */
     int axis() const
     {
-        return  _axis;
+        return _axis;
     }
 
     /** Get epsilon */
     float epsilon() const
     {
-        return  _epsilon;
+        return _epsilon;
     }
-    
+
     /** Get gamma */
     float gamma() const
     {
-        return  _gamma;
+        return _gamma;
     }
 
     /** Get beta */
     float beta() const
     {
-        return  _beta;
+        return _beta;
     }
 
-private:
-    int _axis; 
+    private:
+    int   _axis;
     float _epsilon;
     float _gamma;
     float _beta;
@@ -2184,13 +2185,14 @@ private:
 /** Multi Head Attention Layer Information Class */
 class MultiHeadAttentionLayerInfo final
 {
-public:
+    public:
     /** Constructor
      *
      * @param[in] d_model   Model dimesion
      * @param[in] h         Parallel attention dimesion
      */
-    MultiHeadAttentionLayerInfo(unsigned int d_model = 512, unsigned int h = 8) : _d_model(d_model), _h(h)
+    MultiHeadAttentionLayerInfo(unsigned int d_model = 512, unsigned int h = 8)
+        : _d_model(d_model), _h(h)
     {
     }
 
@@ -2206,7 +2208,7 @@ public:
         return _h;
     }
 
-private:
+    private:
     unsigned int _d_model;
     unsigned int _h;
 };
@@ -2214,14 +2216,15 @@ private:
 /** Scale Dot Production Attention Layer Information Class*/
 class ScaleDotProductionLayerInfo final
 {
-public:
+    public:
     /** Constructor
      *
      * @param[in] d_model   Model dimesion
      * @param[in] h         Parallel attention dimesion
      */
-    ScaleDotProductionLayerInfo(unsigned int d_model = 512, unsigned int h = 8) : _d_model(d_model), 
-                                                                                           _h(h)
+    ScaleDotProductionLayerInfo(unsigned int d_model = 512, unsigned int h = 8)
+        : _d_model(d_model),
+          _h(h)
     {
     }
 
@@ -2229,11 +2232,11 @@ public:
      *
      * @param[in] mha_info   MultiHeadAttentionLayerInfo
      */
-    ScaleDotProductionLayerInfo(MultiHeadAttentionLayerInfo mha_info) : _d_model(mha_info.d_model()),
-                                                                                        _h(mha_info.h())
+    ScaleDotProductionLayerInfo(MultiHeadAttentionLayerInfo mha_info)
+        : _d_model(mha_info.d_model()),
+          _h(mha_info.h())
     {
     }
-    
 
     /* Get Model dimesion */
     unsigned int d_model() const
@@ -2247,10 +2250,18 @@ public:
         return _h;
     }
 
-private:
+    private:
     unsigned int _d_model;
     unsigned int _h;
 };
-
+/**< Tensor target types */
+enum class TensorTargetType
+{
+    UNSPECIFIED,
+    NEON,
+    CL,
+    CLVK,
+    SWITCH,
+};
 } // namespace arm_compute
 #endif // ACL_ARM_COMPUTE_CORE_TYPES_H
