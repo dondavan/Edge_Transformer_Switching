@@ -56,7 +56,7 @@ void NEScaleDotProductionAttentionLayer::configure(ITensor *query,
     std::cout << "NEScaleDotProductionAttentionLayer::configure recurrence count: " << recurrence_count << std::endl;
     /* Scale dot production of key and query */
     _impl->scale_dot_production_op  = std::make_unique<cpu::CpuScaleDotProduction>();
-    _impl->scale_dot_production_op->configure(query->info(),key->info(),value->info(),output->info(),info);
+    _impl->scale_dot_production_op->configure(query->info(),key->info(),value->info(),output->info(),info,recurrence_count);
     _impl->scale_dot_pack = {{ACL_SRC_0, query}, {ACL_SRC_1, key}, {ACL_SRC_2, value}, {ACL_DST, output}};
 
 #ifdef MEASURE_TIME
