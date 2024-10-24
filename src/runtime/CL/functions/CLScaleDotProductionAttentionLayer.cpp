@@ -27,8 +27,17 @@ struct CLScaleDotProductionAttentionLayer::Impl
     bool is_prepared{ false };
 };
 
+struct CLScaleDotProductionAttentionLayer::Recurrence
+{
+    unsigned int recurrence_count{0};
+    ITensor     *query{nullptr};
+    ITensor     *key{nullptr};
+    ITensor     *value{nullptr};
+    ITensor     *output{nullptr};
+};
+
 CLScaleDotProductionAttentionLayer::CLScaleDotProductionAttentionLayer()
-    : _impl(std::make_unique<Impl>())
+    : _impl(std::make_unique<Impl>()),_recurrence(std::make_unique<Recurrence>())
 {
 }
 

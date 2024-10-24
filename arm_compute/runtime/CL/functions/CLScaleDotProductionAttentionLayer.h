@@ -65,7 +65,9 @@ class CLScaleDotProductionAttentionLayer : public IFunction
 
     private:
     struct Impl;
+    struct Recurrence;
     std::unique_ptr<Impl> _impl;
+    std::unique_ptr<Recurrence> _recurrence;
 };
 } // namespace arm_compute
 

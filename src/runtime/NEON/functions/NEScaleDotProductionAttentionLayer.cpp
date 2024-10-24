@@ -27,8 +27,17 @@ struct NEScaleDotProductionAttentionLayer::Impl
     bool is_prepared{false};
 };
 
+struct NEScaleDotProductionAttentionLayer::Recurrence
+{
+    unsigned int recurrence_count{0};
+    ITensor     *query{nullptr};
+    ITensor     *key{nullptr};
+    ITensor     *value{nullptr};
+    ITensor     *output{nullptr};
+};
+
 NEScaleDotProductionAttentionLayer::NEScaleDotProductionAttentionLayer()
-    : _impl(std::make_unique<Impl>())
+    : _impl(std::make_unique<Impl>()), _recurrence(std::make_unique<Recurrence>())
 {
 }
 
