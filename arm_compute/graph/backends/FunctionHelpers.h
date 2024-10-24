@@ -1850,6 +1850,16 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
     return func;
 }
 
+
+static struct recurrence_object
+{
+    unsigned int recurrence_count = 0;
+    ITensor     *query_output            = nullptr;
+    ITensor     *key_output              = nullptr;
+    ITensor     *value_output            = nullptr;
+} attention_linear_recurrence;
+
+
 /** Creates a backend attention linear function
  *
  * @tparam AttentionLinearLayerFunction  Backend attention linear function
@@ -1880,12 +1890,19 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     ITensor              *value_output = get_backing_tensor_from_TensorType<ITensor>(node.output(2));
     const LinearLayerInfo linear_info  = node.linear_info();
 
+    if(attention_linear_recurrence.recurrence_count == 0)
+    {
+        attention_linear_recurrence.query_output = query_output;
+        attention_linear_recurrence.key_output = key_output;
+        attention_linear_recurrence.value_output = value_output;
+    }
+
     // Create and configure function
     auto func = std::make_unique<AttentionLinearLayerFunction>();
     func->configure(query_input, query_w, query_b,
                     key_input, key_w, key_b,
                     value_input, value_w, value_b,
-                    query_output, key_output, value_output,
+                    attention_linear_recurrence.query_output, attention_linear_recurrence.key_output, attention_linear_recurrence.value_output,
                     linear_info);
 
     // Log info
@@ -1893,6 +1910,8 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
                                                << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
                                                << " Input shape: " << input->info()->tensor_shape()
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
+
+    attention_linear_recurrence.recurrence_count++;
 
     return func;
 }
