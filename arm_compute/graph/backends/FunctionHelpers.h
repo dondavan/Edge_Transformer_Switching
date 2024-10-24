@@ -822,10 +822,6 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
         element_wise_recurrence.input1 = input1;
     }
 
-    if(node.recurrence() == 0)
-    {
-        element_wise_recurrence.input1 = input1;
-    }
 
     std::cout << "node.recurrence() "<< node.recurrence() << std::endl;
 
@@ -836,8 +832,15 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
     std::string                func_name;
     if(eltwise_op == EltwiseOperation::Add)
     {
-        std::tie(func, func_name) = create_named_function<typename EltwiseFunctions::Addition>(
-            std::string("ArithmeticAddition"), element_wise_recurrence.input1, input2, output, convert_policy, act_info);
+        if(node.recurrence() == 0)
+        {
+            std::tie(func, func_name) = create_named_function<typename EltwiseFunctions::Addition>(
+                std::string("ArithmeticAddition"), input1, input2, output, convert_policy, act_info);
+        }else
+        {
+            std::tie(func, func_name) = create_named_function<typename EltwiseFunctions::Addition>(
+                std::string("ArithmeticAddition"), element_wise_recurrence.input1, input2, output, convert_policy, act_info);
+        }
     }
     else if(eltwise_op == EltwiseOperation::Sub)
     {
