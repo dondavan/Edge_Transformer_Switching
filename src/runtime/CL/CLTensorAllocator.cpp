@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include<stdio>
 #include "arm_compute/runtime/CL/CLTensorAllocator.h"
 
 #include "arm_compute/core/Error.h"
@@ -48,16 +49,19 @@ std::unique_ptr<ICLMemoryRegion> allocate_region(size_t size, cl_uint alignment)
     // Try fine-grain SVM
     std::unique_ptr<ICLMemoryRegion> region =
         std::make_unique<CLFineSVMMemoryRegion>(CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size, alignment);
+    region != nullptr? std::cout << "fine-grain SVM" << std::end : std::cout << "ahhh" << std::endl;
 
     // Try coarse-grain SVM in case of failure
     if (region != nullptr && region->ptr() == nullptr)
     {
         region = std::make_unique<CLCoarseSVMMemoryRegion>(CL_MEM_READ_WRITE, size, alignment);
+        region != nullptr? std::cout << "Coarse SVM" << std::end : std::cout << "ahhh" << std::endl;
     }
     // Try legacy buffer memory in case of failure
     if (region != nullptr && region->ptr() == nullptr)
     {
         region = std::make_unique<CLBufferMemoryRegion>(CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE, size);
+        region != nullptr? std::cout << "Buffer" << std::end : std::cout << "ahhh" << std::endl;
     }
     return region;
 }
