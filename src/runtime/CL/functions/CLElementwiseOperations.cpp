@@ -34,7 +34,7 @@
 #include "src/gpu/cl/operators/ClSub.h"
 
 
-#include "arm_compute/runtime/CL/CLScheduler.h"v
+#include "arm_compute/runtime/CL/CLScheduler.h"
 
 #ifdef MEASURE_TIME
 #include <chrono>
