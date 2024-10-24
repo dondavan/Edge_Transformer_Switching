@@ -167,7 +167,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     ICLTensor *key_cl;
     ICLTensor *value_cl;
     ICLTensor *output_cl;
-    
+
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
@@ -175,7 +175,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *query_nc = const_cast<ITensor *>(query);
         query_cl          = static_cast<ICLTensor *>(query_nc);
-        query_cl->map(CLScheduler::get().queue());
+        query_cl->map(CLScheduler::get().queue(),false);
     }
 
     if(key->info()->tensor_target_type() == TensorTargetType::CL)
