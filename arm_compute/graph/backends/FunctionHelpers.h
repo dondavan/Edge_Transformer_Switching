@@ -1897,6 +1897,11 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
         attention_linear_recurrence.value_output = value_output;
     }
 
+
+    std::cout << "query_output id: " << attention_linear_recurrence.query_output->info()->id() << std::endl;
+    std::cout << "key_output id: " << attention_linear_recurrence.key_output->info()->id() << std::endl;
+    std::cout << "value_output id: " <<attention_linear_recurrence.value_output->info()->id() << std::endl;
+
     // Create and configure function
     auto func = std::make_unique<AttentionLinearLayerFunction>();
     func->configure(query_input, query_w, query_b,
@@ -1904,6 +1909,7 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
                     value_input, value_w, value_b,
                     attention_linear_recurrence.query_output, attention_linear_recurrence.key_output, attention_linear_recurrence.value_output,
                     linear_info);
+                    
 
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
