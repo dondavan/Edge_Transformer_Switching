@@ -1851,7 +1851,7 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
 }
 
 
- struct recurrence_attention_linear
+static struct recurrence_attention_linear
 {
     unsigned int recurrence_count = 0;
     ITensor     *query_output            = nullptr;
