@@ -41,6 +41,7 @@ namespace graph
 {
 namespace backends
 {
+
 /** Target specific information structure used to pass information to the layer templates */
 struct NETargetInfo
 {
