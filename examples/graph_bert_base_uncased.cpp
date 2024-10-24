@@ -155,7 +155,7 @@ class GraphVanillaTransformerExample : public Example
     void add_encoder_block(std::string data_path, std::string layer_path,
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff, ScaleDotProductionLayerInfo &sdpa_info)
     {
-        ARM_COMPUTE_UNUSED(h);
+        ARM_COMPUTE_UNUSED(h,d_ff);
         SubStream without_attention(graph);
         SubStream with_attention(graph);
 
