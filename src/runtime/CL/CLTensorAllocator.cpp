@@ -62,7 +62,6 @@ std::unique_ptr<ICLMemoryRegion> allocate_region(size_t size, cl_uint alignment)
     if (region != nullptr && region->ptr() == nullptr)
     {
         region = std::make_unique<CLBufferMemoryRegion>(CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE, size);
-        if(region != nullptr) std::cout << "Buffer ahhhhh" << std::endl;
     }
     return region;
 }

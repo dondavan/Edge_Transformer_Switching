@@ -150,6 +150,8 @@ void *CLCoarseSVMMemoryRegion::map(cl::CommandQueue &q, bool blocking)
     ARM_COMPUTE_ERROR_ON(_ptr == nullptr);
     clEnqueueSVMMap(q.get(), blocking ? CL_TRUE : CL_FALSE, CL_MAP_READ | CL_MAP_WRITE, _ptr, _size, 0, nullptr,
                     nullptr);
+    
+    std::cout << "CLCoarseSVMMemoryRegion::map" << std::endl;
     _mapping = _ptr;
     return _mapping;
 }
@@ -172,6 +174,7 @@ void *CLFineSVMMemoryRegion::map(cl::CommandQueue &q, bool blocking)
     {
         clFinish(q.get());
     }
+    std::cout << "CLFineSVMMemoryRegion::map" << std::endl;
     _mapping = _ptr;
     return _mapping;
 }
