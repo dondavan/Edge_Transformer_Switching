@@ -785,6 +785,12 @@ std::unique_ptr<IFunction> create_detection_post_process_layer(DetectionPostProc
     return func;
 }
 
+static struct recurrence_element_wise
+{
+    unsigned int recurrence_count = 0;
+    ITensor     *input1            = nullptr;
+} element_wise_recurrence;
+
 /** Create a backend element-wise operation layer function
  *
  * @tparam EltwiseFunctions Backend element-wise function
@@ -810,12 +816,21 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
     ARM_COMPUTE_ERROR_ON(input2 == nullptr);
     ARM_COMPUTE_ERROR_ON(output == nullptr);
 
+    if(element_wise_recurrence.recurrence_count == 0)
+    {
+        element_wise_recurrence.input1 = input1;
+    }
+
+
+    std::cout << "element_wise input1 id: " << element_wise_recurrence.input1->info()->id() << std::endl;
+
+
     std::unique_ptr<IFunction> func = nullptr;
     std::string                func_name;
     if(eltwise_op == EltwiseOperation::Add)
     {
         std::tie(func, func_name) = create_named_function<typename EltwiseFunctions::Addition>(
-            std::string("ArithmeticAddition"), input1, input2, output, convert_policy, act_info);
+            std::string("ArithmeticAddition"), element_wise_recurrence.input1, input2, output, convert_policy, act_info);
     }
     else if(eltwise_op == EltwiseOperation::Sub)
     {
@@ -849,6 +864,7 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
                                                << " Data Type: " << input1->info()->data_type()
                                                << " Shape: " << input1->info()->tensor_shape() << std::endl);
 
+    element_wise_recurrence.recurrence_count++;
     return func;
 }
 
