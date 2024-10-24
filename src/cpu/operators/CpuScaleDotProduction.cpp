@@ -163,6 +163,11 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     auto value  = tensors.get_tensor(ACL_SRC_2);
     auto output = tensors.get_tensor(ACL_DST);
 
+    std::cout << "query id: " << query->info()->id() << std::endl;
+    std::cout << "key id: " << key->info()->id() << std::endl;
+    std::cout << "value id: " << value->info()->id() << std::endl;
+    std::cout << "output id: " << output->info()->id() << std::endl;
+
     ICLTensor *query_cl;
     ICLTensor *key_cl;
     ICLTensor *value_cl;
@@ -176,6 +181,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         ITensor *query_nc = const_cast<ITensor *>(query);
         query_cl          = static_cast<ICLTensor *>(query_nc);
         query_cl->map(CLScheduler::get().queue());
+
+    std::cout << "CL_query id: " << query->info()->id() << std::endl;
     }
 
     if(key->info()->tensor_target_type() == TensorTargetType::CL)
@@ -183,6 +190,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         ITensor *key_nc = const_cast<ITensor *>(key);
         key_cl          = static_cast<ICLTensor *>(key_nc);
         key_cl->map(CLScheduler::get().queue());
+    std::cout << "CL_key id: " << key->info()->id() << std::endl;
     }
 
     if(value->info()->tensor_target_type() == TensorTargetType::CL)
@@ -190,13 +198,17 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         ITensor *value_nc = const_cast<ITensor *>(value);
         value_cl          = static_cast<ICLTensor *>(value_nc);
         value_cl->map(CLScheduler::get().queue());
+    std::cout << "CL_value id: " << value->info()->id() << std::endl;
     }
 
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
     {
         output_cl          = static_cast<ICLTensor *>(output);
         output_cl->map(CLScheduler::get().queue());
+
+    std::cout << "CL_output id: " << output->info()->id() << std::endl;
     }
+    
 
     std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "key: "<< *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
