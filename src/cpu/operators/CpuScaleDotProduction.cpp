@@ -215,10 +215,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         std::cout << "CL_output id: " << output->info()->id() << std::endl;
         }
     }
-    
-    *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) = _recurrence_count;
-    *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) = _recurrence_count;
-    *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) = _recurrence_count;
+
     std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "key: "<< *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "value: "<< *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
@@ -413,6 +410,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 
     ITensorPack concat_reshape_pack{{ACL_SRC_0, permuted_concat.get()},{ACL_DST, output}};
     NEScheduler::get().schedule_op(_concat_reshape_kernel.get(), Window::DimY, _concat_reshape_kernel->window(), concat_reshape_pack);
+
+    std::cout<< "output: "<< *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     //const auto concat_split_dimension = _concat_reshape_kernel->get_split_dimension();
 /*
 #ifdef MEASURE_TIME
