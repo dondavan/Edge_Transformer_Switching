@@ -215,9 +215,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         }
     }
     
-    *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) = _recurrence_count;
-    *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) = _recurrence_count;
-    *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) = _recurrence_count;
     std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "key: "<< *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "value: "<< *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
