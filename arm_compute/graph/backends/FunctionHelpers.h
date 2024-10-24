@@ -1975,7 +1975,7 @@ std::unique_ptr<IFunction> create_scale_dot_production_layer(ScaleDotProductionA
 
     std::cout << "query id: " << sdpa_recurrence.query->info()->id() << std::endl;
     std::cout << "key id: " << sdpa_recurrence.key->info()->id() << std::endl;
-    std::cout << "value id: " <<sdpa_recurrence.alue->info()->id() << std::endl;
+    std::cout << "value id: " <<sdpa_recurrence.value->info()->id() << std::endl;
     std::cout << "output id: " << sdpa_recurrence.output->info()->id() << std::endl;
 
     // Create and configure function
