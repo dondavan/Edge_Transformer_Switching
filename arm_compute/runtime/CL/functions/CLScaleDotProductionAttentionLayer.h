@@ -34,9 +34,9 @@ class CLScaleDotProductionAttentionLayer : public IFunction
      * @param[in]  value      Input tenser of Attention Value, Data type supported: F32
      * @param[out] output     Output tensor, shape (d_model,d_model). Data type supported: F32
      */
-    void configure(const ITensor                            *query,
-                   const ITensor                            *key,
-                   const ITensor                            *value,
+    void configure(ITensor                            *query,
+                   ITensor                            *key,
+                   ITensor                            *value,
                    ITensor                                  *output,
                    const ScaleDotProductionLayerInfo &info,
                    int recurrence_count);
@@ -48,9 +48,9 @@ class CLScaleDotProductionAttentionLayer : public IFunction
      * @param[out] output     Output tensor, shape (d_model,d_model). Data type supported: F32
      */
     void configure(const CLCompileContext                     &compile_context,
-                   const ITensor                            *query,
-                   const ITensor                            *key,
-                   const ITensor                            *value,
+                   ITensor                            *query,
+                   ITensor                            *key,
+                   ITensor                            *value,
                    ITensor                                  *output,
                    const ScaleDotProductionLayerInfo &info,
                    int recurrence_count);

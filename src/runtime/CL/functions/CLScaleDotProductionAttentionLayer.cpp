@@ -44,9 +44,9 @@ CLScaleDotProductionAttentionLayer::CLScaleDotProductionAttentionLayer()
 
 CLScaleDotProductionAttentionLayer::~CLScaleDotProductionAttentionLayer() = default;
 
-void CLScaleDotProductionAttentionLayer::configure(const ITensor                            *query,
-                                                   const ITensor                            *key,
-                                                   const ITensor                            *value,
+void CLScaleDotProductionAttentionLayer::configure(ITensor                            *query,
+                                                   ITensor                            *key,
+                                                   ITensor                            *value,
                                                    ITensor                                  *output,
                                                    const ScaleDotProductionLayerInfo &info,
                                                    int recurrence_count)
@@ -54,9 +54,9 @@ void CLScaleDotProductionAttentionLayer::configure(const ITensor                
     configure(CLKernelLibrary::get().get_compile_context(), query, key, value, output, info,recurrence_count);
 }
 void CLScaleDotProductionAttentionLayer::configure(const CLCompileContext                     &compile_context,
-                                                   const ITensor                            *query,
-                                                   const ITensor                            *key,
-                                                   const ITensor                            *value,
+                                                   ITensor                            *query,
+                                                   ITensor                            *key,
+                                                   ITensor                            *value,
                                                    ITensor                                  *output,
                                                    const ScaleDotProductionLayerInfo &info,
                                                    int recurrence_count)
