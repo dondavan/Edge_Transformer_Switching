@@ -59,6 +59,9 @@
 /** The following symbols have been moved to:
  * MatMulInfo
  */
+
+#include "arm_compute/function_info/ScaleDotProductionLayerInfo.h.h"
+
 #include "arm_compute/core/Coordinates.h"
 #include "arm_compute/core/Size2D.h"
 #include "arm_compute/core/Size3D.h"
@@ -2211,69 +2214,6 @@ class MultiHeadAttentionLayerInfo final
     private:
     unsigned int _d_model;
     unsigned int _h;
-};
-
-struct recurrence_object
-{
-    unsigned int recurrence_count;
-    ITensor     *query;
-    ITensor     *key;
-    ITensor     *value;
-    ITensor     *output;
-};
-
-/** Scale Dot Production Attention Layer Information Class*/
-class ScaleDotProductionLayerInfo final
-{
-    public:
-    /** Constructor
-     *
-     * @param[in] d_model   Model dimesion
-     * @param[in] h         Parallel attention dimesion
-     */
-    ScaleDotProductionLayerInfo(unsigned int d_model = 512, unsigned int h = 8)
-        : _d_model(d_model),
-          _h(h)
-
-    {
-        _sdpa_recurrence.recurrence_count = 0;
-        _sdpa_recurrence.query            = nullptr;
-        _sdpa_recurrence.key              = nullptr;
-        _sdpa_recurrence.value            = nullptr;
-        _sdpa_recurrence.output           = nullptr;
-    }
-
-    /** Constructor using Multi-head attention layer info
-     *
-     * @param[in] mha_info   MultiHeadAttentionLayerInfo
-     */
-    ScaleDotProductionLayerInfo(MultiHeadAttentionLayerInfo mha_info)
-        : _d_model(mha_info.d_model()),
-          _h(mha_info.h())
-    {
-    }
-
-    /* Get Model dimesion */
-    unsigned int d_model() const
-    {
-        return _d_model;
-    }
-
-    /* Get Parallel attention dimesion */
-    unsigned int h() const
-    {
-        return _h;
-    }
-
-    struct recurrence_object sdpa_recurrence()
-    {
-        return _sdpa_recurrence;
-    }
-
-    private:
-    unsigned int             _d_model;
-    unsigned int             _h;
-    struct recurrence_object _sdpa_recurrence;
 };
 
 /**< Tensor target types */
