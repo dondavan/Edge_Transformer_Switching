@@ -545,7 +545,7 @@ NodeID GraphBuilder::add_elementwise_node(
         g.add_connection(params.target, input1.node_id, input1.index, nid, 1);
     }else
     {
-        nid = g.add_node<EltwiseLayerNode>(descriptors::EltwiseLayerDescriptor{ operation });
+        nid = g.add_node<EltwiseLayerNode>(descriptors::EltwiseLayerDescriptor{ operation }, recurrence);
 
         g.add_connection(input0.node_id, input0.index, nid, 0);
         g.add_connection(input1.node_id, input1.index, nid, 1);
