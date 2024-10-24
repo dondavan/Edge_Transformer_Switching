@@ -97,15 +97,8 @@ void CLArithmeticAddition::run()
     ICLTensor * src_0_cl          = static_cast<ICLTensor *>(src_0_nc);
     src_0_cl->map(CLScheduler::get().queue());
 
-    ICLTensor * src_1_cl = const_cast<ICLTensor *>(_impl->src_1);
-    src_1_cl->map(CLScheduler::get().queue());
-
-    ICLTensor * dst_cl = const_cast<ICLTensor *>(_impl->dst);
-    dst_cl->map(CLScheduler::get().queue());
 
     std::cout<< "src_0_cl: "<< *reinterpret_cast<float *>(_impl->src_0->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout<< "src_1_cl: "<< *reinterpret_cast<float *>(_impl->src_1->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout<< "dst_cl: "<< *reinterpret_cast<float *>(_impl->dst->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
         
     ITensorPack pack;
     pack.add_tensor(TensorType::ACL_SRC_0, _impl->src_0);
@@ -116,8 +109,6 @@ void CLArithmeticAddition::run()
 
 
     std::cout<< "aftrer src_0_cl: "<< *reinterpret_cast<float *>(_impl->src_0->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout<< "aftrer src_1_cl: "<< *reinterpret_cast<float *>(_impl->src_1->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout<< "aftrer dst_cl: "<< *reinterpret_cast<float *>(_impl->dst->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
