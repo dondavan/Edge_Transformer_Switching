@@ -42,7 +42,7 @@ namespace arm_compute
 {
 struct CLArithmeticAddition::Impl
 {
-    ITensor               *src_0{ nullptr };
+    const ITensor               *src_0{ nullptr };
     const ICLTensor               *src_1{ nullptr };
     ICLTensor                     *dst{ nullptr };
     std::unique_ptr<opencl::ClAdd> op{ nullptr };
@@ -63,7 +63,7 @@ void CLArithmeticAddition::configure(
 }
 
 void CLArithmeticAddition::configure(const CLCompileContext    &compile_context,
-                                     ITensor           *input1,
+                                     const ITensor           *input1,
                                      const ICLTensor           *input2,
                                      ICLTensor                 *output,
                                      ConvertPolicy              policy,

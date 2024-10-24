@@ -114,7 +114,7 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   ITensor           *input1,
+                   const ITensor           *input1,
                    const ICLTensor           *input2,
                    ICLTensor                 *output,
                    ConvertPolicy              policy,
