@@ -1964,6 +1964,20 @@ std::unique_ptr<IFunction> create_scale_dot_production_layer(ScaleDotProductionA
     typename TargetInfo::TensorType *value  = get_backing_tensor<TargetInfo>(node.input(2));
     typename TargetInfo::TensorType *output = get_backing_tensor<TargetInfo>(node.output(0));
 
+    if(sdpa_recurrence.recurrence_count == 0)
+    {
+        sdpa_recurrence.query = query;
+        sdpa_recurrence.key = key;
+        sdpa_recurrence.value = value;
+        sdpa_recurrence.output = output;
+    }
+
+
+    std::cout << "query id: " << sdpa_recurrence.query->info()->id() << std::endl;
+    std::cout << "key id: " << sdpa_recurrence.key->info()->id() << std::endl;
+    std::cout << "value id: " << vsdpa_recurrence.alue->info()->id() << std::endl;
+    std::cout << "output id: " << sdpa_recurrence.output->info()->id() << std::endl;
+
     // Create and configure function
     auto func = std::make_unique<ScaleDotProductionLayerFunction>();
     func->configure(query, key, value, output, node.sdpa_info());
