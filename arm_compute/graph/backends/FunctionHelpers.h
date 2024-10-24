@@ -1980,7 +1980,7 @@ std::unique_ptr<IFunction> create_scale_dot_production_layer(ScaleDotProductionA
 
     // Create and configure function
     auto func = std::make_unique<ScaleDotProductionLayerFunction>();
-    func->configure(query, key, value, output, node.sdpa_info());
+    func->configure(sdpa_recurrence.query, sdpa_recurrence.key, sdpa_recurrence.value, sdpa_recurrence.output, node.sdpa_info());
 
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "

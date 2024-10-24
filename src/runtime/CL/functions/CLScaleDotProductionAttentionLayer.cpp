@@ -47,16 +47,18 @@ void CLScaleDotProductionAttentionLayer::configure(const ICLTensor              
                                                    const ICLTensor                            *key,
                                                    const ICLTensor                            *value,
                                                    ICLTensor                                  *output,
-                                                   const ScaleDotProductionLayerInfo &info)
+                                                   const ScaleDotProductionLayerInfo &info,
+                                                   int recurrence_count)
 {
-    configure(CLKernelLibrary::get().get_compile_context(), query, key, value, output, info);
+    configure(CLKernelLibrary::get().get_compile_context(), query, key, value, output, info,recurrence_count);
 }
 void CLScaleDotProductionAttentionLayer::configure(const CLCompileContext                     &compile_context,
                                                    const ICLTensor                            *query,
                                                    const ICLTensor                            *key,
                                                    const ICLTensor                            *value,
                                                    ICLTensor                                  *output,
-                                                   const ScaleDotProductionLayerInfo &info)
+                                                   const ScaleDotProductionLayerInfo &info,
+                                                   int recurrence_count)
 {
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
