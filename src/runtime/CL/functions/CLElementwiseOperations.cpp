@@ -33,6 +33,9 @@
 #include "src/gpu/cl/operators/ClElementwiseOperations.h"
 #include "src/gpu/cl/operators/ClSub.h"
 
+
+#include "arm_compute/runtime/CL/CLScheduler.h"v
+
 #ifdef MEASURE_TIME
 #include <chrono>
 #include <fstream>
@@ -90,10 +93,29 @@ void CLArithmeticAddition::run()
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
+    ITensor * src_0_nc = const_cast<ITensor *>(_impl->src_0);
+    ICLTensor * src_0_cl          = static_cast<ICLTensor *>(src_0_nc);
+    src_0_cl->map(CLScheduler::get().queue());
+
+    ICLTensor * src_1_cl = const_cast<ICLTensor *>(_impl->src_1);
+    src_1_cl->map(CLScheduler::get().queue());
+
+    ICLTensor * dst_cl = const_cast<ICLTensor *>(_impl->dst);
+    dst_cl->map(CLScheduler::get().queue());
+
+    std::cout<< "src_0_cl: "<< *reinterpret_cast<float *>(src_0_cl->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+    std::cout<< "src_1_cl: "<< *reinterpret_cast<float *>(src_1_cl->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+    std::cout<< "dst_cl: "<< *reinterpret_cast<float *>(dst_cl->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+        
     ITensorPack pack;
     pack.add_tensor(TensorType::ACL_SRC_0, _impl->src_0);
     pack.add_tensor(TensorType::ACL_SRC_1, _impl->src_1);
     pack.add_tensor(TensorType::ACL_DST, _impl->dst);
+
+
+    std::cout<< "src_0_cl after: "<< *reinterpret_cast<float *>(src_0_cl->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+    std::cout<< "src_1_cl after: "<< *reinterpret_cast<float *>(src_1_cl->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+    std::cout<< "dst_cl after: "<< *reinterpret_cast<float *>(dst_cl->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
 
     _impl->op->run(pack);
 
