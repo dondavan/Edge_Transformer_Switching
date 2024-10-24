@@ -2,6 +2,7 @@
 
 #include "arm_compute/core/CL/CLKernelLibrary.h"
 #include "arm_compute/core/CL/ICLTensor.h"
+#include "arm_compute/core/ITensor.h"
 #include "arm_compute/core/Types.h"
 #include "arm_compute/core/Validate.h"
 
