@@ -38,7 +38,7 @@ public:
      *
      * @param[in] descriptor Containing information for the node described in @ref descriptors::EltwiseLayerDescriptor
      */
-    EltwiseLayerNode(const descriptors::EltwiseLayerDescriptor &descriptor);
+    EltwiseLayerNode(const descriptors::EltwiseLayerDescriptor &descriptor, int recurrence);
     /** Eltwise operation accessor
      *
      * @return Eltwise operation that is to be performed by the node
@@ -75,6 +75,8 @@ public:
      */
     void set_fused_activation(ActivationLayerInfo fused_activation);
 
+    int recurrence();
+
     // Inherited overridden methods:
     NodeType         type() const override;
     bool             forward_descriptors() override;
@@ -85,6 +87,7 @@ public:
 
 private:
     descriptors::EltwiseLayerDescriptor descriptor;
+    int _recurrence;
 };
 
 /** Unary Eltwise Layer node */

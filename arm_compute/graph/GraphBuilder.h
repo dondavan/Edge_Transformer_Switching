@@ -267,7 +267,7 @@ class GraphBuilder final
      * @return Node ID of the created node, EmptyNodeID in case of error
      */
     static NodeID add_elementwise_node(
-        Graph &g, NodeParams params, NodeIdxPair input0, NodeIdxPair input1, EltwiseOperation operation);
+        Graph &g, NodeParams params, NodeIdxPair input0, NodeIdxPair input1, EltwiseOperation operation, int recurrence);
     /** Adds a dequantization node to the graph
      *
      * @param[in] g      Graph to add the node to

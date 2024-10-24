@@ -531,7 +531,7 @@ NodeID GraphBuilder::add_dummy_node(Graph &g, NodeParams params, NodeIdxPair inp
 }
 
 NodeID GraphBuilder::add_elementwise_node(
-    Graph &g, NodeParams params, NodeIdxPair input0, NodeIdxPair input1, EltwiseOperation operation)
+    Graph &g, NodeParams params, NodeIdxPair input0, NodeIdxPair input1, EltwiseOperation operation, int recurrence)
 {
     check_nodeidx_pair(input0, g);
     check_nodeidx_pair(input1, g);
@@ -539,7 +539,7 @@ NodeID GraphBuilder::add_elementwise_node(
     NodeID nid;
     if(params.target != Target::UNSPECIFIED)
     {  
-        nid = g.add_node<EltwiseLayerNode>(params.target, descriptors::EltwiseLayerDescriptor{ operation });
+        nid = g.add_node<EltwiseLayerNode>(params.target, descriptors::EltwiseLayerDescriptor{ operation }, recurrence);
 
         g.add_connection(params.target, input0.node_id, input0.index, nid, 0);
         g.add_connection(params.target, input1.node_id, input1.index, nid, 1);
@@ -832,10 +832,10 @@ NodeID GraphBuilder::add_scale_layer(Graph              &g,
     NodeIdxPair      add_const_nidxp = { add_const_nid, 0 };
 
     // Create node and connect
-    NodeID      mul_node      = GraphBuilder::add_elementwise_node(g, params, input, mul_const_nidxp, EltwiseOperation::Mul);
+    NodeID      mul_node      = GraphBuilder::add_elementwise_node(g, params, input, mul_const_nidxp, EltwiseOperation::Mul,0);
     NodeIdxPair mulnode_nidxp = { mul_node, 0 };
     NodeID      add_node =
-        GraphBuilder::add_elementwise_node(g, params, mulnode_nidxp, add_const_nidxp, EltwiseOperation::Add);
+        GraphBuilder::add_elementwise_node(g, params, mulnode_nidxp, add_const_nidxp, EltwiseOperation::Add,0);
 
     return add_node;
 }

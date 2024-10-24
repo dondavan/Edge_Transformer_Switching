@@ -31,7 +31,7 @@ namespace arm_compute
 {
 namespace graph
 {
-EltwiseLayerNode::EltwiseLayerNode(const descriptors::EltwiseLayerDescriptor &descriptor) : descriptor(descriptor)
+EltwiseLayerNode::EltwiseLayerNode(const descriptors::EltwiseLayerDescriptor &descriptor, int recurrence) : descriptor(descriptor), _recurrence(recurrence)
 {
     _input_edges.resize(2, EmptyEdgeID);
     _outputs.resize(1, NullTensorID);
@@ -65,6 +65,11 @@ QuantizationInfo EltwiseLayerNode::output_quant_info() const
 void EltwiseLayerNode::set_fused_activation(ActivationLayerInfo fused_activation)
 {
     descriptor.fused_activation = fused_activation;
+}
+
+int EltwiseLayerNode::recurrence()
+{
+    return _recurrence;
 }
 
 bool EltwiseLayerNode::forward_descriptors()

@@ -657,8 +657,8 @@ class EltwiseLayer final : public ILayer
      * @param[in] sub_stream1 First graph sub-stream
      * @param[in] op          Element-wise operation to perform
      */
-    EltwiseLayer(SubStream &&sub_stream0, SubStream &&sub_stream1, EltwiseOperation op)
-        : _ss0(std::move(sub_stream0)), _ss1(std::move(sub_stream1)), _op(op)
+    EltwiseLayer(SubStream &&sub_stream0, SubStream &&sub_stream1, EltwiseOperation op, int recurrence)
+        : _ss0(std::move(sub_stream0)), _ss1(std::move(sub_stream1)), _op(op), _recurrence(recurrence)
     {
     }
 
@@ -669,13 +669,14 @@ class EltwiseLayer final : public ILayer
         NodeIdxPair input1        = { _ss1.tail_node(), 0 };
         common_params.target      = assigned_target();
 
-        return GraphBuilder::add_elementwise_node(s.graph(), common_params, input0, input1, _op);
+        return GraphBuilder::add_elementwise_node(s.graph(), common_params, input0, input1, _op, _recurrence);
     }
 
     private:
     SubStream        _ss0;
     SubStream        _ss1;
     EltwiseOperation _op;
+    int _recurrence;
 };
 /** Flatten Layer */
 class FlattenLayer final : public ILayer
