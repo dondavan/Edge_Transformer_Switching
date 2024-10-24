@@ -43,7 +43,7 @@ public:
      * @param[in]  value           Attention value tensor info. Data types supported: F32.
      * @param[out] output          Destination tensor info. Data type supported: F32
      */
-    void configure( const ITensorInfo *query, const ITensorInfo *key, const ITensorInfo *value, ITensorInfo *output, const ScaleDotProductionLayerInfo& info);
+    void configure( const ITensorInfo *query, const ITensorInfo *key, const ITensorInfo *value, ITensorInfo *output, const ScaleDotProductionLayerInfo& info, int recurrence_count);
     /** Static function to check if given info will lead to a valid configuration
      *
      * Similar to @ref CpuScaleDotProduction::configure()
@@ -126,6 +126,8 @@ private:
         true}; /**< If we run CpuGemmInterleave4x4Kernel on lhs and CpuGemmTranspose1xWKernel on rhs */
 
     experimental::MemoryRequirements _aux_mem{Count};
+
+    int _recurrence_count{-1};
 
 };
 } // namespace cpu
