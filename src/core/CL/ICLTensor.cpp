@@ -34,6 +34,7 @@ ICLTensor::ICLTensor() : _mapping(nullptr)
 void ICLTensor::map(cl::CommandQueue &q, bool blocking)
 {
     _mapping = do_map(q, blocking);
+    std::cout << "mapped tensor " << this->info()->id() << std::endl;
 }
 
 void ICLTensor::unmap(cl::CommandQueue &q)
