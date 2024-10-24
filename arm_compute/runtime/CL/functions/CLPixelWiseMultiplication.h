@@ -34,6 +34,7 @@ namespace arm_compute
 // Forward declaration
 class CLCompileContext;
 class ICLTensor;
+class ITensor;
 class ITensorInfo;
 
 /** Basic function to run opencl::ClMul. */
@@ -84,7 +85,7 @@ public:
      * @param[in]      rounding_policy Rounding policy. Supported rounding modes: to zero, to nearest even.
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
+    void configure(ITensor                 *input1,
                    ICLTensor                 *input2,
                    ICLTensor                 *output,
                    float                      scale,
@@ -106,7 +107,7 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   ICLTensor                 *input1,
+                   ITensor                 *input1,
                    ICLTensor                 *input2,
                    ICLTensor                 *output,
                    float                      scale,

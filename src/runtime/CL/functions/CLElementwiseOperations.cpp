@@ -109,7 +109,7 @@ void CLArithmeticAddition::run()
 
 struct CLArithmeticSubtraction::Impl
 {
-    const ICLTensor               *src_0{ nullptr };
+    const ITensor               *src_0{ nullptr };
     const ICLTensor               *src_1{ nullptr };
     ICLTensor                     *dst{ nullptr };
     std::unique_ptr<opencl::ClSub> op{ nullptr };
@@ -123,7 +123,7 @@ CLArithmeticSubtraction::CLArithmeticSubtraction(CLArithmeticSubtraction &&)    
 CLArithmeticSubtraction &CLArithmeticSubtraction::operator=(CLArithmeticSubtraction &&) = default;
 CLArithmeticSubtraction::~CLArithmeticSubtraction()                                     = default;
 
-void CLArithmeticSubtraction::configure(const ICLTensor           *input1,
+void CLArithmeticSubtraction::configure(const ITensor           *input1,
                                         const ICLTensor           *input2,
                                         ICLTensor                 *output,
                                         ConvertPolicy              policy,
@@ -133,7 +133,7 @@ void CLArithmeticSubtraction::configure(const ICLTensor           *input1,
 }
 
 void CLArithmeticSubtraction::configure(const CLCompileContext    &compile_context,
-                                        const ICLTensor           *input1,
+                                        const ITensor           *input1,
                                         const ICLTensor           *input2,
                                         ICLTensor                 *output,
                                         ConvertPolicy              policy,
@@ -167,7 +167,7 @@ void CLArithmeticSubtraction::run()
 
 struct CLArithmeticDivision::Impl
 {
-    const ICLTensor                               *src_0{ nullptr };
+    const ITensor                               *src_0{ nullptr };
     const ICLTensor                               *src_1{ nullptr };
     ICLTensor                                     *dst{ nullptr };
     std::unique_ptr<opencl::ClElementwiseDivision> op{ nullptr };
@@ -181,7 +181,7 @@ CLArithmeticDivision::CLArithmeticDivision(CLArithmeticDivision &&)            =
 CLArithmeticDivision &CLArithmeticDivision::operator=(CLArithmeticDivision &&) = default;
 CLArithmeticDivision::~CLArithmeticDivision()                                  = default;
 
-void CLArithmeticDivision::configure(ICLTensor                 *input1,
+void CLArithmeticDivision::configure(ITensor                 *input1,
                                      ICLTensor                 *input2,
                                      ICLTensor                 *output,
                                      const ActivationLayerInfo &act_info)
@@ -190,7 +190,7 @@ void CLArithmeticDivision::configure(ICLTensor                 *input1,
 }
 
 void CLArithmeticDivision::configure(const CLCompileContext    &compile_context,
-                                     const ICLTensor           *input1,
+                                     const ITensor           *input1,
                                      const ICLTensor           *input2,
                                      ICLTensor                 *output,
                                      const ActivationLayerInfo &act_info)
@@ -222,7 +222,7 @@ void CLArithmeticDivision::run()
 
 struct CLElementwiseMax::Impl
 {
-    const ICLTensor                          *src_0{ nullptr };
+    const ITensor                          *src_0{ nullptr };
     const ICLTensor                          *src_1{ nullptr };
     ICLTensor                                *dst{ nullptr };
     std::unique_ptr<opencl::ClElementwiseMax> op{ nullptr };
@@ -236,7 +236,7 @@ CLElementwiseMax::CLElementwiseMax(CLElementwiseMax &&)            = default;
 CLElementwiseMax &CLElementwiseMax::operator=(CLElementwiseMax &&) = default;
 CLElementwiseMax::~CLElementwiseMax()                              = default;
 
-void CLElementwiseMax::configure(ICLTensor                 *input1,
+void CLElementwiseMax::configure(ITensor                 *input1,
                                  ICLTensor                 *input2,
                                  ICLTensor                 *output,
                                  const ActivationLayerInfo &act_info)
@@ -245,7 +245,7 @@ void CLElementwiseMax::configure(ICLTensor                 *input1,
 }
 
 void CLElementwiseMax::configure(const CLCompileContext    &compile_context,
-                                 ICLTensor                 *input1,
+                                 ITensor                 *input1,
                                  ICLTensor                 *input2,
                                  ICLTensor                 *output,
                                  const ActivationLayerInfo &act_info)

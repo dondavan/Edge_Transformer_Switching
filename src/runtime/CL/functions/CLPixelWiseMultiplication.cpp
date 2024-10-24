@@ -24,6 +24,7 @@
 #include "arm_compute/runtime/CL/functions/CLPixelWiseMultiplication.h"
 
 #include "arm_compute/core/CL/ICLTensor.h"
+#include "arm_compute/core/ITensor.h"
 #include "arm_compute/runtime/CL/CLScheduler.h"
 
 #include "src/core/CL/ICLKernel.h"
@@ -35,7 +36,7 @@ namespace arm_compute
 {
 struct CLPixelWiseMultiplication::Impl
 {
-    const ICLTensor               *src_0{nullptr};
+    const ITensor               *src_0{nullptr};
     const ICLTensor               *src_1{nullptr};
     ICLTensor                     *dst{nullptr};
     std::unique_ptr<opencl::ClMul> op{nullptr};
@@ -48,7 +49,7 @@ CLPixelWiseMultiplication::CLPixelWiseMultiplication(CLPixelWiseMultiplication &
 CLPixelWiseMultiplication &CLPixelWiseMultiplication::operator=(CLPixelWiseMultiplication &&) = default;
 CLPixelWiseMultiplication::~CLPixelWiseMultiplication()                                       = default;
 
-void CLPixelWiseMultiplication::configure(ICLTensor                 *input1,
+void CLPixelWiseMultiplication::configure(ITensor                 *input1,
                                           ICLTensor                 *input2,
                                           ICLTensor                 *output,
                                           float                      scale,
@@ -61,7 +62,7 @@ void CLPixelWiseMultiplication::configure(ICLTensor                 *input1,
 }
 
 void CLPixelWiseMultiplication::configure(const CLCompileContext    &compile_context,
-                                          ICLTensor                 *input1,
+                                          ITensor                 *input1,
                                           ICLTensor                 *input2,
                                           ICLTensor                 *output,
                                           float                      scale,

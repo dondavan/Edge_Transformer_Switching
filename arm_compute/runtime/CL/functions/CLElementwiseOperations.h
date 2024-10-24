@@ -205,7 +205,7 @@ public:
      * @param[in]      policy   Policy to use to handle overflow.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(const ICLTensor           *input1,
+    void configure(const ITensor           *input1,
                    const ICLTensor           *input2,
                    ICLTensor                 *output,
                    ConvertPolicy              policy,
@@ -236,7 +236,7 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   const ICLTensor           *input1,
+                   const ITensor           *input1,
                    const ICLTensor           *input2,
                    ICLTensor                 *output,
                    ConvertPolicy              policy,
@@ -317,7 +317,7 @@ public:
      * @param[out]     output   Output tensor. Data types supported: Same as @p input1.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
+    void configure(ITensor                 *input1,
                    ICLTensor                 *input2,
                    ICLTensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
@@ -332,7 +332,7 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   const ICLTensor           *input1,
+                   const ITensor           *input1,
                    const ICLTensor           *input2,
                    ICLTensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
@@ -403,7 +403,7 @@ public:
      * @param[out]     output   Output tensor. Data types supported: same as @p input1.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
+    void configure(ITensor                 *input1,
                    ICLTensor                 *input2,
                    ICLTensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
@@ -418,7 +418,7 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   ICLTensor                 *input1,
+                   ITensor                 *input1,
                    ICLTensor                 *input2,
                    ICLTensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
