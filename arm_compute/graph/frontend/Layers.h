@@ -1638,7 +1638,7 @@ class ScaleDotProductionLayer final : public ILayer
      *
      * @param[in] sdpa      Multi head scale dot production layer information
      */
-    ScaleDotProductionLayer(const ScaleDotProductionLayerInfo &sdpa_info)
+    ScaleDotProductionLayer(ScaleDotProductionLayerInfo &sdpa_info)
         : _sdpa_info(sdpa_info)
     {
     }
@@ -1652,7 +1652,7 @@ class ScaleDotProductionLayer final : public ILayer
     }
 
     private:
-    const ScaleDotProductionLayerInfo &_sdpa_info;
+    ScaleDotProductionLayerInfo &_sdpa_info;
 };
 
 /** LayerNormLayer */
