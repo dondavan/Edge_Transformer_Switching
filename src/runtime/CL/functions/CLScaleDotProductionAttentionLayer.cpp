@@ -64,6 +64,8 @@ void CLScaleDotProductionAttentionLayer::configure(const CLCompileContext       
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
 
+    std::cout << "NEScaleDotProductionAttentionLayer::configure recurrence count: " << recurrence_count << std::endl;
+    
     /* Scale dot production of key and query */
     _impl->scale_dot_production_op = std::make_unique<opencl::ClScaleDotProduction>();
     _impl->scale_dot_production_op->configure(compile_context, query->info(), key->info(), value->info(), output->info(), info);

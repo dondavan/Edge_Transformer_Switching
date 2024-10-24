@@ -53,7 +53,7 @@ void NEScaleDotProductionAttentionLayer::configure(ITensor *query,
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
+    std::cout << "NEScaleDotProductionAttentionLayer::configure recurrence count: " << recurrence_count << std::endl;
     /* Scale dot production of key and query */
     _impl->scale_dot_production_op  = std::make_unique<cpu::CpuScaleDotProduction>();
     _impl->scale_dot_production_op->configure(query->info(),key->info(),value->info(),output->info(),info);
