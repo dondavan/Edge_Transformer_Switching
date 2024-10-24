@@ -35,7 +35,7 @@ namespace arm_compute
 void *CLBufferAllocator::allocate(size_t size, size_t alignment)
 {
     ARM_COMPUTE_UNUSED(alignment);
-    cl_mem buf{clCreateBuffer(CLScheduler::get().context().get(), CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE, size,
+    cl_mem buf{clCreateBuffer(CLScheduler::get().context().get(), CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, size,
                               nullptr, nullptr)};
     return static_cast<void *>(buf);
 }
@@ -49,6 +49,6 @@ void CLBufferAllocator::free(void *ptr)
 std::unique_ptr<IMemoryRegion> CLBufferAllocator::make_region(size_t size, size_t alignment)
 {
     ARM_COMPUTE_UNUSED(alignment);
-    return std::make_unique<CLBufferMemoryRegion>(CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE, size);
+    return std::make_unique<CLBufferMemoryRegion>(CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, size);
 }
 } // namespace arm_compute
