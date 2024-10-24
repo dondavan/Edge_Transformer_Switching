@@ -43,20 +43,20 @@ CLScaleDotProductionAttentionLayer::CLScaleDotProductionAttentionLayer()
 
 CLScaleDotProductionAttentionLayer::~CLScaleDotProductionAttentionLayer() = default;
 
-void CLScaleDotProductionAttentionLayer::configure(const ICLTensor                            *query,
-                                                   const ICLTensor                            *key,
-                                                   const ICLTensor                            *value,
-                                                   ICLTensor                                  *output,
+void CLScaleDotProductionAttentionLayer::configure(const ITensor                            *query,
+                                                   const ITensor                            *key,
+                                                   const ITensor                            *value,
+                                                   ITensor                                  *output,
                                                    const ScaleDotProductionLayerInfo &info,
                                                    int recurrence_count)
 {
     configure(CLKernelLibrary::get().get_compile_context(), query, key, value, output, info,recurrence_count);
 }
 void CLScaleDotProductionAttentionLayer::configure(const CLCompileContext                     &compile_context,
-                                                   const ICLTensor                            *query,
-                                                   const ICLTensor                            *key,
-                                                   const ICLTensor                            *value,
-                                                   ICLTensor                                  *output,
+                                                   const ITensor                            *query,
+                                                   const ITensor                            *key,
+                                                   const ITensor                            *value,
+                                                   ITensor                                  *output,
                                                    const ScaleDotProductionLayerInfo &info,
                                                    int recurrence_count)
 {
@@ -65,7 +65,7 @@ void CLScaleDotProductionAttentionLayer::configure(const CLCompileContext       
 #endif
 
     std::cout << "NEScaleDotProductionAttentionLayer::configure recurrence count: " << recurrence_count << std::endl;
-    
+
     /* Scale dot production of key and query */
     _impl->scale_dot_production_op = std::make_unique<opencl::ClScaleDotProduction>();
     _impl->scale_dot_production_op->configure(compile_context, query->info(), key->info(), value->info(), output->info(), info);
