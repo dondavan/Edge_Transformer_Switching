@@ -179,6 +179,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
+    std::cout <<"_recurrence_count:  "<< _recurrence_count << std::endl
     if(_recurrence_count == 0)
     {
         if(query->info()->tensor_target_type() == TensorTargetType::CL)
