@@ -199,6 +199,7 @@ void allocate_all_tensors(Graph &g)
     {
         if(tensor && !tensor->bound_edges().empty() && tensor->handle() != nullptr && tensor->handle()->tensor().info()->is_resizable() && tensor->handle()->tensor().is_used())
         {
+            std::cout <<"tid: " tensor.get()->id()<< std::endl;
             tensor->handle()->allocate();
         }
     }
