@@ -48,8 +48,6 @@ namespace backends
 namespace detail
 {
 
-static unsigned int recurrence_count = 0;
-
 /** Returns backing tensor of a given tensor
  *
  * @tparam TargetInfo Target information
@@ -1936,6 +1934,15 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     return func;
 }*/
 
+static struct recurrence_object
+{
+    unsigned int recurrence_count = 0;
+    ITensor     *query            = nullptr;
+    ITensor     *key              = nullptr;
+    ITensor     *value            = nullptr;
+    ITensor     *output           = nullptr;
+} sdpa_recurrence;
+
 /** Creates a backend scale dot production function
  *
  * @tparam ScaleDotProductionLayerFunction  Backend scale dot production function
@@ -1949,7 +1956,7 @@ template <typename ScaleDotProductionLayerFunction, typename TargetInfo>
 std::unique_ptr<IFunction> create_scale_dot_production_layer(ScaleDotProductionAttentionNode &node)
 {
     validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
-    std::cout << "recurrent: " << recurrence_count << std::endl;
+    std::cout << "recurrent: " << sdpa_recurrence.recurrence_count << std::endl;
 
     // Extract IO and info
     typename TargetInfo::TensorType *query  = get_backing_tensor<TargetInfo>(node.input(0));
@@ -1966,7 +1973,7 @@ std::unique_ptr<IFunction> create_scale_dot_production_layer(ScaleDotProductionA
                                                << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
                                                << " Input shape: " << input->info()->tensor_shape()
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
-    recurrence_count++;
+    sdpa_recurrence.recurrence_count++;
 
     return func;
 }
