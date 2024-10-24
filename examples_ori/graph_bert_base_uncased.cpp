@@ -65,13 +65,13 @@ class GraphVanillaTransformerExample : public Example
         std::string data_path = common_params.data_path;
 
         // Model parameters
-        constexpr unsigned int d_model    = 1024U;   // Dim layer output
+        constexpr unsigned int d_model    = 768U;   // Dim layer output
         constexpr unsigned int d_vocab    = 30522U; // Vocaboary size
         constexpr unsigned int d_segemnt  = 2U;     // Sentence segmentation size
         constexpr unsigned int d_position = 512U;   // Pretrained positional encoding length
-        constexpr unsigned int h          = 16U;    // Parallel attention (Heads)
+        constexpr unsigned int h          = 12U;    // Parallel attention (Heads)
         constexpr float        eps        = 1e-12;  // Layer normalization eplision
-        constexpr unsigned int d_ff       = 4096U;  // Dim feedforward
+        constexpr unsigned int d_ff       = 3072U;  // Dim feedforward
 
         // Create input tensor
         const TensorShape src_tensor = TensorShape(common_params.input_len);
@@ -91,7 +91,7 @@ class GraphVanillaTransformerExample : public Example
         // Encode Input
         graph << InputLayer(input_descriptor, get_token_accessor(common_params),
                             get_segment_accessor(common_params.segment, move(at2_preproccessor)))
-                     .set_name("in1")
+                     .set_name("in").set_target(Target::CL)
 
               << EmbeddingLayer(EmbeddingLayerInfo(d_model,
                                                    d_vocab,
@@ -102,47 +102,32 @@ class GraphVanillaTransformerExample : public Example
                                 get_weights_accessor(data_path, "token_embedding.npy", operation_layout),
                                 get_weights_accessor(data_path, "segment_embedding.npy", operation_layout),
                                 get_weights_accessor(data_path, "positional_embedding.npy", operation_layout))
-                     .set_name("tkemb1");
+                     .set_name("tkemb").set_target(Target::CL);
 
-            add_encoder_block(data_path,"layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_1/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_2/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_3/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_4/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_5/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_1/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_2/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_3/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_4/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_5/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
 
-            add_encoder_block(data_path,"layer_6/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_7/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_8/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_9/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_10/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_11/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-
-            add_encoder_block(data_path,"layer_12/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_13/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_14/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_15/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_16/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_17/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-
-            add_encoder_block(data_path,"layer_18/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_19/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_20/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_21/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_22/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-            add_encoder_block(data_path,"layer_23/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
-
+        add_encoder_block(data_path, "layer_6/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_7/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_8/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_9/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_10/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
+        add_encoder_block(data_path, "layer_11/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
 
         // Pooler
-        graph << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model) ,
-                                               TensorShape(d_model) ),
-                               get_weights_accessor(data_path, "pooler_weight.npy"),
-                               get_weights_accessor(data_path, "pooler_bias.npy"))
-                               
-              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH,1.f, 1.f))
-              
-              << OutputLayer(get_output_accessor(common_params)).set_name("out1");
-              
+        graph << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model),
+                                             TensorShape(d_model)),
+                             get_weights_accessor(data_path, "pooler_weight.npy"),
+                             get_weights_accessor(data_path, "pooler_bias.npy")).set_target(Target::CL).set_name("post_linear")
+
+              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f)).set_target(Target::CL).set_name("post_acti")
+
+              << OutputLayer(get_output_accessor(common_params)).set_name("out").set_target(Target::CL);
+
         // Finalize graph
         GraphConfig config;
 
@@ -152,6 +137,15 @@ class GraphVanillaTransformerExample : public Example
         config.tuner_file  = common_params.tuner_file;
         config.mlgo_file   = common_params.mlgo_file;
 
+        config.use_transition_memory_manager = false;
+
+#ifdef MEASURE_TIME
+        // Clear previous output
+        std::ofstream ofs;
+        ofs.open("measure_output.txt", std::ofstream::out | std::ofstream::trunc);
+        ofs.close();
+#endif
+
         graph.finalize(common_params.target, config);
 
         return true;
@@ -159,8 +153,14 @@ class GraphVanillaTransformerExample : public Example
 
     void do_run() override
     {
+        auto start_time = std::chrono::high_resolution_clock::now();
+
         // Run graph
         graph.run();
+
+        auto   end_time  = std::chrono::high_resolution_clock::now();
+        double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+        std::cout << "Run cost: " << cost_time << std::endl;
     }
 
     private:
@@ -186,7 +186,7 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL).set_name("attention_linear")
             << ScaleDotProductionLayer(sdpa_info).set_name("mha").set_target(Target::NEON);
 
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add,0).set_name("attention_res_add").set_target(Target::CL);
+        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add, 1).set_name("attention_res_add").set_target(Target::CL);
 
         /* Self output */
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("attention_norm");
@@ -204,7 +204,7 @@ class GraphVanillaTransformerExample : public Example
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::CL).set_name("ff_linear_2");
 
-        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add,0).set_name("ff_res_add").set_target(Target::CL);
+        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add, 0).set_name("ff_res_add").set_target(Target::CL);
 
         /* Output*/
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("ff_norm");
