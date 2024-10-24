@@ -749,7 +749,7 @@ class GraphBuilder final
      * 
      * @return Node ID of the created node, EmptyNodeID in case of error
      */
-    static NodeID add_scale_dot_production_node(Graph &g, NodeParams params, NodeIdxPair input, ScaleDotProductionLayerInfo mha_info);
+    static NodeID add_scale_dot_production_node(Graph &g, NodeParams params, NodeIdxPair input, ScaleDotProductionLayerInfo &sdpa_info);
     /** Adds a layer normalization layer node to the graph
      *
      * @param[in] g       Graph to add the node to

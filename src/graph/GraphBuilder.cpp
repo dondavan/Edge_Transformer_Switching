@@ -1197,7 +1197,7 @@ NodeID GraphBuilder::add_attention_linear_layer(Graph &g, NodeParams params, Nod
     return attention_linear_nid;
 }
 
-NodeID GraphBuilder::add_scale_dot_production_node(Graph &g, NodeParams params, NodeIdxPair input, ScaleDotProductionLayerInfo sdpa_info)
+NodeID GraphBuilder::add_scale_dot_production_node(Graph &g, NodeParams params, NodeIdxPair input, ScaleDotProductionLayerInfo &sdpa_info)
 {
     check_nodeidx_pair(input, g);
 

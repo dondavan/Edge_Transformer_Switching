@@ -1634,12 +1634,12 @@ class AttentionLinearLayer final : public ILayer
 class ScaleDotProductionLayer final : public ILayer
 {
     public:
-    /** Construct a multi-head attention layer.
+    /** Construct a scale dot production layer.
      *
-     * @param[in] mha_info      Multi head attention layer information
+     * @param[in] sdpa      Multi head scale dot production layer information
      */
-    ScaleDotProductionLayer(const ScaleDotProductionLayerInfo &mha_info)
-        : _mha_info(mha_info)
+    ScaleDotProductionLayer(const ScaleDotProductionLayerInfo &sdpa_info)
+        : _sdpa_info(sdpa_info)
     {
     }
 
@@ -1648,11 +1648,11 @@ class ScaleDotProductionLayer final : public ILayer
         NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input         = { s.tail_node(), 0 };
         common_params.target      = assigned_target();
-        return GraphBuilder::add_scale_dot_production_node(s.graph(), common_params, input, _mha_info);
+        return GraphBuilder::add_scale_dot_production_node(s.graph(), common_params, input, _sdpa_info);
     }
 
     private:
-    const ScaleDotProductionLayerInfo &_mha_info;
+    const ScaleDotProductionLayerInfo &_sdpa_info;
 };
 
 /** LayerNormLayer */
