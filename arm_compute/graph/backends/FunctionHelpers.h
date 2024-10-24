@@ -806,7 +806,8 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
     validate_node<TargetInfo>(node, 2 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    typename TargetInfo::TensorType *input1         = get_backing_tensor<TargetInfo>(node.input(0));
+    //typename TargetInfo::TensorType *input1         = get_backing_tensor<TargetInfo>(node.input(0));
+    ITensor *input1 = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
     typename TargetInfo::TensorType *input2         = get_backing_tensor<TargetInfo>(node.input(1));
     typename TargetInfo::TensorType *output         = get_backing_tensor<TargetInfo>(node.output(0));
     const EltwiseOperation           eltwise_op     = node.eltwise_operation();
