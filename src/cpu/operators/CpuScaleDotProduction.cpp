@@ -33,6 +33,22 @@ void CpuScaleDotProduction::configure(const ITensorInfo *query,
 
     ARM_COMPUTE_LOG_PARAMS(key, value, query, output);
     
+    TensorShape query_buffer = TensorShape(query->tensor_shape().x(),
+                                           query->tensor_shape().y(),
+                                           query->tensor_shape().z(),
+                                            1);
+    TensorShape key_buffer = TensorShape(key->tensor_shape().x(),
+                                         key->tensor_shape().y(),
+                                         key->tensor_shape().z(),
+                                            1);
+    TensorShape value_buffer = TensorShape(value->tensor_shape().x(),
+                                           value->tensor_shape().y(),
+                                           value->tensor_shape().z(),
+                                           1);
+    _query_cpu_buffer = query->clone()->set_tensor_shape(query_buffer);
+    _key_cpu_buffer = key->clone()->set_tensor_shape(key_buffer);
+    _value_cpu_buffer = value->clone()->set_tensor_shape(value_buffer);
+
     // Query multi-Head reshape 
     TensorShape query_reshape = TensorShape(query->tensor_shape().x()/info.h(),
                                             info.h(),
@@ -176,44 +192,43 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     ICLTensor *value_cl;
     ICLTensor *output_cl;
 
+    if(query->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *query_nc = const_cast<ITensor *>(query);
+        query_cl          = static_cast<ICLTensor *>(query_nc);
+        std::cout << "CL_query id: " << query->info()->id() << std::endl;
+    }
+
+    if(key->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *key_nc = const_cast<ITensor *>(key);
+        key_cl          = static_cast<ICLTensor *>(key_nc);
+        std::cout << "CL_key id: " << key->info()->id() << std::endl;
+    }
+
+    if(value->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *value_nc = const_cast<ITensor *>(value);
+        value_cl          = static_cast<ICLTensor *>(value_nc);
+        std::cout << "CL_value id: " << value->info()->id() << std::endl;
+    }
+
+    if(output->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        output_cl          = static_cast<ICLTensor *>(output);
+        std::cout << "CL_output id: " << output->info()->id() << std::endl;
+    }
+
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
     std::cout <<"_recurrence_count:  "<< _recurrence_count << std::endl;
     if(_recurrence_count == 0)
     {
-        if(query->info()->tensor_target_type() == TensorTargetType::CL)
-        {
-            ITensor *query_nc = const_cast<ITensor *>(query);
-            query_cl          = static_cast<ICLTensor *>(query_nc);
-            query_cl->map(CLScheduler::get().queue());
-
-        std::cout << "CL_query id: " << query->info()->id() << std::endl;
-        }
-
-        if(key->info()->tensor_target_type() == TensorTargetType::CL)
-        {
-            ITensor *key_nc = const_cast<ITensor *>(key);
-            key_cl          = static_cast<ICLTensor *>(key_nc);
-            key_cl->map(CLScheduler::get().queue());
-        std::cout << "CL_key id: " << key->info()->id() << std::endl;
-        }
-
-        if(value->info()->tensor_target_type() == TensorTargetType::CL)
-        {
-            ITensor *value_nc = const_cast<ITensor *>(value);
-            value_cl          = static_cast<ICLTensor *>(value_nc);
-            value_cl->map(CLScheduler::get().queue());
-        std::cout << "CL_value id: " << value->info()->id() << std::endl;
-        }
-
-        if(output->info()->tensor_target_type() == TensorTargetType::CL)
-        {
-            output_cl          = static_cast<ICLTensor *>(output);
-            output_cl->map(CLScheduler::get().queue());
-
-        std::cout << "CL_output id: " << output->info()->id() << std::endl;
-        }
+        query_cl->map(CLScheduler::get().queue());
+        key_cl->map(CLScheduler::get().queue());
+        value_cl->map(CLScheduler::get().queue());
+        output_cl->map(CLScheduler::get().queue());
     }
     
     std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
@@ -228,6 +243,31 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "mapping cost: " << cost_time << std::endl;
 #endif
 
+#ifdef MEASURE_TIME
+    auto read_start_time = std::chrono::high_resolution_clock::now();
+#endif
+    CpuAuxTensorHandler query_cpu_buffer(offset_int_vec(QueryCPUBuffer), _query_cpu_buffer, tensors);
+    CpuAuxTensorHandler key_cpu_buffer(offset_int_vec(ValueCPUBuffer), _key_cpu_buffer, tensors);
+    CpuAuxTensorHandler value_cpu_buffer(offset_int_vec(KeyCPUBuffer), _value_cpu_buffer, tensors);
+
+    CLScheduler::get().queue().enqueueReadBuffer(query_cl->cl_buffer(), CL_TRUE, 0, query_cpu_buffer.get()->info()->total_size(), query_cpu_buffer.get()->buffer());
+    CLScheduler::get().queue().enqueueReadBuffer(query_cl->cl_buffer(), CL_TRUE, 0, query_cpu_buffer.get()->info()->total_size(), query_cpu_buffer.get()->buffer());
+    CLScheduler::get().queue().enqueueReadBuffer(query_cl->cl_buffer(), CL_TRUE, 0, query_cpu_buffer.get()->info()->total_size(), query_cpu_buffer.get()->buffer());
+    CLScheduler::get().queue().enqueueReadBuffer(query_cl->cl_buffer(), CL_TRUE, 0, query_cpu_buffer.get()->info()->total_size(), query_cpu_buffer.get()->buffer());
+
+
+#ifdef MEASURE_TIME
+    auto   read_end_time  = std::chrono::high_resolution_clock::now();
+    double read_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(read_end_time - read_start_time).count();
+    std::ofstream measure_out("measure_output.txt",std::ios::app);
+    measure_out.precision(5);
+    measure_out << std::scientific << "Reading cost: " << read_cost_time << std::endl;
+#endif
+
+
+    CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
+    CpuAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
+    CpuAuxTensorHandler reshaped_key(offset_int_vec(KeyReshape), _reshaped_key, tensors);
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CpuAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
     CpuAuxTensorHandler reshaped_key(offset_int_vec(KeyReshape), _reshaped_key, tensors);

@@ -77,6 +77,11 @@ private:
         Softmax,
         GemmedContext,
         ConcatPermute,
+
+        QueryCPUBuffer,
+        KeyCPUBuffer,
+        ValueCPUBuffer,
+        
         Count
     };
 
@@ -118,6 +123,10 @@ private:
     TensorInfo _scaled_query_key{};
     TensorInfo _softmaxed_product{};
     TensorInfo _gemmed_context{};
+
+    TensorInfo _query_cpu_buffer{};
+    TensorInfo _key_cpu_buffer{};
+    TensorInfo _value_cpu_buffer{};
 
     bool _run_pretranspose{false};
     bool _run_scale{false};
