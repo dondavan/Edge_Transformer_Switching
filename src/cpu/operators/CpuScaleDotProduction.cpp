@@ -195,7 +195,27 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    
+    if(query->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *query_nc = const_cast<ITensor *>(query);
+        query_cl          = static_cast<ICLTensor *>(query_nc);
+        query_cl->map(CLScheduler::get().queue());
+    }
+
+    if(key->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *key_nc = const_cast<ITensor *>(key);
+        key_cl          = static_cast<ICLTensor *>(key_nc);
+        query_cl->map(CLScheduler::get().queue());
+    }
+
+    if(value->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *value_nc = const_cast<ITensor *>(value);
+        value_cl          = static_cast<ICLTensor *>(value_nc);
+        query_cl->map(CLScheduler::get().queue());
+    }
+
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
@@ -266,7 +286,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     CpuAuxTensorHandler gemmed_context(offset_int_vec(GemmedContext), _gemmed_context, tensors);
 
     // Run Query multi-Head reshape 
-    ITensorPack query_reshape_pack{{ACL_SRC_0, query_cpu_buffer_aux.get()},{ACL_DST, reshaped_query.get()}};
+    ITensorPack query_reshape_pack{{ACL_SRC_0, query},{ACL_DST, reshaped_query.get()}};
     NEScheduler::get().schedule_op(_query_reshape_kernel.get(), Window::DimY, _query_reshape_kernel->window(), query_reshape_pack);
     //const auto query_split_dimension = _query_reshape_kernel->get_split_dimension();
 /*
@@ -297,7 +317,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 */
 
     // Run Key multi-Head reshape 
-    ITensorPack key_reshape_pack{{ACL_SRC_0, key_cpu_buffer_aux.get()},{ACL_DST, reshaped_key.get()}};
+    ITensorPack key_reshape_pack{{ACL_SRC_0, key},{ACL_DST, reshaped_key.get()}};
     NEScheduler::get().schedule_op(_key_reshape_kernel.get(), Window::DimY, _key_reshape_kernel->window(), key_reshape_pack);
     //const auto key_split_dimension = _key_reshape_kernel->get_split_dimension();
 /*
@@ -330,7 +350,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     _key_transpose_func->run(key_transpose_pack);
 
     // Run Value multi-Head reshape 
-    ITensorPack value_reshape_pack{{ACL_SRC_0, value_cpu_buffer_aux.get()},{ACL_DST, reshaped_value.get()}};
+    ITensorPack value_reshape_pack{{ACL_SRC_0, value},{ACL_DST, reshaped_value.get()}};
     NEScheduler::get().schedule_op(_value_reshape_kernel.get(), Window::DimY, _value_reshape_kernel->window(), value_reshape_pack);
     //const auto value_split_dimension = _value_reshape_kernel->get_split_dimension();
 /*
