@@ -258,7 +258,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *key_nc = const_cast<ITensor *>(key);
         key_cl          = static_cast<ICLTensor *>(key_nc);
-        CLScheduler::get().queue().enqueueReadBuffer(key_cl->cl_buffer(), CL_TRUE, 0, key_cpu_buffer_aux.get()->info()->total_size(), value_cpu_buffer_aux.get()->buffer());
+        CLScheduler::get().queue().enqueueReadBuffer(key_cl->cl_buffer(), CL_TRUE, 0, key_cpu_buffer_aux.get()->info()->total_size(), key_cpu_buffer_aux.get()->buffer());
         std::cout << "Aux CL_key: " << *reinterpret_cast<float *>(key_cpu_buffer_aux.get()->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
 
