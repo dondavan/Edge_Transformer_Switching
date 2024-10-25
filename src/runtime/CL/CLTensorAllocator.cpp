@@ -46,8 +46,17 @@ static IAllocator *static_global_cl_allocator = nullptr;
  */
 std::unique_ptr<ICLMemoryRegion> allocate_region(size_t size, cl_uint alignment)
 {
+    cl_device_svm_capabilities caps;
+
+    cl_int err = clGetDeviceInfo(
+        deviceID,
+        CL_DEVICE_SVM_CAPABILITIES,
+        sizeof(cl_device_svm_capabilities),
+        &caps,
+        0
+    );
+    
     // Try fine-grain SVM
-    std::cout << "CL_MEM_SVM_FINE_GRAIN_BUFFER" << CL_MEM_SVM_FINE_GRAIN_BUFFER << std::endl;
     std::unique_ptr<ICLMemoryRegion> region =
         std::make_unique<CLFineSVMMemoryRegion>(CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size, alignment);
     if(region != nullptr && region->ptr() != nullptr) std::cout << "fine-grain SVM" << std::endl;
