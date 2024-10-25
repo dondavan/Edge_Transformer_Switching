@@ -196,10 +196,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
     
-    std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout<< "key: "<< *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-    std::cout<< "value: "<< *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
-
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
