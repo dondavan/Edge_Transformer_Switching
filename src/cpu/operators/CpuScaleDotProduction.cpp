@@ -201,7 +201,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *query_nc = const_cast<ITensor *>(query);
         query_cl          = static_cast<ICLTensor *>(query_nc);
-        query_cl->map(CLScheduler::get().queue());
+        query_cl->map(CLScheduler::get().queue(),false);
         std::cout << "CL_query id: " << query->info()->id() << std::endl;
     }
 
@@ -209,7 +209,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *key_nc = const_cast<ITensor *>(key);
         key_cl          = static_cast<ICLTensor *>(key_nc);
-        key_cl->map(CLScheduler::get().queue1());
+        key_cl->map(CLScheduler::get().queue1(),false);
         std::cout << "CL_key id: " << key->info()->id() << std::endl;
     }
 
@@ -217,7 +217,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *value_nc = const_cast<ITensor *>(value);
         value_cl          = static_cast<ICLTensor *>(value_nc);
-        value_cl->map(CLScheduler::get().queue2());
+        value_cl->map(CLScheduler::get().queue2(),false);
         std::cout << "CL_value id: " << value->info()->id() << std::endl;
     }
 
