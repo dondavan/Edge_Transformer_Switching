@@ -209,7 +209,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *key_nc = const_cast<ITensor *>(key);
         key_cl          = static_cast<ICLTensor *>(key_nc);
-        key_cl->map(CLScheduler::get().queue());
+        key_cl->map(CLScheduler::get().queue1());
         std::cout << "CL_key id: " << key->info()->id() << std::endl;
     }
 
@@ -217,7 +217,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *value_nc = const_cast<ITensor *>(value);
         value_cl          = static_cast<ICLTensor *>(value_nc);
-        value_cl->map(CLScheduler::get().queue());
+        value_cl->map(CLScheduler::get().queue2());
         std::cout << "CL_value id: " << value->info()->id() << std::endl;
     }
 
