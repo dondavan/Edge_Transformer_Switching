@@ -93,13 +93,22 @@ void CLArithmeticAddition::run()
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
+    ITensor * src_0_nc = const_cast<ITensor *>(_impl->src_0);
+    ICLTensor * src_0_cl          = static_cast<ICLTensor *>(src_0_nc);
+    src_0_cl->map(CLScheduler::get().queue());
 
+
+    std::cout<< "src_0_cl: "<< *reinterpret_cast<float *>(_impl->src_0->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
+        
     ITensorPack pack;
     pack.add_tensor(TensorType::ACL_SRC_0, _impl->src_0);
     pack.add_tensor(TensorType::ACL_SRC_1, _impl->src_1);
     pack.add_tensor(TensorType::ACL_DST, _impl->dst);
 
     _impl->op->run(pack);
+
+
+    std::cout<< "aftrer src_0_cl: "<< *reinterpret_cast<float *>(_impl->src_0->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
