@@ -180,7 +180,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
     std::cout <<"_recurrence_count:  "<< _recurrence_count << std::endl;
-    
+    if(_recurrence_count == 0)
+    {
         if(query->info()->tensor_target_type() == TensorTargetType::CL)
         {
             ITensor *query_nc = const_cast<ITensor *>(query);
@@ -213,8 +214,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 
         std::cout << "CL_output id: " << output->info()->id() << std::endl;
         }
+    }
     
-
     std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "key: "<< *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "value: "<< *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
