@@ -49,7 +49,7 @@ std::unique_ptr<ICLMemoryRegion> allocate_region(size_t size, cl_uint alignment)
     // Try fine-grain SVM
     std::unique_ptr<ICLMemoryRegion> region =
         std::make_unique<CLFineSVMMemoryRegion>(CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size, alignment);
-    if(region != nullptr) std::cout << "fine-grain SVM" << std::endl;
+    if(region != nullptr && region->ptr() != nullptr) std::cout << "fine-grain SVM" << std::endl;
 
     // Try coarse-grain SVM in case of failure
     if (region != nullptr && region->ptr() == nullptr)
