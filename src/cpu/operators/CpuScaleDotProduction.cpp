@@ -195,6 +195,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
+if(_recurrence_count ==0){
     if(query->info()->tensor_target_type() == TensorTargetType::CL)
     {
         ITensor *query_nc = const_cast<ITensor *>(query);
@@ -222,7 +223,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         output_cl->map(CLScheduler::get().queue());
         std::cout << "CL_output id: " << output->info()->id() << std::endl;
     }
-
+}
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
