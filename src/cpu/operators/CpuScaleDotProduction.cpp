@@ -206,14 +206,14 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *key_nc = const_cast<ITensor *>(key);
         key_cl          = static_cast<ICLTensor *>(key_nc);
-        query_cl->map(CLScheduler::get().queue());
+        key_cl->map(CLScheduler::get().queue());
     }
 
     if(value->info()->tensor_target_type() == TensorTargetType::CL)
     {
         ITensor *value_nc = const_cast<ITensor *>(value);
         value_cl          = static_cast<ICLTensor *>(value_nc);
-        query_cl->map(CLScheduler::get().queue());
+        value_cl->map(CLScheduler::get().queue());
     }
 
 #ifdef MEASURE_TIME
@@ -228,6 +228,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 #ifdef MEASURE_TIME
     auto read_start_time = std::chrono::high_resolution_clock::now();
 #endif
+    /*
     CpuAuxTensorHandler query_cpu_buffer_aux(offset_int_vec(QueryCPUBuffer), _query_cpu_buffer, tensors);
     CpuAuxTensorHandler key_cpu_buffer_aux(offset_int_vec(ValueCPUBuffer), _key_cpu_buffer, tensors);
     CpuAuxTensorHandler value_cpu_buffer_aux(offset_int_vec(KeyCPUBuffer), _value_cpu_buffer, tensors);
@@ -258,7 +259,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     //CLScheduler::get().queue().enqueueReadBuffer(query_cl->cl_buffer(), CL_TRUE, 0, query_cpu_buffer_aux.get()->info()->total_size(), query_cpu_buffer_aux.get()->buffer());
     //CLScheduler::get().queue().enqueueReadBuffer(key_cl->cl_buffer(), CL_TRUE, 0, key_cpu_buffer_aux.get()->info()->total_size(), value_cpu_buffer_aux.get()->buffer());
     //CLScheduler::get().queue().enqueueReadBuffer(value_cl->cl_buffer(), CL_TRUE, 0, value_cpu_buffer_aux.get()->info()->total_size(), key_cpu_buffer_aux.get()->buffer());
-
+*/
 
 #ifdef MEASURE_TIME
     auto   read_end_time  = std::chrono::high_resolution_clock::now();
