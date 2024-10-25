@@ -192,10 +192,16 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     ICLTensor *value_cl;
     ICLTensor *output_cl;
 
+
+#ifdef MEASURE_TIME
+    auto start_time = std::chrono::high_resolution_clock::now();
+#endif
+    
     if(query->info()->tensor_target_type() == TensorTargetType::CL)
     {
         ITensor *query_nc = const_cast<ITensor *>(query);
         query_cl          = static_cast<ICLTensor *>(query_nc);
+        query_cl->map(CLScheduler::get().queue());
         std::cout << "CL_query id: " << query->info()->id() << std::endl;
     }
 
@@ -203,6 +209,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *key_nc = const_cast<ITensor *>(key);
         key_cl          = static_cast<ICLTensor *>(key_nc);
+        key_cl->map(CLScheduler::get().queue());
         std::cout << "CL_key id: " << key->info()->id() << std::endl;
     }
 
@@ -210,53 +217,17 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     {
         ITensor *value_nc = const_cast<ITensor *>(value);
         value_cl          = static_cast<ICLTensor *>(value_nc);
+        value_cl->map(CLScheduler::get().queue());
         std::cout << "CL_value id: " << value->info()->id() << std::endl;
     }
 
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
     {
         output_cl          = static_cast<ICLTensor *>(output);
+        output_cl->map(CLScheduler::get().queue());
         std::cout << "CL_output id: " << output->info()->id() << std::endl;
     }
 
-#ifdef MEASURE_TIME
-    auto start_time = std::chrono::high_resolution_clock::now();
-#endif
-    std::cout <<"_recurrence_count:  "<< _recurrence_count << std::endl;
-    if(_recurrence_count == 0)
-    {
-        if(query->info()->tensor_target_type() == TensorTargetType::CL)
-        {
-            ITensor *query_nc = const_cast<ITensor *>(query);
-            query_cl          = static_cast<ICLTensor *>(query_nc);
-            query_cl->map(CLScheduler::get().queue());
-            std::cout << "CL_query id: " << query->info()->id() << std::endl;
-        }
-
-        if(key->info()->tensor_target_type() == TensorTargetType::CL)
-        {
-            ITensor *key_nc = const_cast<ITensor *>(key);
-            key_cl          = static_cast<ICLTensor *>(key_nc);
-            key_cl->map(CLScheduler::get().queue());
-            std::cout << "CL_key id: " << key->info()->id() << std::endl;
-        }
-
-        if(value->info()->tensor_target_type() == TensorTargetType::CL)
-        {
-            ITensor *value_nc = const_cast<ITensor *>(value);
-            value_cl          = static_cast<ICLTensor *>(value_nc);
-            value_cl->map(CLScheduler::get().queue());
-            std::cout << "CL_value id: " << value->info()->id() << std::endl;
-        }
-
-        if(output->info()->tensor_target_type() == TensorTargetType::CL)
-        {
-            output_cl          = static_cast<ICLTensor *>(output);
-            output_cl->map(CLScheduler::get().queue());
-            std::cout << "CL_output id: " << output->info()->id() << std::endl;
-        }
-    }
-    
     std::cout<< "query: "<< *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "key: "<< *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     std::cout<< "value: "<< *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
@@ -269,6 +240,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "mapping cost: " << cost_time << std::endl;
 #endif
 
+/*
 #ifdef MEASURE_TIME
     auto read_start_time = std::chrono::high_resolution_clock::now();
 #endif
@@ -310,6 +282,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out.precision(5);
     measure_out << std::scientific << "Reading cost: " << read_cost_time << std::endl;
 #endif
+*/
 
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CpuAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
@@ -509,6 +482,36 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 #endif
 */
 
+    if(query->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *query_nc = const_cast<ITensor *>(query);
+        query_cl          = static_cast<ICLTensor *>(query_nc);
+        query_cl->unmap(CLScheduler::get().queue());
+        std::cout << "CL_query id: " << query->info()->id() << std::endl;
+    }
+
+    if(key->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *key_nc = const_cast<ITensor *>(key);
+        key_cl          = static_cast<ICLTensor *>(key_nc);
+        key_cl->unmap(CLScheduler::get().queue());
+        std::cout << "CL_key id: " << key->info()->id() << std::endl;
+    }
+
+    if(value->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        ITensor *value_nc = const_cast<ITensor *>(value);
+        value_cl          = static_cast<ICLTensor *>(value_nc);
+        value_cl->unmap(CLScheduler::get().queue());
+        std::cout << "CL_value id: " << value->info()->id() << std::endl;
+    }
+
+    if(output->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        output_cl          = static_cast<ICLTensor *>(output);
+        output_cl->unmap(CLScheduler::get().queue());
+        std::cout << "CL_output id: " << output->info()->id() << std::endl;
+    }
 }
 
 experimental::MemoryRequirements CpuScaleDotProduction::workspace() const
