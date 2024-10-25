@@ -238,7 +238,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "mapping cost: " << cost_time << std::endl;
 #endif
 
-/*
+
 #ifdef MEASURE_TIME
     auto read_start_time = std::chrono::high_resolution_clock::now();
 #endif
@@ -280,7 +280,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out.precision(5);
     measure_out << std::scientific << "Reading cost: " << read_cost_time << std::endl;
 #endif
-*/
+
 
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CpuAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
