@@ -41,7 +41,11 @@ CLRuntimeContext::CLRuntimeContext()
     auto             ctx   = std::get<0>(ctx_dev_err);
     auto             dev   = std::get<1>(ctx_dev_err);
     cl::CommandQueue queue = cl::CommandQueue(ctx, dev);
-    _gpu_owned_scheduler->init(ctx, queue, dev, &_tuner);
+
+    cl::CommandQueue queue1 = cl::CommandQueue(ctx, dev);
+    cl::CommandQueue queue2 = cl::CommandQueue(ctx, dev);
+
+    _gpu_owned_scheduler->init(ctx, queue,queue1, queue2, dev, &_tuner);
     const std::string cl_kernels_folder("./cl_kernels");
     CLKernelLibrary::get().init(cl_kernels_folder, ctx, dev);
 }

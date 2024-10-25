@@ -43,6 +43,18 @@ cl::CommandQueue &CLScheduler::queue()
     return _queue;
 }
 
+cl::CommandQueue &CLScheduler::queue1()
+{
+    ARM_COMPUTE_ERROR_ON(!_is_initialised);
+    return _queue1;
+}
+
+cl::CommandQueue &CLScheduler::queue2()
+{
+    ARM_COMPUTE_ERROR_ON(!_is_initialised);
+    return _queue2;
+}
+
 GPUTarget CLScheduler::target() const
 {
     return _target;
@@ -125,8 +137,10 @@ void CLScheduler::default_init_with_context(cl::Device             &device,
     {
         const std::string cl_kernels_folder("./cl_kernels/");
         cl::CommandQueue  queue = cl::CommandQueue(ctx, device);
+        cl::CommandQueue  queue1 = cl::CommandQueue(ctx, device);
+        cl::CommandQueue  queue2 = cl::CommandQueue(ctx, device);
         CLKernelLibrary::get().init(cl_kernels_folder, ctx, device);
-        init(ctx, queue, device, cl_tuner, gemm_h);
+        init(ctx, queue, queue1, queue2, device, cl_tuner, gemm_h);
         _cl_tuner = cl_tuner;
     }
 }
@@ -141,8 +155,10 @@ void CLScheduler::default_init(ICLTuner *cl_tuner, CLGEMMHeuristicsHandle *gemm_
         std::tie(ctx, dev, err) = create_opencl_context_and_device(cl_backend_type);
         ARM_COMPUTE_ERROR_ON_MSG(err != CL_SUCCESS, "Failed to create OpenCL context");
         cl::CommandQueue queue = cl::CommandQueue(ctx, dev);
+        cl::CommandQueue  queue1 = cl::CommandQueue(ctx, dev);
+        cl::CommandQueue  queue2 = cl::CommandQueue(ctx, dev);
         CLKernelLibrary::get().init("./cl_kernels/", ctx, dev);
-        init(ctx, queue, dev, cl_tuner, gemm_h);
+        init(ctx, queue, queue1, queue2, dev, cl_tuner, gemm_h);
     }
 
     // Set CL tuner and GEMM heuristics
@@ -165,6 +181,8 @@ void CLScheduler::set_context(cl::Context context)
 
 void CLScheduler::init(cl::Context             context,
                        cl::CommandQueue        queue,
+                       cl::CommandQueue        queue1,
+                       cl::CommandQueue        queue2,
                        const cl::Device       &device,
                        ICLTuner               *cl_tuner,
                        CLGEMMHeuristicsHandle *gemm_h,
@@ -172,6 +190,8 @@ void CLScheduler::init(cl::Context             context,
 {
     set_context(std::move(context));
     _queue           = std::move(queue);
+    _queue1           = std::move(queue1);
+    _queue2           = std::move(queue2);
     _target          = get_target_from_device(device);
     _is_initialised  = true;
     _cl_tuner        = cl_tuner;

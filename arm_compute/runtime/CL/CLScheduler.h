@@ -114,6 +114,8 @@ public:
      */
     void init(cl::Context             context,
               cl::CommandQueue        queue,
+              cl::CommandQueue        queue1,
+              cl::CommandQueue        queue2,
               const cl::Device       &device,
               ICLTuner               *cl_tuner        = nullptr,
               CLGEMMHeuristicsHandle *gemm_h          = nullptr,
@@ -130,6 +132,18 @@ public:
      * @return A CL command queue.
      */
     cl::CommandQueue &queue();
+
+     /** Accessor for the associated CL command queue.
+     *
+     * @return A CL command queue.
+     */
+    cl::CommandQueue &queue1();
+
+     /** Accessor for the associated CL command queue.
+     *
+     * @return A CL command queue.
+     */
+    cl::CommandQueue &queue2();
 
     /** Get the target GPU.
      *
@@ -203,6 +217,8 @@ private:
 
     cl::Context             _context;
     cl::CommandQueue        _queue;
+    cl::CommandQueue        _queue1;
+    cl::CommandQueue        _queue2;
     GPUTarget               _target;
     bool                    _is_initialised;
     ICLTuner               *_cl_tuner;
