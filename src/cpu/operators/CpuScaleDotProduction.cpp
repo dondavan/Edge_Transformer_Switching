@@ -221,9 +221,13 @@ if(_recurrence_count ==0){
     {
         output_cl          = static_cast<ICLTensor *>(output);
         output_cl->map(CLScheduler::get().queue());
-        std::cout << "CL_output id: " << output->info()->id() << std::endl;
     }
 }
+
+    std::cout << "query_cl CL_value: " << *reinterpret_cast<float *>(query_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    std::cout << "key_cl CL_value: " << *reinterpret_cast<float *>(key_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    std::cout << "value_cl CL_value: " << *reinterpret_cast<float *>(value_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    std::cout << "output_cl CL_value: " << *reinterpret_cast<float *>(output_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
