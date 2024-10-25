@@ -92,6 +92,7 @@ void *CLBufferMemoryRegion::ptr()
 void *CLBufferMemoryRegion::map(cl::CommandQueue &q, bool blocking)
 {
     ARM_COMPUTE_ERROR_ON(_mem.get() == nullptr);
+    stdL::cout << "CLBufferMemoryRegion::map " << std::endl;
     _mapping = q.enqueueMapBuffer(_mem, blocking ? CL_TRUE : CL_FALSE, CL_MAP_READ | CL_MAP_WRITE, 0, _size);
     return _mapping;
 }

@@ -51,6 +51,7 @@ std::unique_ptr<ICLMemoryRegion> allocate_region(size_t size, cl_uint alignment)
         std::make_unique<CLFineSVMMemoryRegion>(CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size, alignment);
     if(region != nullptr) std::cout << "fine-grain SVM" << std::endl;
     
+    /*
     // Try coarse-grain SVM in case of failure
     if (region != nullptr && region->ptr() == nullptr)
     {
@@ -58,10 +59,12 @@ std::unique_ptr<ICLMemoryRegion> allocate_region(size_t size, cl_uint alignment)
         if(region != nullptr) std::cout << "Coarse SVM" << std::endl;
 
     }
+    */
     // Try legacy buffer memory in case of failure
     if (region != nullptr && region->ptr() == nullptr)
     {
         region = std::make_unique<CLBufferMemoryRegion>(CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE, size);
+        if(region != nullptr) std::cout << "Buffer ehhh" << std::endl;
     }
     return region;
 }
