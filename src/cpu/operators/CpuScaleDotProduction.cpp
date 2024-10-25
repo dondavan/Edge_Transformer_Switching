@@ -216,6 +216,13 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
         value_cl->map(CLScheduler::get().queue());
     }
 
+    if(output->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        output_cl          = static_cast<ICLTensor *>(output);
+        output_cl->map(CLScheduler::get().queue());
+        std::cout << "CL_output id: " << output->info()->id() << std::endl;
+    }
+
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
@@ -449,17 +456,9 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 #endif
 */
 
-    if(output->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        output_cl          = static_cast<ICLTensor *>(output);
-        output_cl->map(CLScheduler::get().queue());
-        std::cout << "CL_output id: " << output->info()->id() << std::endl;
-    }
-
     ITensorPack concat_reshape_pack{{ACL_SRC_0, permuted_concat.get()},{ACL_DST, output}};
     NEScheduler::get().schedule_op(_concat_reshape_kernel.get(), Window::DimY, _concat_reshape_kernel->window(), concat_reshape_pack);
 
-    std::cout<< "output: "<< *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(0,0,0))) <<std::endl;
     //const auto concat_split_dimension = _concat_reshape_kernel->get_split_dimension();
 /*
 #ifdef MEASURE_TIME
@@ -473,13 +472,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out.close();
 #endif
 */
-
-    if(output->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        output_cl          = static_cast<ICLTensor *>(output);
-        output_cl->unmap(CLScheduler::get().queue());
-        std::cout << "CL_output id: " << output->info()->id() << std::endl;
-    }
 }
 
 experimental::MemoryRequirements CpuScaleDotProduction::workspace() const
