@@ -54,7 +54,7 @@ std::unique_ptr<ICLMemoryRegion> allocate_region(size_t size, cl_uint alignment)
     // Try legacy buffer memory in case of failure
     if (region != nullptr && region->ptr() == nullptr)
     {
-        region = std::make_unique<CLBufferMemoryRegion>(CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE, size);
+        region = std::make_unique<CLBufferMemoryRegion>(CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, size);
         if(region != nullptr) std::cout << "Buffer ehhh" << std::endl;
     }
     return region;
