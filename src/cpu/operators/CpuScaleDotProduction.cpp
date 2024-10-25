@@ -223,36 +223,10 @@ if(_recurrence_count ==0){
         output_cl->map(CLScheduler::get().queue());
     }
 }
-    if(query->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        ITensor *query_nc = const_cast<ITensor *>(query);
-        query_cl          = static_cast<ICLTensor *>(query_nc);
-        std::cout << "query_cl CL_value: " << *reinterpret_cast<float *>(query_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    }
-
-    if(key->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        ITensor *key_nc = const_cast<ITensor *>(key);
-        key_cl          = static_cast<ICLTensor *>(key_nc);
-        std::cout << "key_cl CL_value: " << *reinterpret_cast<float *>(key_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    }
-
-    if(value->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        ITensor *value_nc = const_cast<ITensor *>(value);
-        value_cl          = static_cast<ICLTensor *>(value_nc);
-        std::cout << "value_cl CL_value: " << *reinterpret_cast<float *>(value_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    }
-
-    if(output->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        output_cl          = static_cast<ICLTensor *>(output);
-        std::cout << "output_cl CL_value: " << *reinterpret_cast<float *>(output_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    }
-    std::cout << "query_cl CL_value: " << *reinterpret_cast<float *>(query_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    std::cout << "key_cl CL_value: " << *reinterpret_cast<float *>(key_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    std::cout << "value_cl CL_value: " << *reinterpret_cast<float *>(value_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    std::cout << "output_cl CL_value: " << *reinterpret_cast<float *>(output_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    std::cout << "query_cl CL_value: " << *reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    std::cout << "key_cl CL_value: " << *reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    std::cout << "value_cl CL_value: " << *reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    std::cout << "output_cl CL_value: " << *reinterpret_cast<float *>(output->ptr_to_element(Coordinates(0,0,0))) << std::endl;
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
