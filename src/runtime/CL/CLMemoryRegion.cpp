@@ -112,7 +112,7 @@ ICLSVMMemoryRegion::ICLSVMMemoryRegion(cl_mem_flags flags, size_t size, size_t a
         _ptr = clSVMAlloc(CLScheduler::get().context().get(), flags, size, alignment);
         if (_ptr != nullptr)
         {
-            _mem = cl::Buffer(CLScheduler::get().context(), CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, _size, _ptr);
+            _mem = cl::Buffer(CLScheduler::get().context(), CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, _size, _ptr);
         }
     }
 }
