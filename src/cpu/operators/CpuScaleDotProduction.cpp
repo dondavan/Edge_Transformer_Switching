@@ -191,7 +191,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     ICLTensor *key_cl;
     ICLTensor *value_cl;
     ICLTensor *output_cl;
-
     if(query->info()->tensor_target_type() == TensorTargetType::CL)
     {
         ITensor *query_nc = const_cast<ITensor *>(query);
