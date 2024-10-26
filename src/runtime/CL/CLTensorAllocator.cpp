@@ -66,6 +66,28 @@ std::unique_ptr<ICLMemoryRegion> allocate_region(size_t size, cl_uint alignment)
     }
     return region;
 }
+/** Helper function used to allocate the backing memory of a tensor
+ *
+ * @param[in] size      Size of the allocation
+ * @param[in] alignment Alignment of the allocation
+ *
+ * @return A wrapped memory region
+ */
+std::unique_ptr<ICLMemoryRegion> allocate_region(size_t size, cl_uint alignment, cl_mem_flags mem_hint)
+{
+    // Try fine-grain SVM
+    std::unique_ptr<ICLMemoryRegion> region =
+        std::make_unique<CLFineSVMMemoryRegion>(CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size, alignment);
+    if(region != nullptr && region->ptr() != nullptr) std::cout << "fine-grain SVM" << std::endl;
+
+    // Try legacy buffer memory in case of failure
+    if (region != nullptr && region->ptr() == nullptr)
+    {
+        region = std::make_unique<CLBufferMemoryRegion>(CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE, size);
+        if(region != nullptr) std::cout << "Buffer ehhh" << std::endl;
+    }
+    return region;
+}
 /** Clears quantization arrays
  *
  * @param[in, out] scale  Quantization scale array
@@ -145,7 +167,13 @@ void CLTensorAllocator::allocate()
         }
         else
         {
-            _memory.set_owned_region(allocate_region(info().total_size(), 0));
+            if(info().id() == 15 || info().id() == 16 || info().id() == 17 || info().id() == 18)
+            {
+                _memory.set_owned_region(allocate_region(info().total_size(), 0, CL_MEM_ALLOC_HOST_PTR));
+            }else
+            {
+                _memory.set_owned_region(allocate_region(info().total_size(), 0));
+            }
         }
     }
     else
