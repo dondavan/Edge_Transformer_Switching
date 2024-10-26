@@ -213,6 +213,7 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
     ICLTensor *dst_cl;
     if(src0->info()->tensor_target_type() == TensorTargetType::CL)
     {
+        std::cout << "src0 mapped" << std::endl;
         ITensor *src0_nc = const_cast<ITensor *>(src0);
         src0_cl          = static_cast<ICLTensor *>(src0_nc);
         src0_cl->map(CLScheduler::get().queue());
@@ -220,6 +221,8 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
 
     if(src1->info()->tensor_target_type() == TensorTargetType::CL)
     {
+
+        std::cout << "src1 mapped" << std::endl;
         ITensor *src1_nc = const_cast<ITensor *>(src1);
         src1_cl          = static_cast<ICLTensor *>(src1_nc);
         src1_cl->map(CLScheduler::get().queue());
@@ -227,7 +230,9 @@ void CpuAddKernel::run_op(ITensorPack &tensors, const Window &window, const Thre
 
     if(dst->info()->tensor_target_type() == TensorTargetType::CL)
     {
-        dst_cl          = static_cast<ICLTensor *>(dst);
+
+        std::cout << "dst mapped" << std::endl;
+        dst_cl = static_cast<ICLTensor *>(dst);
         dst_cl->map(CLScheduler::get().queue());
     }
 
