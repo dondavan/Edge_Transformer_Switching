@@ -45,9 +45,14 @@ void CpuScaleDotProduction::configure(const ITensorInfo                 *query,
                                            value->tensor_shape().y(),
                                            value->tensor_shape().z(),
                                            1);
+    TensorShape output_buffer = TensorShape(output->tensor_shape().x(),
+                                           output->tensor_shape().y(),
+                                           output->tensor_shape().z(),
+                                           1);
     _query_cpu_buffer        = query->clone()->set_tensor_shape(query_buffer);
     _key_cpu_buffer          = key->clone()->set_tensor_shape(key_buffer);
     _value_cpu_buffer        = value->clone()->set_tensor_shape(value_buffer);
+    _ouput_cpu_buffer        = output->clone()->set_tensor_shape(output_buffer);
 
     // Query multi-Head reshape
     TensorShape query_reshape = TensorShape(query->tensor_shape().x() / info.h(),
@@ -238,6 +243,7 @@ if(_recurrence_count ==0){
     CpuAuxTensorHandler query_cpu_buffer_aux(offset_int_vec(QueryCPUBuffer), _query_cpu_buffer, tensors);
     CpuAuxTensorHandler key_cpu_buffer_aux(offset_int_vec(ValueCPUBuffer), _key_cpu_buffer, tensors);
     CpuAuxTensorHandler value_cpu_buffer_aux(offset_int_vec(KeyCPUBuffer), _value_cpu_buffer, tensors);
+    CpuAuxTensorHandler output_cpu_buffer_aux(offset_int_vec(OuputCPUBuffer), _ouput_cpu_buffer, tensors);
 
     if(query->info()->tensor_target_type() == TensorTargetType::CL)
     {
@@ -292,7 +298,7 @@ if(_recurrence_count ==0){
     CpuAuxTensorHandler gemmed_context(offset_int_vec(GemmedContext), _gemmed_context, tensors);
 
     // Run Query multi-Head reshape
-    ITensorPack query_reshape_pack{ { ACL_SRC_0, query }, { ACL_DST, reshaped_query.get() } };
+    ITensorPack query_reshape_pack{ { ACL_SRC_0, query_cpu_buffer_aux.get() }, { ACL_DST, reshaped_query.get() } };
     NEScheduler::get().schedule_op(_query_reshape_kernel.get(), Window::DimY, _query_reshape_kernel->window(), query_reshape_pack);
     //const auto query_split_dimension = _query_reshape_kernel->get_split_dimension();
     /*
@@ -323,7 +329,7 @@ if(_recurrence_count ==0){
 */
 
     // Run Key multi-Head reshape
-    ITensorPack key_reshape_pack{ { ACL_SRC_0, key }, { ACL_DST, reshaped_key.get() } };
+    ITensorPack key_reshape_pack{ { ACL_SRC_0, key_cpu_buffer_aux.get() }, { ACL_DST, reshaped_key.get() } };
     NEScheduler::get().schedule_op(_key_reshape_kernel.get(), Window::DimY, _key_reshape_kernel->window(), key_reshape_pack);
     //const auto key_split_dimension = _key_reshape_kernel->get_split_dimension();
     /*
@@ -356,7 +362,7 @@ if(_recurrence_count ==0){
     _key_transpose_func->run(key_transpose_pack);
 
     // Run Value multi-Head reshape
-    ITensorPack value_reshape_pack{ { ACL_SRC_0, value }, { ACL_DST, reshaped_value.get() } };
+    ITensorPack value_reshape_pack{ { ACL_SRC_0, value_cpu_buffer_aux.get() }, { ACL_DST, reshaped_value.get() } };
     NEScheduler::get().schedule_op(_value_reshape_kernel.get(), Window::DimY, _value_reshape_kernel->window(), value_reshape_pack);
     //const auto value_split_dimension = _value_reshape_kernel->get_split_dimension();
     /*
@@ -453,13 +459,13 @@ if(_recurrence_count ==0){
 #endif
 */
 
-    ITensorPack concat_reshape_pack{ { ACL_SRC_0, permuted_concat.get() }, { ACL_DST, output } };
+    ITensorPack concat_reshape_pack{ { ACL_SRC_0, permuted_concat.get() }, { ACL_DST, output_cpu_buffer_aux.get() } };
     NEScheduler::get().schedule_op(_concat_reshape_kernel.get(), Window::DimY, _concat_reshape_kernel->window(), concat_reshape_pack);
 
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
     {
         output_cl          = static_cast<ICLTensor *>(output);
-        CLScheduler::get().queue().enqueueWriteBuffer(output_cl->cl_buffer(), CL_TRUE, 0, output->info()->total_size(), output->buffer());
+        CLScheduler::get().queue().enqueueWriteBuffer(output_cl->cl_buffer(), CL_TRUE, 0, output->info()->total_size(), output_cpu_buffer_aux.get());
         std::cout << "Aux CL_output_cl: " << *reinterpret_cast<float *>(output_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
 

@@ -81,6 +81,7 @@ private:
         QueryCPUBuffer,
         KeyCPUBuffer,
         ValueCPUBuffer,
+        OuputCPUBuffer,
         
         Count
     };
@@ -127,6 +128,7 @@ private:
     TensorInfo _query_cpu_buffer{};
     TensorInfo _key_cpu_buffer{};
     TensorInfo _value_cpu_buffer{};
+    TensorInfo _ouput_cpu_buffer{};
 
     bool _run_pretranspose{false};
     bool _run_scale{false};
