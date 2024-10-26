@@ -83,7 +83,7 @@ std::unique_ptr<ICLMemoryRegion> allocate_region(size_t size, cl_uint alignment,
     // Try legacy buffer memory in case of failure
     if (region != nullptr && region->ptr() == nullptr)
     {
-        region = std::make_unique<CLBufferMemoryRegion>(CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE, size);
+        region = std::make_unique<CLBufferMemoryRegion>(mem_hint, size);
         if(region != nullptr) std::cout << "Buffer ehhh" << std::endl;
     }
     return region;
@@ -169,7 +169,7 @@ void CLTensorAllocator::allocate()
         {
             if(info().id() == 15 || info().id() == 16 || info().id() == 17 || info().id() == 18)
             {
-                _memory.set_owned_region(allocate_region(info().total_size(), 0, CL_MEM_ALLOC_HOST_PTR));
+                _memory.set_owned_region(allocate_region(info().total_size(), 0, CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE));
             }else
             {
                 _memory.set_owned_region(allocate_region(info().total_size(), 0));
