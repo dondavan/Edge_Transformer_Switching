@@ -458,16 +458,17 @@ if(_recurrence_count ==0){
     measure_out << std::scientific << "concat_permute_func cost: " << cost_time << std::endl;
 #endif
 */
-
+    std::cout << "finished 0" << std::endl;
     ITensorPack concat_reshape_pack{ { ACL_SRC_0, permuted_concat.get() }, { ACL_DST, output_cpu_buffer_aux.get() } };
     NEScheduler::get().schedule_op(_concat_reshape_kernel.get(), Window::DimY, _concat_reshape_kernel->window(), concat_reshape_pack);
-
+    std::cout << "finished 1" << std::endl;
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
     {
         output_cl          = static_cast<ICLTensor *>(output);
         CLScheduler::get().queue().enqueueWriteBuffer(output_cl->cl_buffer(), CL_TRUE, 0, output->info()->total_size(), output_cpu_buffer_aux.get());
         std::cout << "Aux CL_output_cl: " << *reinterpret_cast<float *>(output_cpu_buffer_aux.get()->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
+    std::cout << "finished 2" << std::endl;
 
     //const auto concat_split_dimension = _concat_reshape_kernel->get_split_dimension();
     /*
