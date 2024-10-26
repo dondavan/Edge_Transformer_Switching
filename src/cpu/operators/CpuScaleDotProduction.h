@@ -13,6 +13,7 @@
 #include "src/cpu/operators/CpuActivation.h"
 #include "src/cpu/kernels/CpuGemmInterleave4x4Kernel.h"
 #include "src/cpu/kernels/CpuGemmTranspose1xWKernel.h"
+#include "src/cpu/kernels/CpuAddKernel.h"
 
 #include "src/cpu/kernels/CpuReshapeKernel.h"
 #include "src/cpu/operators/CpuPermute.h"
