@@ -207,7 +207,7 @@ class GraphVanillaTransformerExample : public Example
         graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add, 0).set_name("ff_res_add").set_target(Target::NEON);
 
         /* Output*/
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("ff_norm");
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_norm");
     }
 };
 
