@@ -471,18 +471,9 @@ if(_recurrence_count ==0){
 #endif
 */
 
-    ITensorPack concat_reshape_pack{ { ACL_SRC_0, permuted_concat.get() }, { ACL_DST, output_cpu_buffer_aux.get() } };
+    ITensorPack concat_reshape_pack{ { ACL_SRC_0, permuted_concat.get() }, { ACL_DST, output} };
     NEScheduler::get().schedule_op(_concat_reshape_kernel.get(), Window::DimY, _concat_reshape_kernel->window(), concat_reshape_pack);
-    if(output->info()->tensor_target_type() == TensorTargetType::CL)
-    {
-        output_cl          = static_cast<ICLTensor *>(output);
-        if(_recurrence_count ==0)
-        {
-            output_cl->map(CLScheduler::get().queue());
-        }
-        CLScheduler::get().queue().enqueueWriteBuffer(output_cl->cl_buffer(), CL_TRUE, 0, output_cpu_buffer_aux.get()->info()->total_size(), output_cpu_buffer_aux.get()->buffer());
-        std::cout << "Aux CL_output_cl: " << *reinterpret_cast<float *>(output_cpu_buffer_aux.get()->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    }
+    
 
     //const auto concat_split_dimension = _concat_reshape_kernel->get_split_dimension();
     /*
