@@ -465,7 +465,7 @@ if(_recurrence_count ==0){
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
     {
         output_cl          = static_cast<ICLTensor *>(output);
-        CLScheduler::get().queue().enqueueWriteBuffer(output_cl->cl_buffer(), CL_TRUE, 0, output->info()->total_size(), output_cpu_buffer_aux.get());
+        CLScheduler::get().queue().enqueueWriteBuffer(output_cl->cl_buffer(), CL_TRUE, 0, output_cpu_buffer_aux.get()->info()->total_size(), output_cpu_buffer_aux.get()->buffer());
         std::cout << "Aux CL_output_cl: " << *reinterpret_cast<float *>(output_cpu_buffer_aux.get()->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
     std::cout << "finished 2" << std::endl;
