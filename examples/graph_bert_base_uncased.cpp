@@ -91,7 +91,7 @@ class GraphVanillaTransformerExample : public Example
         // Encode Input
         graph << InputLayer(input_descriptor, get_token_accessor(common_params),
                             get_segment_accessor(common_params.segment, move(at2_preproccessor)))
-                     .set_name("in").set_target(Target::CL)
+                     .set_name("in").set_target(Target::NEON)
 
               << EmbeddingLayer(EmbeddingLayerInfo(d_model,
                                                    d_vocab,
@@ -102,7 +102,7 @@ class GraphVanillaTransformerExample : public Example
                                 get_weights_accessor(data_path, "token_embedding.npy", operation_layout),
                                 get_weights_accessor(data_path, "segment_embedding.npy", operation_layout),
                                 get_weights_accessor(data_path, "positional_embedding.npy", operation_layout))
-                     .set_name("tkemb").set_target(Target::CL);
+                     .set_name("tkemb").set_target(Target::NEON);
 
         add_encoder_block(data_path, "layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
         add_encoder_block(data_path, "layer_1/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, sdpa_info);
@@ -122,11 +122,11 @@ class GraphVanillaTransformerExample : public Example
         graph << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model),
                                              TensorShape(d_model)),
                              get_weights_accessor(data_path, "pooler_weight.npy"),
-                             get_weights_accessor(data_path, "pooler_bias.npy")).set_target(Target::CL).set_name("post_linear")
+                             get_weights_accessor(data_path, "pooler_bias.npy")).set_target(Target::NEON).set_name("post_linear")
 
-              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f)).set_target(Target::CL).set_name("post_acti")
+              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f)).set_target(Target::NEON).set_name("post_acti")
 
-              << OutputLayer(get_output_accessor(common_params)).set_name("out").set_target(Target::CL);
+              << OutputLayer(get_output_accessor(common_params)).set_name("out").set_target(Target::NEON);
 
         // Finalize graph
         GraphConfig config;
@@ -186,10 +186,10 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL).set_name("attention_linear")
             << ScaleDotProductionLayer(sdpa_info).set_name("mha").set_target(Target::NEON);
 
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add, 1).set_name("attention_res_add").set_target(Target::CL);
+        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add, 1).set_name("attention_res_add").set_target(Target::NEON);
 
         /* Self output */
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("attention_norm");
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attention_norm");
 
         SubStream without_ff(graph);
         SubStream with_ff(graph);
@@ -197,17 +197,17 @@ class GraphVanillaTransformerExample : public Example
         with_ff << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
                                                TensorShape(d_ff) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_0.npy"),
-                               get_weights_accessor(data_path + layer_path, "ff_bias_0.npy")).set_target(Target::CL).set_name("ff_linear_1")
-                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_acti")
+                               get_weights_accessor(data_path + layer_path, "ff_bias_0.npy")).set_target(Target::NEON).set_name("ff_linear_1")
+                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::NEON).set_name("ff_acti")
                 << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_ff, d_model) /*weight*/,
                                                TensorShape(d_model) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
-                               get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::CL).set_name("ff_linear_2");
+                               get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::NEON).set_name("ff_linear_2");
 
-        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add, 0).set_name("ff_res_add").set_target(Target::CL);
+        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add, 0).set_name("ff_res_add").set_target(Target::NEON);
 
         /* Output*/
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("ff_norm");
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_norm");
     }
 };
 
