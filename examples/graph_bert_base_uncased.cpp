@@ -197,12 +197,12 @@ class GraphVanillaTransformerExample : public Example
         with_ff << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
                                                TensorShape(d_ff) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_0.npy"),
-                               get_weights_accessor(data_path + layer_path, "ff_bias_0.npy")).set_target(Target::NEON).set_name("ff_linear_1")
-                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::NEON).set_name("ff_acti")
+                               get_weights_accessor(data_path + layer_path, "ff_bias_0.npy")).set_target(Target::CL).set_name("ff_linear_1")
+                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_acti")
                 << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_ff, d_model) /*weight*/,
                                                TensorShape(d_model) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
-                               get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::NEON).set_name("ff_linear_2");
+                               get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::CL).set_name("ff_linear_2");
 
         graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add, 0).set_name("ff_res_add").set_target(Target::NEON);
 
