@@ -249,6 +249,10 @@ if(_recurrence_count ==0){
     {
         ITensor *query_nc = const_cast<ITensor *>(query);
         query_cl          = static_cast<ICLTensor *>(query_nc);
+        if(_recurrence_count ==0)
+        {
+            query_cl->map(CLScheduler::get().queue());
+        }
         CLScheduler::get().queue().enqueueReadBuffer(query_cl->cl_buffer(), CL_TRUE, 0, query_cpu_buffer_aux.get()->info()->total_size(), query_cpu_buffer_aux.get()->buffer());
         std::cout << "Aux CL_query: " << *reinterpret_cast<float *>(query_cpu_buffer_aux.get()->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
@@ -257,6 +261,10 @@ if(_recurrence_count ==0){
     {
         ITensor *key_nc = const_cast<ITensor *>(key);
         key_cl          = static_cast<ICLTensor *>(key_nc);
+        if(_recurrence_count ==0)
+        {
+            key_cl->map(CLScheduler::get().queue());
+        }
         CLScheduler::get().queue().enqueueReadBuffer(key_cl->cl_buffer(), CL_TRUE, 0, key_cpu_buffer_aux.get()->info()->total_size(), key_cpu_buffer_aux.get()->buffer());
         std::cout << "Aux CL_key: " << *reinterpret_cast<float *>(key_cpu_buffer_aux.get()->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
@@ -265,6 +273,10 @@ if(_recurrence_count ==0){
     {
         ITensor *value_nc = const_cast<ITensor *>(value);
         value_cl          = static_cast<ICLTensor *>(value_nc);
+        if(_recurrence_count ==0)
+        {
+            value_cl->map(CLScheduler::get().queue());
+        }
         CLScheduler::get().queue().enqueueReadBuffer(value_cl->cl_buffer(), CL_TRUE, 0, value_cpu_buffer_aux.get()->info()->total_size(), value_cpu_buffer_aux.get()->buffer());
         std::cout << "Aux CL_value: " << *reinterpret_cast<float *>(value_cpu_buffer_aux.get()->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
@@ -465,6 +477,10 @@ if(_recurrence_count ==0){
     if(output->info()->tensor_target_type() == TensorTargetType::CL)
     {
         output_cl          = static_cast<ICLTensor *>(output);
+        if(_recurrence_count ==0)
+        {
+            output_cl->map(CLScheduler::get().queue());
+        }
         CLScheduler::get().queue().enqueueWriteBuffer(output_cl->cl_buffer(), CL_TRUE, 0, output_cpu_buffer_aux.get()->info()->total_size(), output_cpu_buffer_aux.get()->buffer());
         std::cout << "Aux CL_output_cl: " << *reinterpret_cast<float *>(output_cpu_buffer_aux.get()->ptr_to_element(Coordinates(0,0,0))) << std::endl;
     }
