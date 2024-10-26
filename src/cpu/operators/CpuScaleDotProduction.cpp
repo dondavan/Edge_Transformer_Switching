@@ -181,6 +181,10 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     std::cout << "value id: " << value->info()->id() << std::endl;
     std::cout << "output id: " << output->info()->id() << std::endl;
 
+    ICLTensor *query_cl;
+    ICLTensor *key_cl;
+    ICLTensor *value_cl;
+    ICLTensor *output_cl;
 
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
@@ -230,7 +234,7 @@ if(_recurrence_count ==0){
 #ifdef MEASURE_TIME
     auto read_start_time = std::chrono::high_resolution_clock::now();
 #endif
-    /*
+    
     CpuAuxTensorHandler query_cpu_buffer_aux(offset_int_vec(QueryCPUBuffer), _query_cpu_buffer, tensors);
     CpuAuxTensorHandler key_cpu_buffer_aux(offset_int_vec(ValueCPUBuffer), _key_cpu_buffer, tensors);
     CpuAuxTensorHandler value_cpu_buffer_aux(offset_int_vec(KeyCPUBuffer), _value_cpu_buffer, tensors);
@@ -261,7 +265,7 @@ if(_recurrence_count ==0){
     //CLScheduler::get().queue().enqueueReadBuffer(query_cl->cl_buffer(), CL_TRUE, 0, query_cpu_buffer_aux.get()->info()->total_size(), query_cpu_buffer_aux.get()->buffer());
     //CLScheduler::get().queue().enqueueReadBuffer(key_cl->cl_buffer(), CL_TRUE, 0, key_cpu_buffer_aux.get()->info()->total_size(), value_cpu_buffer_aux.get()->buffer());
     //CLScheduler::get().queue().enqueueReadBuffer(value_cl->cl_buffer(), CL_TRUE, 0, value_cpu_buffer_aux.get()->info()->total_size(), key_cpu_buffer_aux.get()->buffer());
-*/
+
 
 #ifdef MEASURE_TIME
     auto   read_end_time  = std::chrono::high_resolution_clock::now();
@@ -451,6 +455,13 @@ if(_recurrence_count ==0){
 
     ITensorPack concat_reshape_pack{ { ACL_SRC_0, permuted_concat.get() }, { ACL_DST, output } };
     NEScheduler::get().schedule_op(_concat_reshape_kernel.get(), Window::DimY, _concat_reshape_kernel->window(), concat_reshape_pack);
+
+    if(output->info()->tensor_target_type() == TensorTargetType::CL)
+    {
+        output_cl          = static_cast<ICLTensor *>(output);
+        CLScheduler::get().queue().enqueueWriteBuffer(output_cl->cl_buffer(), CL_TRUE, 0, output->info()->total_size(), output->buffer());
+        std::cout << "Aux CL_output_cl: " << *reinterpret_cast<float *>(output_cl->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    }
 
     //const auto concat_split_dimension = _concat_reshape_kernel->get_split_dimension();
     /*
