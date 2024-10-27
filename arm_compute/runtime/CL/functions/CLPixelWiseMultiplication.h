@@ -33,7 +33,7 @@ namespace arm_compute
 {
 // Forward declaration
 class CLCompileContext;
-class ICLTensor;
+class ITensor;
 class ITensorInfo;
 
 /** Basic function to run opencl::ClMul. */
@@ -84,9 +84,9 @@ public:
      * @param[in]      rounding_policy Rounding policy. Supported rounding modes: to zero, to nearest even.
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+    void configure(ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    float                      scale,
                    ConvertPolicy              overflow_policy,
                    RoundingPolicy             rounding_policy,
@@ -106,9 +106,9 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+                   ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    float                      scale,
                    ConvertPolicy              overflow_policy,
                    RoundingPolicy             rounding_policy,
@@ -167,9 +167,9 @@ public:
      * @param[out]     output   The output tensor, Data types supported: same as @p input1. Number of channels supported: same as @p input1.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+    void configure(ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Initialise the kernel's inputs, output.
      *
@@ -182,9 +182,9 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+                   ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Static function to check if given info will lead to a valid configuration of @ref CLComplexPixelWiseMultiplication
      *

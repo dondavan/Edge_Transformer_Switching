@@ -35,9 +35,9 @@ namespace arm_compute
 {
 struct CLPixelWiseMultiplication::Impl
 {
-    const ICLTensor               *src_0{nullptr};
-    const ICLTensor               *src_1{nullptr};
-    ICLTensor                     *dst{nullptr};
+    const ITensor               *src_0{nullptr};
+    const ITensor               *src_1{nullptr};
+    ITensor                     *dst{nullptr};
     std::unique_ptr<opencl::ClMul> op{nullptr};
 };
 
@@ -48,9 +48,9 @@ CLPixelWiseMultiplication::CLPixelWiseMultiplication(CLPixelWiseMultiplication &
 CLPixelWiseMultiplication &CLPixelWiseMultiplication::operator=(CLPixelWiseMultiplication &&) = default;
 CLPixelWiseMultiplication::~CLPixelWiseMultiplication()                                       = default;
 
-void CLPixelWiseMultiplication::configure(ICLTensor                 *input1,
-                                          ICLTensor                 *input2,
-                                          ICLTensor                 *output,
+void CLPixelWiseMultiplication::configure(ITensor                 *input1,
+                                          ITensor                 *input2,
+                                          ITensor                 *output,
                                           float                      scale,
                                           ConvertPolicy              overflow_policy,
                                           RoundingPolicy             rounding_policy,
@@ -61,9 +61,9 @@ void CLPixelWiseMultiplication::configure(ICLTensor                 *input1,
 }
 
 void CLPixelWiseMultiplication::configure(const CLCompileContext    &compile_context,
-                                          ICLTensor                 *input1,
-                                          ICLTensor                 *input2,
-                                          ICLTensor                 *output,
+                                          ITensor                 *input1,
+                                          ITensor                 *input2,
+                                          ITensor                 *output,
                                           float                      scale,
                                           ConvertPolicy              overflow_policy,
                                           RoundingPolicy             rounding_policy,
@@ -100,9 +100,9 @@ void CLPixelWiseMultiplication::run()
 
 struct CLComplexPixelWiseMultiplication::Impl
 {
-    const ICLTensor                      *src_0{nullptr};
-    const ICLTensor                      *src_1{nullptr};
-    ICLTensor                            *dst{nullptr};
+    const ITensor                      *src_0{nullptr};
+    const ITensor                      *src_1{nullptr};
+    ITensor                            *dst{nullptr};
     std::unique_ptr<opencl::ClComplexMul> op{nullptr};
 };
 
@@ -114,18 +114,18 @@ CLComplexPixelWiseMultiplication &
 CLComplexPixelWiseMultiplication::operator=(CLComplexPixelWiseMultiplication &&) = default;
 CLComplexPixelWiseMultiplication::~CLComplexPixelWiseMultiplication()            = default;
 
-void CLComplexPixelWiseMultiplication::configure(ICLTensor                 *input1,
-                                                 ICLTensor                 *input2,
-                                                 ICLTensor                 *output,
+void CLComplexPixelWiseMultiplication::configure(ITensor                 *input1,
+                                                 ITensor                 *input2,
+                                                 ITensor                 *output,
                                                  const ActivationLayerInfo &act_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input1, input2, output, act_info);
 }
 
 void CLComplexPixelWiseMultiplication::configure(const CLCompileContext    &compile_context,
-                                                 ICLTensor                 *input1,
-                                                 ICLTensor                 *input2,
-                                                 ICLTensor                 *output,
+                                                 ITensor                 *input1,
+                                                 ITensor                 *input2,
+                                                 ITensor                 *output,
                                                  const ActivationLayerInfo &act_info)
 {
     _impl->src_0 = input1;
