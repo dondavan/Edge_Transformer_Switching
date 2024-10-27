@@ -90,9 +90,9 @@ void CLArithmeticAddition::run()
 
 struct CLArithmeticSubtraction::Impl
 {
-    const ICLTensor               *src_0{nullptr};
-    const ICLTensor               *src_1{nullptr};
-    ICLTensor                     *dst{nullptr};
+    const ITensor               *src_0{nullptr};
+    const ITensor               *src_1{nullptr};
+    ITensor                     *dst{nullptr};
     std::unique_ptr<opencl::ClSub> op{nullptr};
 };
 
@@ -103,9 +103,9 @@ CLArithmeticSubtraction::CLArithmeticSubtraction(CLArithmeticSubtraction &&)    
 CLArithmeticSubtraction &CLArithmeticSubtraction::operator=(CLArithmeticSubtraction &&) = default;
 CLArithmeticSubtraction::~CLArithmeticSubtraction()                                     = default;
 
-void CLArithmeticSubtraction::configure(const ICLTensor           *input1,
-                                        const ICLTensor           *input2,
-                                        ICLTensor                 *output,
+void CLArithmeticSubtraction::configure(const ITensor           *input1,
+                                        const ITensor           *input2,
+                                        ITensor                 *output,
                                         ConvertPolicy              policy,
                                         const ActivationLayerInfo &act_info)
 {
@@ -113,9 +113,9 @@ void CLArithmeticSubtraction::configure(const ICLTensor           *input1,
 }
 
 void CLArithmeticSubtraction::configure(const CLCompileContext    &compile_context,
-                                        const ICLTensor           *input1,
-                                        const ICLTensor           *input2,
-                                        ICLTensor                 *output,
+                                        const ITensor           *input1,
+                                        const ITensor           *input2,
+                                        ITensor                 *output,
                                         ConvertPolicy              policy,
                                         const ActivationLayerInfo &act_info)
 {
@@ -147,9 +147,9 @@ void CLArithmeticSubtraction::run()
 
 struct CLArithmeticDivision::Impl
 {
-    const ICLTensor                               *src_0{nullptr};
-    const ICLTensor                               *src_1{nullptr};
-    ICLTensor                                     *dst{nullptr};
+    const ITensor                               *src_0{nullptr};
+    const ITensor                               *src_1{nullptr};
+    ITensor                                     *dst{nullptr};
     std::unique_ptr<opencl::ClElementwiseDivision> op{nullptr};
 };
 
@@ -160,18 +160,18 @@ CLArithmeticDivision::CLArithmeticDivision(CLArithmeticDivision &&)            =
 CLArithmeticDivision &CLArithmeticDivision::operator=(CLArithmeticDivision &&) = default;
 CLArithmeticDivision::~CLArithmeticDivision()                                  = default;
 
-void CLArithmeticDivision::configure(ICLTensor                 *input1,
-                                     ICLTensor                 *input2,
-                                     ICLTensor                 *output,
+void CLArithmeticDivision::configure(ITensor                 *input1,
+                                     ITensor                 *input2,
+                                     ITensor                 *output,
                                      const ActivationLayerInfo &act_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input1, input2, output, act_info);
 }
 
 void CLArithmeticDivision::configure(const CLCompileContext    &compile_context,
-                                     const ICLTensor           *input1,
-                                     const ICLTensor           *input2,
-                                     ICLTensor                 *output,
+                                     const ITensor           *input1,
+                                     const ITensor           *input2,
+                                     ITensor                 *output,
                                      const ActivationLayerInfo &act_info)
 {
     _impl->src_0 = input1;
@@ -201,9 +201,9 @@ void CLArithmeticDivision::run()
 
 struct CLElementwiseMax::Impl
 {
-    const ICLTensor                          *src_0{nullptr};
-    const ICLTensor                          *src_1{nullptr};
-    ICLTensor                                *dst{nullptr};
+    const ITensor                          *src_0{nullptr};
+    const ITensor                          *src_1{nullptr};
+    ITensor                                *dst{nullptr};
     std::unique_ptr<opencl::ClElementwiseMax> op{nullptr};
 };
 
@@ -214,18 +214,18 @@ CLElementwiseMax::CLElementwiseMax(CLElementwiseMax &&)            = default;
 CLElementwiseMax &CLElementwiseMax::operator=(CLElementwiseMax &&) = default;
 CLElementwiseMax::~CLElementwiseMax()                              = default;
 
-void CLElementwiseMax::configure(ICLTensor                 *input1,
-                                 ICLTensor                 *input2,
-                                 ICLTensor                 *output,
+void CLElementwiseMax::configure(ITensor                 *input1,
+                                 ITensor                 *input2,
+                                 ITensor                 *output,
                                  const ActivationLayerInfo &act_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input1, input2, output, act_info);
 }
 
 void CLElementwiseMax::configure(const CLCompileContext    &compile_context,
-                                 ICLTensor                 *input1,
-                                 ICLTensor                 *input2,
-                                 ICLTensor                 *output,
+                                 ITensor                 *input1,
+                                 ITensor                 *input2,
+                                 ITensor                 *output,
                                  const ActivationLayerInfo &act_info)
 {
     _impl->src_0 = input1;
@@ -255,9 +255,9 @@ void CLElementwiseMax::run()
 
 struct CLElementwiseMin::Impl
 {
-    const ICLTensor                          *src_0{nullptr};
-    const ICLTensor                          *src_1{nullptr};
-    ICLTensor                                *dst{nullptr};
+    const ITensor                          *src_0{nullptr};
+    const ITensor                          *src_1{nullptr};
+    ITensor                                *dst{nullptr};
     std::unique_ptr<opencl::ClElementwiseMin> op{nullptr};
 };
 
@@ -268,18 +268,18 @@ CLElementwiseMin::CLElementwiseMin(CLElementwiseMin &&)            = default;
 CLElementwiseMin &CLElementwiseMin::operator=(CLElementwiseMin &&) = default;
 CLElementwiseMin::~CLElementwiseMin()                              = default;
 
-void CLElementwiseMin::configure(ICLTensor                 *input1,
-                                 ICLTensor                 *input2,
-                                 ICLTensor                 *output,
+void CLElementwiseMin::configure(ITensor                 *input1,
+                                 ITensor                 *input2,
+                                 ITensor                 *output,
                                  const ActivationLayerInfo &act_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input1, input2, output, act_info);
 }
 
 void CLElementwiseMin::configure(const CLCompileContext    &compile_context,
-                                 ICLTensor                 *input1,
-                                 ICLTensor                 *input2,
-                                 ICLTensor                 *output,
+                                 ITensor                 *input1,
+                                 ITensor                 *input2,
+                                 ITensor                 *output,
                                  const ActivationLayerInfo &act_info)
 {
     _impl->src_0 = input1;
@@ -309,9 +309,9 @@ void CLElementwiseMin::run()
 
 struct CLElementwiseSquaredDiff::Impl
 {
-    const ICLTensor                                  *src_0{nullptr};
-    const ICLTensor                                  *src_1{nullptr};
-    ICLTensor                                        *dst{nullptr};
+    const ITensor                                  *src_0{nullptr};
+    const ITensor                                  *src_1{nullptr};
+    ITensor                                        *dst{nullptr};
     std::unique_ptr<opencl::ClElementwiseSquaredDiff> op{nullptr};
 };
 
@@ -322,18 +322,18 @@ CLElementwiseSquaredDiff::CLElementwiseSquaredDiff(CLElementwiseSquaredDiff &&) 
 CLElementwiseSquaredDiff &CLElementwiseSquaredDiff::operator=(CLElementwiseSquaredDiff &&) = default;
 CLElementwiseSquaredDiff::~CLElementwiseSquaredDiff()                                      = default;
 
-void CLElementwiseSquaredDiff::configure(ICLTensor                 *input1,
-                                         ICLTensor                 *input2,
-                                         ICLTensor                 *output,
+void CLElementwiseSquaredDiff::configure(ITensor                 *input1,
+                                         ITensor                 *input2,
+                                         ITensor                 *output,
                                          const ActivationLayerInfo &act_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input1, input2, output, act_info);
 }
 
 void CLElementwiseSquaredDiff::configure(const CLCompileContext    &compile_context,
-                                         ICLTensor                 *input1,
-                                         ICLTensor                 *input2,
-                                         ICLTensor                 *output,
+                                         ITensor                 *input1,
+                                         ITensor                 *input2,
+                                         ITensor                 *output,
                                          const ActivationLayerInfo &act_info)
 {
     _impl->src_0 = input1;
@@ -363,9 +363,9 @@ void CLElementwiseSquaredDiff::run()
 
 struct CLElementwisePower::Impl
 {
-    const ICLTensor                            *src_0{nullptr};
-    const ICLTensor                            *src_1{nullptr};
-    ICLTensor                                  *dst{nullptr};
+    const ITensor                            *src_0{nullptr};
+    const ITensor                            *src_1{nullptr};
+    ITensor                                  *dst{nullptr};
     std::unique_ptr<opencl::ClElementwisePower> op{nullptr};
 };
 
@@ -376,18 +376,18 @@ CLElementwisePower::CLElementwisePower(CLElementwisePower &&)            = defau
 CLElementwisePower &CLElementwisePower::operator=(CLElementwisePower &&) = default;
 CLElementwisePower::~CLElementwisePower()                                = default;
 
-void CLElementwisePower::configure(ICLTensor                 *input1,
-                                   ICLTensor                 *input2,
-                                   ICLTensor                 *output,
+void CLElementwisePower::configure(ITensor                 *input1,
+                                   ITensor                 *input2,
+                                   ITensor                 *output,
                                    const ActivationLayerInfo &act_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input1, input2, output, act_info);
 }
 
 void CLElementwisePower::configure(const CLCompileContext    &compile_context,
-                                   ICLTensor                 *input1,
-                                   ICLTensor                 *input2,
-                                   ICLTensor                 *output,
+                                   ITensor                 *input1,
+                                   ITensor                 *input2,
+                                   ITensor                 *output,
                                    const ActivationLayerInfo &act_info)
 {
     _impl->src_0 = input1;

@@ -31,7 +31,6 @@
 namespace arm_compute
 {
 class ITensor;
-class ICLTensor;
 class CLCompileContext;
 class ITensorInfo;
 
@@ -205,9 +204,9 @@ public:
      * @param[in]      policy   Policy to use to handle overflow.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(const ICLTensor           *input1,
-                   const ICLTensor           *input2,
-                   ICLTensor                 *output,
+    void configure(const ITensor           *input1,
+                   const ITensor           *input2,
+                   ITensor                 *output,
                    ConvertPolicy              policy,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Initialise the kernel's inputs, output and conversion policy.
@@ -236,9 +235,9 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   const ICLTensor           *input1,
-                   const ICLTensor           *input2,
-                   ICLTensor                 *output,
+                   const ITensor           *input1,
+                   const ITensor           *input2,
+                   ITensor                 *output,
                    ConvertPolicy              policy,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Static function to check if given info will lead to a valid configuration of opencl::kernels::ClSaturatedArithmeticKernel for subtraction
@@ -317,9 +316,9 @@ public:
      * @param[out]     output   Output tensor. Data types supported: Same as @p input1.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+    void configure(ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Initialise the kernel's inputs, output.
      *
@@ -332,9 +331,9 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   const ICLTensor           *input1,
-                   const ICLTensor           *input2,
-                   ICLTensor                 *output,
+                   const ITensor           *input1,
+                   const ITensor           *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Static function to check if given info will lead to a valid configuration of @ref CLArithmeticDivision
      *
@@ -403,9 +402,9 @@ public:
      * @param[out]     output   Output tensor. Data types supported: same as @p input1.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+    void configure(ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Initialise the kernel's inputs, output and conversion policy.
      *
@@ -418,9 +417,9 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+                   ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Static function to check if given info will lead to a valid configuration of opencl::kernels::ClArithmeticKernel for max
      *
@@ -489,9 +488,9 @@ public:
      * @param[out]     output   Output tensor. Data types supported: same as @p input1.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+    void configure(ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Initialise the kernel's inputs, output and conversion policy.
      *
@@ -504,9 +503,9 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+                   ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Static function to check if given info will lead to a valid configuration of opencl::kernels::ClArithmeticKernel for min
      *
@@ -573,9 +572,9 @@ public:
      * @param[out]     output   Output tensor. Data types supported: same as @p input1.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+    void configure(ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Initialise the kernel's inputs, output and conversion policy.
      *
@@ -588,9 +587,9 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+                   ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Static function to check if given info will lead to a valid configuration of opencl::kernels::ClArithmeticKernel for squared difference
      *
@@ -652,9 +651,9 @@ public:
      * @param[out]     output   Output tensor. Data types supported:F16/F32.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+    void configure(ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Initialise the kernel's inputs, output and conversion policy.
      *
@@ -667,9 +666,9 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+                   ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Static function to check if given info will lead to a valid configuration of opencl::kernels::ClArithmeticKernel for power
      *
