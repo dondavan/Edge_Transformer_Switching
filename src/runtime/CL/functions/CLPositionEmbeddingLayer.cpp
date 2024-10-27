@@ -17,9 +17,9 @@ namespace arm_compute
 
 struct CLPositionEmbeddingLayer::Impl
 {
-    const ICLTensor                         *src{ nullptr };
-    const ICLTensor                         *position{ nullptr };
-    ICLTensor                               *dst{ nullptr };
+    const ITensor                         *src{ nullptr };
+    const ITensor                         *position{ nullptr };
+    ITensor                               *dst{ nullptr };
     IRuntimeContext                         *ctx{ nullptr };
     std::unique_ptr<opencl::ClPositionEmbed> op{ nullptr };
 };
@@ -31,17 +31,17 @@ CLPositionEmbeddingLayer::CLPositionEmbeddingLayer()
 
 CLPositionEmbeddingLayer::~CLPositionEmbeddingLayer() = default;
 
-void CLPositionEmbeddingLayer::configure(ICLTensor *input,
-                                         ICLTensor *position,
-                                         ICLTensor *output)
+void CLPositionEmbeddingLayer::configure(ITensor *input,
+                                         ITensor *position,
+                                         ITensor *output)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input, position, output);
 }
 
 void CLPositionEmbeddingLayer::configure(const CLCompileContext &compile_context,
-                                         ICLTensor              *input,
-                                         ICLTensor              *position,
-                                         ICLTensor              *output)
+                                         ITensor              *input,
+                                         ITensor              *position,
+                                         ITensor              *output)
 {
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();

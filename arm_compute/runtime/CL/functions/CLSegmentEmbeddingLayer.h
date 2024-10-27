@@ -10,7 +10,7 @@ namespace arm_compute
 {
 // Forward declarations
 class CLCompileContext;
-class ICLTensor;
+class ITensor;
 class ITensorInfo;
 
 class CLSegmentEmbeddingLayer : public IFunction
@@ -31,7 +31,7 @@ public:
      * @param[in]  segment      Const tenser of segment vector, Data type supported: F32
      * @param[out] output       Output tensor, shape (seq_len,d_model). Data type supported: F32
      */
-    void configure(ICLTensor *input, ICLTensor *segment, ICLTensor *output);
+    void configure(ITensor *input, ITensor *segment, ITensor *output);
     /** Set the input and output tensor.
      * 
      * @param[in]  compile_context The compile context to be used.
@@ -39,14 +39,14 @@ public:
      * @param[in]  segment      Const tenser of segment vector, Data type supported: F32
      * @param[out] output       Output tensor, shape (seq_len,d_model). Data type supported: F32
      */
-    void configure(const CLCompileContext &compile_context,ICLTensor *input, ICLTensor *segment, ICLTensor *output);
+    void configure(const CLCompileContext &compile_context,ITensor *input, ITensor *segment, ITensor *output);
     /** Static function to check if given info will lead to a valid configuration of @ref CLSegmentEmbeddingLayer
      *
      * @param[in] output Destination tensor info. Data type supported: same as @p input
      *
      * @return a status
      */
-    static Status validate(ICLTensor *output);
+    static Status validate(ITensor *output);
 
     void prepare() override;
     // Inherited methods overridden:

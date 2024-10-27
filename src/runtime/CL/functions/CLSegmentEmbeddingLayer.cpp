@@ -17,9 +17,9 @@ namespace arm_compute
 
 struct CLSegmentEmbeddingLayer::Impl
 {
-    const ICLTensor                        *src{ nullptr };
-    const ICLTensor                        *segment{ nullptr };
-    ICLTensor                              *dst{ nullptr };
+    const ITensor                        *src{ nullptr };
+    const ITensor                        *segment{ nullptr };
+    ITensor                              *dst{ nullptr };
     IRuntimeContext                      *ctx{ nullptr };
     std::unique_ptr<opencl::ClSegmentEmbed> op{ nullptr };
 };
@@ -32,12 +32,12 @@ CLSegmentEmbeddingLayer::CLSegmentEmbeddingLayer()
 CLSegmentEmbeddingLayer::~CLSegmentEmbeddingLayer() = default;
 
 
-void CLSegmentEmbeddingLayer::configure(ICLTensor *input, ICLTensor *segment, ICLTensor *output)
+void CLSegmentEmbeddingLayer::configure(ITensor *input, ITensor *segment, ITensor *output)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input, segment, output);
 }
 
-void CLSegmentEmbeddingLayer::configure(const CLCompileContext &compile_context,ICLTensor *input, ICLTensor *segment, ICLTensor *output)
+void CLSegmentEmbeddingLayer::configure(const CLCompileContext &compile_context,ITensor *input, ITensor *segment, ITensor *output)
 {
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();

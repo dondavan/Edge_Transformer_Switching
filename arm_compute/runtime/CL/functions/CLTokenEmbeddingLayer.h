@@ -35,9 +35,9 @@ public:
      * @param[in]  emb_info     Token Embedding Layer Info.
      * @param[out] output       Output tensor, shape (seq_len,d_model). Data type supported: F32
      */
-    void configure(ICLTensor *input, 
-                  ICLTensor *vocab, 
-                  ICLTensor *output, 
+    void configure(ITensor *input, 
+                  ITensor *vocab, 
+                  ITensor *output, 
                   const EmbeddingLayerInfo& emb_info);
     /** Set the input and output tensor.
      * 
@@ -48,9 +48,9 @@ public:
      * @param[out] output       Output tensor, shape (seq_len,d_model). Data type supported: F32
      */
     void configure(const CLCompileContext &compile_context,
-                  ICLTensor *input, 
-                  ICLTensor *vocab, 
-                  ICLTensor *output, 
+                  ITensor *input, 
+                  ITensor *vocab, 
+                  ITensor *output, 
                   const EmbeddingLayerInfo& emb_info);
     /** Static function to check if given info will lead to a valid configuration of @ref CLTokenEmbeddingLayer
      *
@@ -59,7 +59,7 @@ public:
      *
      * @return a status
      */
-    static Status validate(ICLTensor *output, const EmbeddingLayerInfo& tkemb_info);
+    static Status validate(ITensor *output, const EmbeddingLayerInfo& tkemb_info);
 
     void prepare() override;
     // Inherited methods overridden:

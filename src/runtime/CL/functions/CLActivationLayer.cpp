@@ -36,8 +36,8 @@ namespace arm_compute
 {
 struct CLActivationLayer::Impl
 {
-    const ICLTensor                      *src{nullptr};
-    ICLTensor                            *dst{nullptr};
+    const ITensor                      *src{nullptr};
+    ITensor                            *dst{nullptr};
     CLRuntimeContext                     *ctx{nullptr};
     std::unique_ptr<opencl::ClActivation> op{nullptr};
 };
@@ -50,14 +50,14 @@ CLActivationLayer::CLActivationLayer(CLActivationLayer &&)            = default;
 CLActivationLayer &CLActivationLayer::operator=(CLActivationLayer &&) = default;
 CLActivationLayer::~CLActivationLayer()                               = default;
 
-void CLActivationLayer::configure(ICLTensor *input, ICLTensor *output, ActivationLayerInfo act_info)
+void CLActivationLayer::configure(ITensor *input, ITensor *output, ActivationLayerInfo act_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input, output, act_info);
 }
 
 void CLActivationLayer::configure(const CLCompileContext &compile_context,
-                                  ICLTensor              *input,
-                                  ICLTensor              *output,
+                                  ITensor              *input,
+                                  ITensor              *output,
                                   ActivationLayerInfo     act_info)
 {
     ARM_COMPUTE_ERROR_ON_NULLPTR(input);

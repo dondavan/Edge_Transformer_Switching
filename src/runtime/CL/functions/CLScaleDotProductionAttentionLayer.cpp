@@ -34,19 +34,19 @@ CLScaleDotProductionAttentionLayer::CLScaleDotProductionAttentionLayer()
 
 CLScaleDotProductionAttentionLayer::~CLScaleDotProductionAttentionLayer() = default;
 
-void CLScaleDotProductionAttentionLayer::configure(const ICLTensor                            *query,
-                                                   const ICLTensor                            *key,
-                                                   const ICLTensor                            *value,
-                                                   ICLTensor                                  *output,
+void CLScaleDotProductionAttentionLayer::configure(const ITensor                            *query,
+                                                   const ITensor                            *key,
+                                                   const ITensor                            *value,
+                                                   ITensor                                  *output,
                                                    const ScaleDotProductionLayerInfo &info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), query, key, value, output, info);
 }
 void CLScaleDotProductionAttentionLayer::configure(const CLCompileContext                     &compile_context,
-                                                   const ICLTensor                            *query,
-                                                   const ICLTensor                            *key,
-                                                   const ICLTensor                            *value,
-                                                   ICLTensor                                  *output,
+                                                   const ITensor                            *query,
+                                                   const ITensor                            *key,
+                                                   const ITensor                            *value,
+                                                   ITensor                                  *output,
                                                    const ScaleDotProductionLayerInfo &info)
 {
 #ifdef MEASURE_TIME

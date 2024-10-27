@@ -11,8 +11,8 @@ namespace arm_compute
 {
 // Forward declarations
 class CLCompileContext;
-class ICLTensor;
-class ICLTensorInfo;
+class ITensor;
+class ITensorInfo;
 
 /** Perform basic layer normalization function */
 class CLLayerNormLayer : public IFunction
@@ -44,8 +44,8 @@ class CLLayerNormLayer : public IFunction
      * @param[in]  input1 First tensor input. Data type supported: F32.
      * @param[out] output Output tensor. Data type supported: F32.
      */
-    void configure(const ICLTensor          *input,
-                   ICLTensor                *output,
+    void configure(const ITensor          *input,
+                   ITensor                *output,
                    const LayerNormLayerInfo &LayerNorm_info);
     /** Initialise the kernel's inputs and output
      *
@@ -61,8 +61,8 @@ class CLLayerNormLayer : public IFunction
      * @param[out] output Output tensor. Data type supported: F32.
      */
     void configure(const CLCompileContext   &compile_context,
-                   const ICLTensor          *input,
-                   ICLTensor                *output,
+                   const ITensor          *input,
+                   ITensor                *output,
                    const LayerNormLayerInfo &LayerNorm_info);
     /** Static function to check if given info will lead to a valid configuration of @ref CLLayerNormLayer
      *
@@ -71,7 +71,7 @@ class CLLayerNormLayer : public IFunction
      *
      * @return a status
      */
-    static Status validate(const ICLTensor *input, ICLTensor *output, const LayerNormLayerInfo &LayerNorm_info);
+    static Status validate(const ITensor *input, ITensor *output, const LayerNormLayerInfo &LayerNorm_info);
 
     // Inherited methods overridden
     void run() override;

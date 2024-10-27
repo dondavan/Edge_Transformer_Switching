@@ -11,7 +11,7 @@ namespace arm_compute
 {
 // Forward declarations
 class CLCompileContext;
-class ICLTensor;
+class ITensor;
 class ITensorInfo;
 
 class CLEmbeddingSumLayer : public IFunction
@@ -33,10 +33,10 @@ class CLEmbeddingSumLayer : public IFunction
      * @param[in]  position     Token embedding input, Data type supported: F32
      * @param[out] output       Output tensor, shape (seq_len,d_model). Data type supported: F32
      */
-    void configure( ICLTensor *token,
-                    ICLTensor *segemnt, 
-                    ICLTensor *position, 
-                    ICLTensor *output, 
+    void configure( ITensor *token,
+                    ITensor *segemnt, 
+                    ITensor *position, 
+                    ITensor *output, 
                     const EmbeddingLayerInfo &emb_info);
     /** Set the input and output tensor.
      * 
@@ -47,10 +47,10 @@ class CLEmbeddingSumLayer : public IFunction
      * @param[out] output       Output tensor, shape (seq_len,d_model). Data type supported: F32
      */
     void configure( const CLCompileContext &compile_context,
-                    ICLTensor *token,
-                    ICLTensor *segemnt, 
-                    ICLTensor *position, 
-                    ICLTensor *output, 
+                    ITensor *token,
+                    ITensor *segemnt, 
+                    ITensor *position, 
+                    ITensor *output, 
                     const EmbeddingLayerInfo &emb_info);
     /** Static function to check if given info will lead to a valid configuration of @ref CLEmbeddingSumLayer
      * 
@@ -61,7 +61,7 @@ class CLEmbeddingSumLayer : public IFunction
      *
      * @return a status
      */
-    static Status validate(ICLTensor *token, ICLTensor *segemnt, ICLTensor *position, ICLTensor *output, const EmbeddingLayerInfo &emb_info);
+    static Status validate(ITensor *token, ITensor *segemnt, ITensor *position, ITensor *output, const EmbeddingLayerInfo &emb_info);
 
     void prepare() override;
     // Inherited methods overridden:

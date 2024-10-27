@@ -12,8 +12,8 @@ namespace arm_compute
 
 // Forward declarations
 class CLCompileContext;
-class ICLTensor;
-class ICLTensorInfo;
+class ITensor;
+class ITensorInfo;
 
 class CLScaleDotProductionAttentionLayer : public IFunction
 {
@@ -34,10 +34,10 @@ class CLScaleDotProductionAttentionLayer : public IFunction
      * @param[in]  value      Input tenser of Attention Value, Data type supported: F32
      * @param[out] output     Output tensor, shape (d_model,d_model). Data type supported: F32
      */
-    void configure(const ICLTensor                            *query,
-                   const ICLTensor                            *key,
-                   const ICLTensor                            *value,
-                   ICLTensor                                  *output,
+    void configure(const ITensor                            *query,
+                   const ITensor                            *key,
+                   const ITensor                            *value,
+                   ITensor                                  *output,
                    const ScaleDotProductionLayerInfo &info);
     /** Set the input and output tensor.
      * 
@@ -47,10 +47,10 @@ class CLScaleDotProductionAttentionLayer : public IFunction
      * @param[out] output     Output tensor, shape (d_model,d_model). Data type supported: F32
      */
     void configure(const CLCompileContext                     &compile_context,
-                   const ICLTensor                            *query,
-                   const ICLTensor                            *key,
-                   const ICLTensor                            *value,
-                   ICLTensor                                  *output,
+                   const ITensor                            *query,
+                   const ITensor                            *key,
+                   const ITensor                            *value,
+                   ITensor                                  *output,
                    const ScaleDotProductionLayerInfo &info);
     /** Static function to check if given info will lead to a valid configuration of @ref CLScaleDotProductionAttentionLayer
      *
@@ -58,7 +58,7 @@ class CLScaleDotProductionAttentionLayer : public IFunction
      *
      * @return a status
      */
-    static Status validate(ICLTensor *output);
+    static Status validate(ITensor *output);
 
     // Inherited methods overridden:
     void run() override;

@@ -31,6 +31,7 @@
 namespace arm_compute
 {
 class ICLTensor;
+class ITensor;
 class CLCompileContext;
 class ITensorInfo;
 
@@ -82,9 +83,9 @@ public:
      * @param[in]      policy   Policy to use to handle overflow.
      * @param[in]      act_info (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input1,
-                   ICLTensor                 *input2,
-                   ICLTensor                 *output,
+    void configure(ITensor                 *input1,
+                   ITensor                 *input2,
+                   ITensor                 *output,
                    ConvertPolicy              policy,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Initialise the kernel's inputs, output and conversion policy.
@@ -113,9 +114,9 @@ public:
      * @param[in]      act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   const ICLTensor           *input1,
-                   const ICLTensor           *input2,
-                   ICLTensor                 *output,
+                   const ITensor           *input1,
+                   const ITensor           *input2,
+                   ITensor                 *output,
                    ConvertPolicy              policy,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Static function to check if given info will lead to a valid configuration of opencl::kernels::ClSaturatedArithmeticKernel for addition

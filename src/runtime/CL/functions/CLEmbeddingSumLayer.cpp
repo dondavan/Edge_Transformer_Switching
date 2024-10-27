@@ -17,10 +17,10 @@ namespace arm_compute
 
 struct CLEmbeddingSumLayer::Impl
 {
-    const ICLTensor                    *token{ nullptr };
-    const ICLTensor                    *segment{ nullptr };
-    const ICLTensor                    *position{ nullptr };
-    ICLTensor                          *dst{ nullptr };
+    const ITensor                    *token{ nullptr };
+    const ITensor                    *segment{ nullptr };
+    const ITensor                    *position{ nullptr };
+    ITensor                          *dst{ nullptr };
     IRuntimeContext                    *ctx{ nullptr };
     std::unique_ptr<opencl::ClEmbedSum> op{ nullptr };
 };
@@ -32,20 +32,20 @@ CLEmbeddingSumLayer::CLEmbeddingSumLayer()
 
 CLEmbeddingSumLayer::~CLEmbeddingSumLayer() = default;
 
-void CLEmbeddingSumLayer::configure(ICLTensor                *token,
-                                    ICLTensor                *segment,
-                                    ICLTensor                *position,
-                                    ICLTensor                *output,
+void CLEmbeddingSumLayer::configure(ITensor                *token,
+                                    ITensor                *segment,
+                                    ITensor                *position,
+                                    ITensor                *output,
                                     const EmbeddingLayerInfo &emb_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), token, segment, position, output, emb_info);
 }
 
 void CLEmbeddingSumLayer::configure(const CLCompileContext   &compile_context,
-                                    ICLTensor                *token,
-                                    ICLTensor                *segment,
-                                    ICLTensor                *position,
-                                    ICLTensor                *output,
+                                    ITensor                *token,
+                                    ITensor                *segment,
+                                    ITensor                *position,
+                                    ITensor                *output,
                                     const EmbeddingLayerInfo &emb_info)
 {
 #ifdef MEASURE_TIME

@@ -17,9 +17,9 @@ namespace arm_compute
 
 struct CLTokenEmbeddingLayer::Impl
 {
-    const ICLTensor                      *src{ nullptr };
-    const ICLTensor                      *vocab{ nullptr };
-    ICLTensor                            *dst{ nullptr };
+    const ITensor                      *src{ nullptr };
+    const ITensor                      *vocab{ nullptr };
+    ITensor                            *dst{ nullptr };
     IRuntimeContext                      *ctx{ nullptr };
     std::unique_ptr<opencl::ClTokenEmbed> op{ nullptr };
 };
@@ -31,17 +31,17 @@ CLTokenEmbeddingLayer::CLTokenEmbeddingLayer()
 
 CLTokenEmbeddingLayer::~CLTokenEmbeddingLayer() = default;
 
-void CLTokenEmbeddingLayer::configure(ICLTensor *input,
-                                      ICLTensor *vocab,
-                                      ICLTensor *output, const EmbeddingLayerInfo &emb_info)
+void CLTokenEmbeddingLayer::configure(ITensor *input,
+                                      ITensor *vocab,
+                                      ITensor *output, const EmbeddingLayerInfo &emb_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input, vocab, output, emb_info);
 }
 
 void CLTokenEmbeddingLayer::configure(const CLCompileContext &compile_context,
-                                      ICLTensor              *input,
-                                      ICLTensor              *vocab,
-                                      ICLTensor *output, const EmbeddingLayerInfo &emb_info)
+                                      ITensor              *input,
+                                      ITensor              *vocab,
+                                      ITensor *output, const EmbeddingLayerInfo &emb_info)
 {
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();

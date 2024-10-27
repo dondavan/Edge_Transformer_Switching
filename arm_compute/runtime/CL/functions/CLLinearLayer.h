@@ -14,8 +14,8 @@ namespace arm_compute
 {
 // Forward declarations
 class CLCompileContext;
-class ICLTensor;
-class ICLTensorInfo;
+class ITensor;
+class ITensorInfo;
 
 /** Perform basic linear function */
 class CLLinearLayer : public IFunction
@@ -48,10 +48,10 @@ class CLLinearLayer : public IFunction
      * @param[in]  input1 First tensor input. Data type supported: F32.
      * @param[out] output Output tensor. Data type supported: F32.
      */
-    void configure(const ICLTensor       *input1,
-                   const ICLTensor       *weight,
-                   const ICLTensor       *bias,
-                   ICLTensor             *output,
+    void configure(const ITensor       *input1,
+                   const ITensor       *weight,
+                   const ITensor       *bias,
+                   ITensor             *output,
                    const LinearLayerInfo &linear_info);
     /** Initialise the kernel's inputs and output
      *
@@ -67,10 +67,10 @@ class CLLinearLayer : public IFunction
      * @param[out] output Output tensor. Data type supported: F32.
      */
     void configure(const CLCompileContext &compile_context,
-                   const ICLTensor        *input1,
-                   const ICLTensor        *weight,
-                   const ICLTensor        *bias,
-                   ICLTensor              *output,
+                   const ITensor        *input1,
+                   const ITensor        *weight,
+                   const ITensor        *bias,
+                   ITensor              *output,
                    const LinearLayerInfo  &linear_info);
     /** Static function to check if given info will lead to a valid configuration of @ref CLLinearLayer
      *
@@ -79,7 +79,7 @@ class CLLinearLayer : public IFunction
      *
      * @return a status
      */
-    static Status validate(const ICLTensor *input, const ICLTensor *weight, const ICLTensor *bias, ICLTensor *output, const LinearLayerInfo &linear_info);
+    static Status validate(const ITensor *input, const ITensor *weight, const ITensor *bias, ITensor *output, const LinearLayerInfo &linear_info);
 
     // Inherited methods overridden
     void run() override;

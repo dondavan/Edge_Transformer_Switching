@@ -33,6 +33,7 @@ namespace arm_compute
 {
 class CLCompileContext;
 class ICLTensor;
+class ITensor;
 class ITensorInfo;
 
 /** Basic function to run opencl::kernels::ClActivationKernel
@@ -79,7 +80,7 @@ public:
      * @param[out]     output   Destination tensor. Data type supported: same as @p input
      * @param[in]      act_info Activation layer parameters.
      */
-    void configure(ICLTensor *input, ICLTensor *output, ActivationLayerInfo act_info);
+    void configure(ITensor *input, ITensor *output, ActivationLayerInfo act_info);
     /** Set the input and output tensor.
      *
      * @note If the output tensor is a nullptr or is equal to the input, the activation function will be performed in-place
@@ -91,8 +92,8 @@ public:
      * @param[in]      act_info        Activation layer parameters.
      */
     void configure(const CLCompileContext &compile_context,
-                   ICLTensor              *input,
-                   ICLTensor              *output,
+                   ITensor              *input,
+                   ITensor              *output,
                    ActivationLayerInfo     act_info);
     /** Static function to check if given info will lead to a valid configuration of @ref CLActivationLayer
      *

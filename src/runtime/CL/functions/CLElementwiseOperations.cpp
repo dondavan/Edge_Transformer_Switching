@@ -36,9 +36,9 @@ namespace arm_compute
 {
 struct CLArithmeticAddition::Impl
 {
-    const ICLTensor               *src_0{nullptr};
-    const ICLTensor               *src_1{nullptr};
-    ICLTensor                     *dst{nullptr};
+    const ITensor               *src_0{nullptr};
+    const ITensor               *src_1{nullptr};
+    ITensor                     *dst{nullptr};
     std::unique_ptr<opencl::ClAdd> op{nullptr};
 };
 
@@ -50,15 +50,15 @@ CLArithmeticAddition &CLArithmeticAddition::operator=(CLArithmeticAddition &&) =
 CLArithmeticAddition::~CLArithmeticAddition()                                  = default;
 
 void CLArithmeticAddition::configure(
-    ICLTensor *input1, ICLTensor *input2, ICLTensor *output, ConvertPolicy policy, const ActivationLayerInfo &act_info)
+    ITensor *input1, ITensor *input2, ITensor *output, ConvertPolicy policy, const ActivationLayerInfo &act_info)
 {
     configure(CLKernelLibrary::get().get_compile_context(), input1, input2, output, policy, act_info);
 }
 
 void CLArithmeticAddition::configure(const CLCompileContext    &compile_context,
-                                     const ICLTensor           *input1,
-                                     const ICLTensor           *input2,
-                                     ICLTensor                 *output,
+                                     const ITensor           *input1,
+                                     const ITensor           *input2,
+                                     ITensor                 *output,
                                      ConvertPolicy              policy,
                                      const ActivationLayerInfo &act_info)
 {

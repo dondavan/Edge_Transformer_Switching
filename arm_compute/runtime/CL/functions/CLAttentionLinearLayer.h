@@ -14,8 +14,8 @@ namespace arm_compute
 {
 // Forward declarations
 class CLCompileContext;
-class ICLTensor;
-class ICLTensorInfo;
+class ITensor;
+class ITensorInfo;
 
 /** Perform basic linear function */
 class CLAttentionLinearLayer : public IFunction
@@ -48,10 +48,10 @@ class CLAttentionLinearLayer : public IFunction
      * @param[in]  input1 First tensor input. Data type supported: F32.
      * @param[out] output Output tensor. Data type supported: F32.
      */
-    void configure(const ICLTensor *query_input, const ICLTensor *query_w, const ICLTensor *query_b,
-                   const ICLTensor *key_input, const ICLTensor *key_w, const ICLTensor *key_b,
-                   const ICLTensor *value_input, const ICLTensor *value_w, const ICLTensor *value_b,
-                   ICLTensor *query_output, ICLTensor *key_output, ICLTensor *value_output,
+    void configure(const ITensor *query_input, const ITensor *query_w, const ITensor *query_b,
+                   const ITensor *key_input, const ITensor *key_w, const ITensor *key_b,
+                   const ITensor *value_input, const ITensor *value_w, const ITensor *value_b,
+                   ITensor *query_output, ITensor *key_output, ITensor *value_output,
                    const LinearLayerInfo& linear_info);
     /** Initialise the kernel's inputs and output
      *
@@ -67,10 +67,10 @@ class CLAttentionLinearLayer : public IFunction
      * @param[out] output Output tensor. Data type supported: F32.
      */
     void configure(const CLCompileContext &compile_context,
-                   const ICLTensor *query_input, const ICLTensor *query_w, const ICLTensor *query_b,
-                   const ICLTensor *key_input, const ICLTensor *key_w, const ICLTensor *key_b,
-                   const ICLTensor *value_input, const ICLTensor *value_w, const ICLTensor *value_b,
-                   ICLTensor *query_output, ICLTensor *key_output, ICLTensor *value_output,
+                   const ITensor *query_input, const ITensor *query_w, const ITensor *query_b,
+                   const ITensor *key_input, const ITensor *key_w, const ITensor *key_b,
+                   const ITensor *value_input, const ITensor *value_w, const ITensor *value_b,
+                   ITensor *query_output, ITensor *key_output, ITensor *value_output,
                    const LinearLayerInfo &linear_info);
     /** Static function to check if given info will lead to a valid configuration of @ref CLAttentionLinearLayer
      *
@@ -79,7 +79,7 @@ class CLAttentionLinearLayer : public IFunction
      *
      * @return a status
      */
-    static Status validate(const ICLTensor *input, const ICLTensor *weight, const ICLTensor *bias, ICLTensor *output, const LinearLayerInfo &linear_info);
+    static Status validate(const ITensor *input, const ITensor *weight, const ITensor *bias, ITensor *output, const LinearLayerInfo &linear_info);
 
     // Inherited methods overridden
     void run() override;
