@@ -79,7 +79,7 @@ public:
         }
     }
 
-    void register_tensor(ICLTensor *tensor)
+    void register_tensor(ITensor *tensor)
     {
         _tensors.push_back(tensor);
     }
