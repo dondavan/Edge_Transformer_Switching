@@ -260,6 +260,18 @@ public:
         return *this;
     }
 
+    TensorTargetType tensor_target_type() const override
+    {
+        ARM_COMPUTE_ERROR_ON(_parent == nullptr);
+        return _parent->tensor_target_type();
+    }
+    ITensorInfo &set_tensor_target_type(TensorTargetType target_type) override
+    {
+        ARM_COMPUTE_ERROR_ON(_parent == nullptr);
+        _parent->set_tensor_target_type(target_type);
+        return *this;
+    }
+
 private:
     ITensorInfo    *_parent;
     TensorShape     _tensor_shape;
