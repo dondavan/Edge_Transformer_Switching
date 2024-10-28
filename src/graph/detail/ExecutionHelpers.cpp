@@ -293,7 +293,7 @@ void call_all_tasks(ExecutionWorkload &workload)
 
         std::ofstream measure_out("measure_output.txt", std::ios::app);
         measure_out.precision(5);
-        measure_out << std::scientific << task.node->name() <<" cost: " << tasktask_cost_time << std::endl;
+        measure_out << std::scientific << task.node->name() <<" cost: " << task_cost_time << std::endl;
 #endif
     }
 
