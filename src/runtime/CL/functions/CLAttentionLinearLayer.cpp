@@ -134,6 +134,9 @@ void CLAttentionLinearLayer::run()
     measure_out.close();
 #endif
     */
+   std::cout << "CLAttentionLinearLayer::run "<<*reinterpret_cast<float *>(_impl->query_input->ptr_to_element(Coordinates(0,0,0)));
+   std::cout << "CLAttentionLinearLayer::run "<<*reinterpret_cast<float *>(_impl->key_input->ptr_to_element(Coordinates(0,0,0)));
+   std::cout << "CLAttentionLinearLayer::run "<<*reinterpret_cast<float *>(_impl->value_input->ptr_to_element(Coordinates(0,0,0)));
     // Q
     ITensorPack query_pack;
     query_pack.add_tensor(TensorType::ACL_SRC_0, _impl->query_input);
