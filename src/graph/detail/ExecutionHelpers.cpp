@@ -260,7 +260,7 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
             for(unsigned int i = 0; i < node->num_outputs(); ++i)
             {
                 Tensor *tensor = node->output(i);
-                std::cout << "Input tensor id:" << tensor->id()<< " : ";
+                std::cout << "Output tensor id:" << tensor->id()<< " : ";
                 switch (tensor->desc().target)
                 {
                     case Target::CL:
