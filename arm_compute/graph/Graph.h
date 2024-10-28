@@ -307,6 +307,7 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
     node->set_id(nid);
     node->set_assigned_target(assigned_target);
 
+    /*
     std::cout << nid;
     switch (node->type())
     {
@@ -339,6 +340,7 @@ inline NodeID Graph::add_node(Target assigned_target, Ts &&...args)
         std::cout << " some node was created" << std::endl;
         break;
     }
+    */
     // Keep track of input nodes
     _tagged_nodes[node->type()].push_back(nid);
 
