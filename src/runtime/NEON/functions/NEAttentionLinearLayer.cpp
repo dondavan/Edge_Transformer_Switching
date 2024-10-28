@@ -42,10 +42,10 @@ void NEAttentionLinearLayer::configure(const ITensor *query_input, const ITensor
                                        const ITensor *key_input, const ITensor *key_w, const ITensor *key_b,
                                        const ITensor *value_input, const ITensor *value_w, const ITensor *value_b,
                                        ITensor *query_output, ITensor *key_output, ITensor *value_output,
-                                       const LinearLayerInfo& linear_info)
+                                       const LinearLayerInfo &linear_info)
 {
-    /*
     ARM_COMPUTE_UNUSED(linear_info);
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
@@ -82,7 +82,6 @@ void NEAttentionLinearLayer::configure(const ITensor *query_input, const ITensor
 
     _impl->value_kernel = std::make_unique<cpu::CpuLinear>();
     _impl->value_kernel->configure(value_input->info(), value_w->info(), value_b->info(), value_output->info(), 1.0f, 1.0f);
-
 }
 
 void NEAttentionLinearLayer::run()
