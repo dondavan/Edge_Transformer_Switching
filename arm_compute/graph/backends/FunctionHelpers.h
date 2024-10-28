@@ -2136,7 +2136,7 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(output);
 
-    return func;
+    return wrap_function;
 }
 
 } // namespace detail
