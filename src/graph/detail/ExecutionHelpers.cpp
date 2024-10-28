@@ -309,6 +309,7 @@ void call_all_tasks(ExecutionWorkload &workload)
         auto   all_task_end_time  = std::chrono::high_resolution_clock::now();
         double all_task_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(all_task_end_time - all_task_start_time).count();
 
+        std::ofstream measure_out("measure_output.txt", std::ios::app);
         measure_out.precision(5);
         measure_out << std::scientific << "All task cost: " << all_task_cost_time << std::endl;
 #endif
