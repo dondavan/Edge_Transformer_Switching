@@ -118,6 +118,8 @@ std::unique_ptr<ITensorHandle> NEDeviceBackend::create_tensor(const Tensor &tens
     // Create backend tensor handle
     TensorInfo info(tensor_desc.shape, 1, tensor_desc.data_type, tensor_desc.quant_info);
     info.set_data_layout(tensor_desc.layout);
+    info.set_tensor_target_type(TensorTargetType::NEON);
+    info.set_id(tensor.id());
 
     return std::make_unique<NETensorHandle>(info);
 }

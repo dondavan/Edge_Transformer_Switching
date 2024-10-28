@@ -61,13 +61,21 @@ public:
     {
         for (auto &tensor : _tensors)
         {
-            tensor->map(CLScheduler::get().queue());
+            if(tensor->info()->tensor_target_type() == TensorTargetType::CL)
+            {
+                ICLTensor * tensor_cl          = static_cast<ICLTensor *>(tensor);
+                tensor_cl->map(CLScheduler::get().queue());
+            }
         }
         _func->run();
 
         for (auto &tensor : _tensors)
         {
-            tensor->unmap(CLScheduler::get().queue());
+            if(tensor->info()->tensor_target_type() == TensorTargetType::CL)
+            {
+                ICLTensor * tensor_cl          = static_cast<ICLTensor *>(tensor);
+                tensor_cl->unmap(CLScheduler::get().queue());
+            }
         }
     }
 
@@ -82,7 +90,7 @@ public:
     }
 
 private:
-    std::vector<arm_compute::ICLTensor *> _tensors;
+    std::vector<arm_compute::ITensor *> _tensors;
     std::unique_ptr<IFunction>            _func;
 };
 
