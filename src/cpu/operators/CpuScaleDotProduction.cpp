@@ -181,10 +181,10 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     // Run Query multi-Head reshape 
     ITensorPack query_reshape_pack{{ACL_SRC_0, query},{ACL_DST, reshaped_query.get()}};
     //const auto query_split_dimension = _query_reshape_kernel->get_split_dimension();
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    NEScheduler::get().schedule_op(_query_reshape_kernel.get(), Window::DimY, _query_reshape_kernel->window(), query_reshape_pack);
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
@@ -192,48 +192,56 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out.precision(5);
     measure_out << std::scientific << "query_reshape cost: " << cost_time << std::endl;
 #endif
+    */
+    NEScheduler::get().schedule_op(_query_reshape_kernel.get(), Window::DimY, _query_reshape_kernel->window(), query_reshape_pack);
+
 
 
     ITensorPack query_permute_pack{{ACL_SRC, reshaped_query.get()},{ACL_DST, permuted_query.get()}};
+    /*
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
 #endif
-    _query_permute_func->run(query_permute_pack);
 #ifdef MEASURE_TIME
     end_time  = std::chrono::high_resolution_clock::now();
     cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
     measure_out.precision(5);
     measure_out << std::scientific << "query_permute_func cost: " << cost_time << std::endl;
 #endif
+*/
+    _query_permute_func->run(query_permute_pack);
 
 
     // Run Key multi-Head reshape 
     ITensorPack key_reshape_pack{{ACL_SRC_0, key},{ACL_DST, reshaped_key.get()}};
     //const auto key_split_dimension = _key_reshape_kernel->get_split_dimension();
+    /*
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
 #endif
-    NEScheduler::get().schedule_op(_key_reshape_kernel.get(), Window::DimY, _key_reshape_kernel->window(), key_reshape_pack);
 #ifdef MEASURE_TIME
     end_time  = std::chrono::high_resolution_clock::now();
     cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
     measure_out.precision(5);
     measure_out << std::scientific << "key_reshape cost: " << cost_time << std::endl;
 #endif
+*/
+    NEScheduler::get().schedule_op(_key_reshape_kernel.get(), Window::DimY, _key_reshape_kernel->window(), key_reshape_pack);
 
 
     ITensorPack key_permute_pack{{ACL_SRC, reshaped_key.get()},{ACL_DST, permuted_key.get()}};
+    /*
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
 #endif
-    _key_permute_func->run(key_permute_pack);
 #ifdef MEASURE_TIME
     end_time  = std::chrono::high_resolution_clock::now();
     cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
     measure_out.precision(5);
     measure_out << std::scientific << "key_permute_func cost: " << cost_time << std::endl;
 #endif
-
+    */
+    _key_permute_func->run(key_permute_pack);
 
     ITensorPack key_transpose_pack{{ACL_SRC, permuted_key.get()}, {ACL_DST, transposed_key.get()}};
     _key_transpose_func->run(key_transpose_pack);
@@ -241,29 +249,32 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     // Run Value multi-Head reshape 
     ITensorPack value_reshape_pack{{ACL_SRC_0, value},{ACL_DST, reshaped_value.get()}};
     //const auto value_split_dimension = _value_reshape_kernel->get_split_dimension();
+    /*
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
 #endif
-    NEScheduler::get().schedule_op(_value_reshape_kernel.get(), Window::DimY, _value_reshape_kernel->window(), value_reshape_pack);
 #ifdef MEASURE_TIME
     end_time  = std::chrono::high_resolution_clock::now();
     cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
     measure_out.precision(5);
     measure_out << std::scientific << "value_reshape cost: " << cost_time << std::endl;
 #endif
-
+    */
+    NEScheduler::get().schedule_op(_value_reshape_kernel.get(), Window::DimY, _value_reshape_kernel->window(), value_reshape_pack);
 
     ITensorPack value_permute_pack{{ACL_SRC, reshaped_value.get()},{ACL_DST, permuted_value.get()}};
+    /*
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
 #endif
-    _value_permute_func->run(value_permute_pack);
 #ifdef MEASURE_TIME
     end_time  = std::chrono::high_resolution_clock::now();
     cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
     measure_out.precision(5);
     measure_out << std::scientific << "value_permute_func cost: " << cost_time << std::endl;
 #endif
+    */
+    _value_permute_func->run(value_permute_pack);
 
     // Run interleave kernel
     ITensorPack interleave_pack{{ACL_SRC, permuted_query.get()}, {ACL_DST, interleaved_query.get()}};
@@ -278,16 +289,18 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 
     // Run matrix multiply compute multi-head attention between Query and Key
     ITensorPack gemm_QK_pack{{ACL_SRC_0, interleaved_query.get()}, {ACL_SRC_1, transposed1xw_key.get()}, {ACL_DST, scaled_query_key.get()}};
+    /*
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
 #endif
-   NEScheduler::get().schedule_op(_product_mm_kernel.get(),Window::DimZ,_product_mm_kernel->window(),gemm_QK_pack);
 #ifdef MEASURE_TIME
     end_time  = std::chrono::high_resolution_clock::now();
     cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
     measure_out.precision(5);
     measure_out << std::scientific << "MMUL QK cost: " << cost_time << std::endl;
 #endif
+    */
+   NEScheduler::get().schedule_op(_product_mm_kernel.get(),Window::DimZ,_product_mm_kernel->window(),gemm_QK_pack);
 
     ITensorPack softmax_pack = {{ACL_SRC, scaled_query_key.get()}, {ACL_DST, softmaxed_product.get()}};
     _softmax_func->run(softmax_pack);
@@ -304,37 +317,40 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 
     // Run matrix multiply compute multi-head attention between Query and Key
     ITensorPack gemm_context_pack{{ACL_SRC_0, interleaved_product.get()}, {ACL_SRC_1, transposed1xW_value.get()}, {ACL_DST, gemmed_context.get()}};
+    /*
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
 #endif
-    NEScheduler::get().schedule_op(_context_mm_kernel.get(),Window::DimZ,_context_mm_kernel->window(),gemm_context_pack);
 #ifdef MEASURE_TIME
     end_time  = std::chrono::high_resolution_clock::now();
     cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
     measure_out.precision(5);
     measure_out << std::scientific << "MMUL CV cost: " << cost_time << std::endl;
 #endif
-
+    */
+    NEScheduler::get().schedule_op(_context_mm_kernel.get(),Window::DimZ,_context_mm_kernel->window(),gemm_context_pack);
 
     // Concat all attention head together
     ITensorPack concat_permute_pack{{ACL_SRC, gemmed_context.get()},{ACL_DST, permuted_concat.get()}};
+    /*
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
 #endif
-    _concat_permute_func->run(concat_permute_pack);
 #ifdef MEASURE_TIME
     end_time  = std::chrono::high_resolution_clock::now();
     cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
     measure_out.precision(5);
     measure_out << std::scientific << "concat_permute_func cost: " << cost_time << std::endl;
 #endif
+    */
+    _concat_permute_func->run(concat_permute_pack);
 
     ITensorPack concat_reshape_pack{{ACL_SRC_0, permuted_concat.get()},{ACL_DST, output}};
     //const auto concat_split_dimension = _concat_reshape_kernel->get_split_dimension();
+/*
 #ifdef MEASURE_TIME
     start_time = std::chrono::high_resolution_clock::now();
 #endif
-    NEScheduler::get().schedule_op(_concat_reshape_kernel.get(), Window::DimY, _concat_reshape_kernel->window(), concat_reshape_pack);
 #ifdef MEASURE_TIME
     end_time  = std::chrono::high_resolution_clock::now();
     cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
@@ -342,6 +358,8 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "concat_reshape cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+    */
+    NEScheduler::get().schedule_op(_concat_reshape_kernel.get(), Window::DimY, _concat_reshape_kernel->window(), concat_reshape_pack);
 }
 
 experimental::MemoryRequirements CpuScaleDotProduction::workspace() const
