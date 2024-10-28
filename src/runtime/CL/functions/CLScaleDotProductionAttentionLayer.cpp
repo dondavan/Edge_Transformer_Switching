@@ -49,14 +49,10 @@ void CLScaleDotProductionAttentionLayer::configure(const CLCompileContext       
                                                    ITensor                                  *output,
                                                    const ScaleDotProductionLayerInfo &info)
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    /* Scale dot production of key and query */
-    _impl->scale_dot_production_op = std::make_unique<opencl::ClScaleDotProduction>();
-    _impl->scale_dot_production_op->configure(compile_context, query->info(), key->info(), value->info(), output->info(), info);
-    _impl->scale_dot_pack = { { ACL_SRC_0, query }, { ACL_SRC_1, key }, { ACL_SRC_2, value }, { ACL_DST, output } };
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
@@ -66,17 +62,19 @@ void CLScaleDotProductionAttentionLayer::configure(const CLCompileContext       
     measure_out << std::scientific << "CLScaleDotProductionAttentionLayer::configure cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+    */
+    /* Scale dot production of key and query */
+    _impl->scale_dot_production_op = std::make_unique<opencl::ClScaleDotProduction>();
+    _impl->scale_dot_production_op->configure(compile_context, query->info(), key->info(), value->info(), output->info(), info);
+    _impl->scale_dot_pack = { { ACL_SRC_0, query }, { ACL_SRC_1, key }, { ACL_SRC_2, value }, { ACL_DST, output } };
 }
 
 void CLScaleDotProductionAttentionLayer::run()
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    ITensorPack pack;
-
-    _impl->scale_dot_production_op->run(_impl->scale_dot_pack);
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
@@ -86,6 +84,10 @@ void CLScaleDotProductionAttentionLayer::run()
     measure_out << std::scientific << "CLScaleDotProductionAttentionLayer::run cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+    */
+    ITensorPack pack;
+
+    _impl->scale_dot_production_op->run(_impl->scale_dot_pack);
 }
 
 } // namespace arm_compute

@@ -39,17 +39,10 @@ void CLSegmentEmbeddingLayer::configure(ITensor *input, ITensor *segment, ITenso
 
 void CLSegmentEmbeddingLayer::configure(const CLCompileContext &compile_context,ITensor *input, ITensor *segment, ITensor *output)
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    _impl->src     = input;
-    _impl->segment = segment;
-    _impl->dst     = output;
-    
-    _impl->op = std::make_unique<opencl::ClSegmentEmbed>();
-    _impl->op->configure(compile_context, _impl->src->info(), _impl->segment->info(), _impl->dst->info());
-
 
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
@@ -59,6 +52,13 @@ void CLSegmentEmbeddingLayer::configure(const CLCompileContext &compile_context,
     measure_out << std::scientific << "CLSegmentEmbeddingLayer::configure cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+    */
+    _impl->src     = input;
+    _impl->segment = segment;
+    _impl->dst     = output;
+    
+    _impl->op = std::make_unique<opencl::ClSegmentEmbed>();
+    _impl->op->configure(compile_context, _impl->src->info(), _impl->segment->info(), _impl->dst->info());
 }
 
 void CLSegmentEmbeddingLayer::prepare()
@@ -67,15 +67,10 @@ void CLSegmentEmbeddingLayer::prepare()
 
 void CLSegmentEmbeddingLayer::run()
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    
-    ITensorPack pack;
-    pack.add_tensor(TensorType::ACL_SRC_0, _impl->src);
-    pack.add_tensor(TensorType::ACL_SRC_1, _impl->segment);
-    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
-    _impl->op->run(pack);
 
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
@@ -85,6 +80,13 @@ void CLSegmentEmbeddingLayer::run()
     measure_out << std::scientific <<  "CLSegmentEmbeddingLayer::run cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+    */
+
+    ITensorPack pack;
+    pack.add_tensor(TensorType::ACL_SRC_0, _impl->src);
+    pack.add_tensor(TensorType::ACL_SRC_1, _impl->segment);
+    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
+    _impl->op->run(pack);
 }
 
 } // namespace arm_compute

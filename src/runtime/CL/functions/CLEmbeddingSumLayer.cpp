@@ -48,10 +48,20 @@ void CLEmbeddingSumLayer::configure(const CLCompileContext   &compile_context,
                                     ITensor                *output,
                                     const EmbeddingLayerInfo &emb_info)
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
 
+#ifdef MEASURE_TIME
+    auto          end_time  = std::chrono::high_resolution_clock::now();
+    double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+    std::ofstream measure_out("measure_output.txt", std::ios::app);
+    measure_out.precision(5);
+    measure_out << std::scientific << "CLEmbeddingSumLayer::configure cost: " << cost_time << std::endl;
+    measure_out.close();
+#endif
+    */
     _impl->token    = token;
     _impl->segment  = segment;
     _impl->position = position;
@@ -64,15 +74,6 @@ void CLEmbeddingSumLayer::configure(const CLCompileContext   &compile_context,
                          position->info(),
                          output->info(),
                          emb_info);
-
-#ifdef MEASURE_TIME
-    auto          end_time  = std::chrono::high_resolution_clock::now();
-    double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
-    std::ofstream measure_out("measure_output.txt", std::ios::app);
-    measure_out.precision(5);
-    measure_out << std::scientific << "CLEmbeddingSumLayer::configure cost: " << cost_time << std::endl;
-    measure_out.close();
-#endif
 }
 
 void CLEmbeddingSumLayer::prepare()
@@ -81,17 +82,10 @@ void CLEmbeddingSumLayer::prepare()
 
 void CLEmbeddingSumLayer::run()
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    ITensorPack pack;
-    pack.add_tensor(TensorType::ACL_SRC_0, _impl->token);
-    pack.add_tensor(TensorType::ACL_SRC_1, _impl->segment);
-    pack.add_tensor(TensorType::ACL_SRC_2, _impl->position);
-    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
-
-    _impl->op->run(pack);
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
@@ -101,6 +95,14 @@ void CLEmbeddingSumLayer::run()
     measure_out << std::scientific << "CLEmbeddingSumLayer::run cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+    */
+    ITensorPack pack;
+    pack.add_tensor(TensorType::ACL_SRC_0, _impl->token);
+    pack.add_tensor(TensorType::ACL_SRC_1, _impl->segment);
+    pack.add_tensor(TensorType::ACL_SRC_2, _impl->position);
+    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
+
+    _impl->op->run(pack);
 }
 
 } // namespace arm_compute

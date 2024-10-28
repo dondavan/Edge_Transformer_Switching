@@ -39,18 +39,10 @@ void CLLayerNormLayer::configure(const CLCompileContext   &compile_context,
                                  ITensor                *output,
                                  const LayerNormLayerInfo &LayerNorm_info)
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    ARM_COMPUTE_ERROR_ON_NULLPTR(input, output);
-    ARM_COMPUTE_LOG_PARAMS(input, output);
-
-    _impl->src = input;
-    _impl->dst = output;
-
-    _impl->op = std::make_unique<opencl::ClLayerNorm>();
-    _impl->op->configure(compile_context, input->info(), output->info(), LayerNorm_info);
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
@@ -60,6 +52,15 @@ void CLLayerNormLayer::configure(const CLCompileContext   &compile_context,
     measure_out << std::scientific << "CLLayerNormLayer::configure cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+    */
+    ARM_COMPUTE_ERROR_ON_NULLPTR(input, output);
+    ARM_COMPUTE_LOG_PARAMS(input, output);
+
+    _impl->src = input;
+    _impl->dst = output;
+
+    _impl->op = std::make_unique<opencl::ClLayerNorm>();
+    _impl->op->configure(compile_context, input->info(), output->info(), LayerNorm_info);
 }
 
 Status CLLayerNormLayer::validate(const ITensor          *input,

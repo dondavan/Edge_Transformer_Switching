@@ -71,9 +71,20 @@ void CLAttentionLinearLayer::configure(const CLCompileContext &compile_context,
     ARM_COMPUTE_ERROR_ON_NULLPTR(input, output);
     ARM_COMPUTE_UNUSED(linear_info);
 
+/*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
+
+#ifdef MEASURE_TIME
+    auto          end_time  = std::chrono::high_resolution_clock::now();
+    double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+    std::ofstream measure_out("measure_output.txt", std::ios::app);
+    measure_out.precision(5);
+    measure_out << std::scientific << "CLAttentionLinearLayer::configure cost: " << cost_time << std::endl;
+    measure_out.close();
+#endif
+*/
     _impl->query_input  = query_input;
     _impl->query_w      = query_w;
     _impl->query_b      = query_b;
@@ -97,15 +108,6 @@ void CLAttentionLinearLayer::configure(const CLCompileContext &compile_context,
 
     _impl->value_kernel = std::make_unique<opencl::ClLinear>();
     _impl->value_kernel->configure(compile_context, value_input->info(), value_w->info(), value_b->info(), value_output->info(), 1.0f, 0.f);
-
-#ifdef MEASURE_TIME
-    auto          end_time  = std::chrono::high_resolution_clock::now();
-    double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
-    std::ofstream measure_out("measure_output.txt", std::ios::app);
-    measure_out.precision(5);
-    measure_out << std::scientific << "CLAttentionLinearLayer::configure cost: " << cost_time << std::endl;
-    measure_out.close();
-#endif
 }
 
 Status CLAttentionLinearLayer::validate(const ITensor *input,
@@ -118,10 +120,20 @@ Status CLAttentionLinearLayer::validate(const ITensor *input,
 
 void CLAttentionLinearLayer::run()
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
 
+#ifdef MEASURE_TIME
+    auto          end_time  = std::chrono::high_resolution_clock::now();
+    double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+    std::ofstream measure_out("measure_output.txt", std::ios::app);
+    measure_out.precision(5);
+    measure_out << std::scientific << "CLAttentionLinearLayer::run cost: " << cost_time << std::endl;
+    measure_out.close();
+#endif
+    */
     // Q
     ITensorPack query_pack;
     query_pack.add_tensor(TensorType::ACL_SRC_0, _impl->query_input);
@@ -145,15 +157,6 @@ void CLAttentionLinearLayer::run()
     value_pack.add_tensor(TensorType::ACL_SRC_2, _impl->value_b);
     value_pack.add_tensor(TensorType::ACL_DST, _impl->value_output);
     _impl->value_kernel->run(value_pack);
-
-#ifdef MEASURE_TIME
-    auto          end_time  = std::chrono::high_resolution_clock::now();
-    double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
-    std::ofstream measure_out("measure_output.txt", std::ios::app);
-    measure_out.precision(5);
-    measure_out << std::scientific << "CLAttentionLinearLayer::run cost: " << cost_time << std::endl;
-    measure_out.close();
-#endif
 }
 
 } // namespace arm_compute

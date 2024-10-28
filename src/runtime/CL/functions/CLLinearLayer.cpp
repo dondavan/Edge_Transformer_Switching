@@ -53,17 +53,10 @@ void CLLinearLayer::configure(const CLCompileContext &compile_context,
     ARM_COMPUTE_ERROR_ON_NULLPTR(input, output);
     ARM_COMPUTE_UNUSED(linear_info);
 
+/*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    _impl->src    = input;
-    _impl->weight = weight;
-    _impl->bias   = bias;
-    _impl->dst    = output;
-
-    _impl->op = std::make_unique<opencl::ClLinear>();
-    _impl->op->configure(compile_context, input->info(), weight->info(), bias->info(), output->info(), 1.0f, 0.f);
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
@@ -73,6 +66,14 @@ void CLLinearLayer::configure(const CLCompileContext &compile_context,
     measure_out << std::scientific << "CLLinearLayer::configure cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+*/
+    _impl->src    = input;
+    _impl->weight = weight;
+    _impl->bias   = bias;
+    _impl->dst    = output;
+
+    _impl->op = std::make_unique<opencl::ClLinear>();
+    _impl->op->configure(compile_context, input->info(), weight->info(), bias->info(), output->info(), 1.0f, 0.f);
 }
 
 Status CLLinearLayer::validate(const ITensor *input,
@@ -85,18 +86,10 @@ Status CLLinearLayer::validate(const ITensor *input,
 
 void CLLinearLayer::run()
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    ITensorPack pack;
-
-    pack.add_tensor(TensorType::ACL_SRC_0, _impl->src);
-    pack.add_tensor(TensorType::ACL_SRC_1, _impl->weight);
-    pack.add_tensor(TensorType::ACL_SRC_2, _impl->bias);
-    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
-
-    _impl->op->run(pack);
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
@@ -106,6 +99,15 @@ void CLLinearLayer::run()
     measure_out << std::scientific << "CLLinearLayer::run cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+    */
+    ITensorPack pack;
+
+    pack.add_tensor(TensorType::ACL_SRC_0, _impl->src);
+    pack.add_tensor(TensorType::ACL_SRC_1, _impl->weight);
+    pack.add_tensor(TensorType::ACL_SRC_2, _impl->bias);
+    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
+
+    _impl->op->run(pack);
 }
 
 } // namespace arm_compute
