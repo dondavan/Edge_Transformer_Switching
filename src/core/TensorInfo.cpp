@@ -50,7 +50,8 @@ TensorInfo::TensorInfo()
       _data_layout(DataLayout::NCHW),
       _are_values_constant(true),
       _id(invalid_tensor_id),
-      _lock_paddings(false)
+      _lock_paddings(false),
+      _tensor_target_type(TensorTargetType::UNSPECIFIED)
 {
 }
 
@@ -72,6 +73,7 @@ TensorInfo::TensorInfo(const ITensorInfo &info) : TensorInfo()
     _are_values_constant           = info.are_values_constant();
     _id                            = info.id();
     _lock_paddings                 = info.lock_paddings();
+    _tensor_target_type            = info.tensor_target_type();
 }
 
 TensorInfo::TensorInfo(const TensorInfo &info) : TensorInfo()
@@ -92,6 +94,7 @@ TensorInfo::TensorInfo(const TensorInfo &info) : TensorInfo()
     _are_values_constant           = info.are_values_constant();
     _id                            = info.id();
     _lock_paddings                 = false;
+    _tensor_target_type            = info.tensor_target_type();
 }
 TensorInfo::TensorInfo(Format format) : TensorInfo(TensorShape(), format)
 {
