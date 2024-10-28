@@ -37,6 +37,9 @@
 #include "arm_compute/graph/Types.h"
 #include "arm_compute/graph/Utils.h"
 
+
+#include "arm_compute/runtime/CL/CLScheduler.h"
+
 #include "support/Cast.h"
 
 namespace arm_compute
