@@ -47,6 +47,45 @@ namespace backends
 {
 namespace detail
 {
+
+/** Wrapper for the CPU Function in the OpenCL backend **/
+class CPUWrapperFunction : public IFunction
+{
+public:
+    /* Default constructor */
+    CPUWrapperFunction() : _tensors(), _func(nullptr)
+    {
+    }
+
+    void run() override
+    {
+        for (auto &tensor : _tensors)
+        {
+            tensor->map(CLScheduler::get().queue());
+        }
+        _func->run();
+
+        for (auto &tensor : _tensors)
+        {
+            tensor->unmap(CLScheduler::get().queue());
+        }
+    }
+
+    void register_tensor(ICLTensor *tensor)
+    {
+        _tensors.push_back(tensor);
+    }
+
+    void register_function(std::unique_ptr<IFunction> function)
+    {
+        _func = std::move(function);
+    }
+
+private:
+    std::vector<arm_compute::ICLTensor *> _tensors;
+    std::unique_ptr<IFunction>            _func;
+};
+
 /** Returns backing tensor of a given tensor
  *
  * @tparam TargetInfo Target information
@@ -2027,44 +2066,6 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
 
     return func;
 }
-
-/** Wrapper for the CPU Function in the OpenCL backend **/
-class CPUWrapperFunction : public IFunction
-{
-public:
-    /* Default constructor */
-    CPUWrapperFunction() : _tensors(), _func(nullptr)
-    {
-    }
-
-    void run() override
-    {
-        for (auto &tensor : _tensors)
-        {
-            tensor->map(CLScheduler::get().queue());
-        }
-        _func->run();
-
-        for (auto &tensor : _tensors)
-        {
-            tensor->unmap(CLScheduler::get().queue());
-        }
-    }
-
-    void register_tensor(ICLTensor *tensor)
-    {
-        _tensors.push_back(tensor);
-    }
-
-    void register_function(std::unique_ptr<IFunction> function)
-    {
-        _func = std::move(function);
-    }
-
-private:
-    std::vector<arm_compute::ICLTensor *> _tensors;
-    std::unique_ptr<IFunction>            _func;
-};
 
 } // namespace detail
 } // namespace backends
