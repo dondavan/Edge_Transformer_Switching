@@ -30,18 +30,10 @@ void NELayerNormLayer::configure(const ITensor *input,
                               ITensor *output,
                               const LayerNormLayerInfo& LayerNorm_info)
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    ARM_COMPUTE_ERROR_ON_NULLPTR(input, output);
-    ARM_COMPUTE_LOG_PARAMS(input, output);
-
-    _impl->src      = input;
-    _impl->dst      = output;
-
-    _impl->op = std::make_unique<cpu::CpuLayerNorm>();
-    _impl->op->configure(input->info(), output->info(), LayerNorm_info);
 
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
@@ -51,6 +43,16 @@ void NELayerNormLayer::configure(const ITensor *input,
     measure_out << std::scientific << "NELayerNormLayer::configure cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+    */
+
+    ARM_COMPUTE_ERROR_ON_NULLPTR(input, output);
+    ARM_COMPUTE_LOG_PARAMS(input, output);
+
+    _impl->src      = input;
+    _impl->dst      = output;
+
+    _impl->op = std::make_unique<cpu::CpuLayerNorm>();
+    _impl->op->configure(input->info(), output->info(), LayerNorm_info);
 }
 
 Status NELayerNormLayer::validate(const ITensor *input,
@@ -63,16 +65,10 @@ Status NELayerNormLayer::validate(const ITensor *input,
 
 void NELayerNormLayer::run()
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    ITensorPack pack;
-    
-    pack.add_tensor(TensorType::ACL_SRC, _impl->src);
-    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
-    
-    _impl->op->run(pack);
 
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
@@ -82,7 +78,13 @@ void NELayerNormLayer::run()
     measure_out << std::scientific << "NELayerNormLayer::run cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
-
+    */
+    ITensorPack pack;
+    
+    pack.add_tensor(TensorType::ACL_SRC, _impl->src);
+    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
+    
+    _impl->op->run(pack);
 }
 
 } // namespace arm_compute

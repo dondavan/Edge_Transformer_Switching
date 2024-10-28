@@ -31,16 +31,10 @@ NETokenEmbeddingLayer::~NETokenEmbeddingLayer() = default;
 
 void NETokenEmbeddingLayer::configure(ITensor *input, ITensor *vocab, ITensor *output, const EmbeddingLayerInfo &emb_info)
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    _impl->src   = input;
-    _impl->vocab = vocab;
-    _impl->dst   = output;
-
-    _impl->op = std::make_unique<cpu::CpuTokenEmbed>();
-    _impl->op->configure(_impl->src->info(), _impl->vocab->info(), _impl->dst->info(), emb_info);
-
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
@@ -49,6 +43,15 @@ void NETokenEmbeddingLayer::configure(ITensor *input, ITensor *vocab, ITensor *o
     measure_out << std::scientific << "NETokenEmbeddingLayer::configure cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+*/
+
+    _impl->src   = input;
+    _impl->vocab = vocab;
+    _impl->dst   = output;
+
+    _impl->op = std::make_unique<cpu::CpuTokenEmbed>();
+    _impl->op->configure(_impl->src->info(), _impl->vocab->info(), _impl->dst->info(), emb_info);
+
 }
 
 void NETokenEmbeddingLayer::prepare()
@@ -57,14 +60,10 @@ void NETokenEmbeddingLayer::prepare()
 
 void NETokenEmbeddingLayer::run()
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    ITensorPack pack;
-    pack.add_tensor(TensorType::ACL_SRC_0, _impl->src);
-    pack.add_tensor(TensorType::ACL_SRC_1, _impl->vocab);
-    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
-    _impl->op->run(pack);
 
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
@@ -74,6 +73,12 @@ void NETokenEmbeddingLayer::run()
     measure_out << std::scientific << "NETokenEmbeddingLayer::run cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+    */
+    ITensorPack pack;
+    pack.add_tensor(TensorType::ACL_SRC_0, _impl->src);
+    pack.add_tensor(TensorType::ACL_SRC_1, _impl->vocab);
+    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
+    _impl->op->run(pack);
 }
 
 } // namespace arm_compute

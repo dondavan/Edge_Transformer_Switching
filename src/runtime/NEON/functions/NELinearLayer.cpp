@@ -36,17 +36,10 @@ void NELinearLayer::configure(const ITensor *input,
     ARM_COMPUTE_LOG_PARAMS(input, output);
     ARM_COMPUTE_UNUSED(linear_info);
 
+/*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    _impl->src      = input;
-    _impl->weight   = weight;
-    _impl->bias     = bias;
-    _impl->dst      = output;
-
-    _impl->kernel = std::make_unique<cpu::CpuLinear>();
-    _impl->kernel->configure(input->info(), weight->info(), bias->info(), output->info(), 1.0f, 1.0f);
 
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
@@ -56,6 +49,14 @@ void NELinearLayer::configure(const ITensor *input,
     measure_out << std::scientific << "NELinearLayer::configure cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+*/
+    _impl->src      = input;
+    _impl->weight   = weight;
+    _impl->bias     = bias;
+    _impl->dst      = output;
+
+    _impl->kernel = std::make_unique<cpu::CpuLinear>();
+    _impl->kernel->configure(input->info(), weight->info(), bias->info(), output->info(), 1.0f, 1.0f);
 }
 
 Status NELinearLayer::validate(const ITensor *input, 
@@ -68,18 +69,10 @@ Status NELinearLayer::validate(const ITensor *input,
 
 void NELinearLayer::run()
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    ITensorPack pack;
-
-    pack.add_tensor(TensorType::ACL_SRC_0, _impl->src);
-    pack.add_tensor(TensorType::ACL_SRC_1, _impl->weight);
-    pack.add_tensor(TensorType::ACL_SRC_2, _impl->bias);
-    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
-    
-    _impl->kernel->run(pack);
 
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
@@ -88,7 +81,16 @@ void NELinearLayer::run()
     measure_out.precision(5);
     measure_out << std::scientific << "NELinearLayer::run cost: " << cost_time << std::endl;
     measure_out.close();
-#endif
+#endif  
+    */
+    ITensorPack pack;
+
+    pack.add_tensor(TensorType::ACL_SRC_0, _impl->src);
+    pack.add_tensor(TensorType::ACL_SRC_1, _impl->weight);
+    pack.add_tensor(TensorType::ACL_SRC_2, _impl->bias);
+    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
+    
+    _impl->kernel->run(pack);
 
 }
 
