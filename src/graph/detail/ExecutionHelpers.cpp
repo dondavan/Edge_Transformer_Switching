@@ -60,8 +60,51 @@ void validate_all_nodes(Graph &g)
 
 void configure_all_tensors(Graph &g)
 {
-    auto &tensors = g.tensors();
+    auto &nodes = g.nodes();
+    for (auto &node : nodes)
+    {
+        //Upgrade NEON output tensor to CL tensor
+        for(unsigned int i = 0; i < node.get()->num_outputs(); ++i)
+        {
+            Tensor *tensor = node.get()->output(i);
 
+            if(tensor != nullptr && !tensor->bound_edges().empty())
+            {
+                auto eids = tensor->bound_edges();
+                for(auto eid:eids)
+                {
+                    auto cnode = g.edge(eid)->consumer();
+                    auto pnode = g.edge(eid)->producer();
+                    if(cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL)
+                    {
+                        tensor->desc().target = Target::CL;
+                    }
+                }
+            }
+        }
+        
+        //Upgrade NEON input tensor to CL tensor
+        for(unsigned int i = 0; i < node.get()->num_inputs(); ++i)
+        {
+            Tensor *tensor = node.get()->input(i);
+
+            if(tensor != nullptr && !tensor->bound_edges().empty())
+            {
+                auto eids = tensor->bound_edges();
+                for(auto eid:eids)
+                {
+                    auto cnode = g.edge(eid)->consumer();
+                    auto pnode = g.edge(eid)->producer();
+                    if(cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL)
+                    {
+                        tensor->desc().target = Target::CL;
+                    }
+                }
+            }
+        }
+    }
+
+    auto &tensors = g.tensors();
     for (auto &tensor : tensors)
     {
         if (tensor && tensor->handle() == nullptr)
@@ -174,6 +217,44 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
             if (func != nullptr || is_utility_node(node))
             {
                 workload.tasks.emplace_back(ExecutionTask(std::move(func), node));
+            }
+
+            std::cout << node->name() << " : ";
+            switch (assigned_target)
+            {
+                case Target::CL:
+                    std::cout << " CL" << std::endl;
+                    break;
+                case Target::NEON:
+                    std::cout << " NEON" << std::endl;
+                    break;
+                case Target::SWITCH:
+                    std::cout << " SWITCH" << std::endl;
+                    break;
+                default:
+                    std::cout << " Some other target" << std::endl;
+                    break;
+            }
+
+            for(unsigned int i = 0; i < node->num_inputs(); ++i)
+            {
+                Tensor *tensor = node->input(i);
+                std::cout << "Tensor id:" << tensor->id()<< " : ";
+                switch (tensor->desc().target)
+                {
+                    case Target::CL:
+                        std::cout << " CL" << std::endl;
+                        break;
+                    case Target::NEON:
+                        std::cout << " NEON" << std::endl;
+                        break;
+                    case Target::SWITCH:
+                        std::cout << " SWITCH" << std::endl;
+                        break;
+                    default:
+                        std::cout << " Some other target" << std::endl;
+                        break;
+                }
             }
         }
     }
