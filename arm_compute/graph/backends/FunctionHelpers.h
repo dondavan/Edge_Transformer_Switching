@@ -214,13 +214,19 @@ std::unique_ptr<IFunction> create_activation_layer(ActivationLayerNode &node)
     auto func = std::make_unique<ActivationLayerFunction>();
     func->configure(input, output, act_info);
 
+    auto wrap_function = std::make_unique<CPUWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(input);
+    wrap_function->register_tensor(output);
+
     ARM_COMPUTE_LOG_GRAPH_INFO(
         "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
                         << " Data Type: " << input->info()->data_type() << " Shape: " << input->info()->tensor_shape()
                         << " Activation function: " << act_info.activation() << " a: " << act_info.a() << " b: "
                         << act_info.b() << " InPlace : " << is_in_place_operation(input, output) << std::endl);
 
-    return func;
+    return wrap_function;
 }
 
 /** Creates a backend argminmax layer function
@@ -1825,7 +1831,15 @@ std::unique_ptr<IFunction> create_token_embedding_layer(TokenEmbeddingLayerNode 
         "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
                         << " Data Type: " << input->info()->data_type() << "Input Shape: " << input->info()->tensor_shape() << std::endl);
 
-    return func;
+
+    auto wrap_function = std::make_unique<CPUWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(input);
+    wrap_function->register_tensor(vocab);
+    wrap_function->register_tensor(output);
+
+    return wrap_function;
 }
 
 /** Creates a backend segment embedding layer function
@@ -1854,7 +1868,14 @@ std::unique_ptr<IFunction> create_segment_embedding_layer(SegmentEmbeddingLayerN
     auto func = std::make_unique<SegmentEmbeddingLayerFunction>();
     func->configure(input,segment,output);
 
-    return func;
+    auto wrap_function = std::make_unique<CPUWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(input);
+    wrap_function->register_tensor(segment);
+    wrap_function->register_tensor(output);
+
+    return wrap_function;
 }
 
 /** Creates a backend position embedding layer function
@@ -1883,7 +1904,14 @@ std::unique_ptr<IFunction> create_position_embedding_layer(PositionEmbeddingLaye
     auto func = std::make_unique<PositionEmbeddingLayerFunction>();
     func->configure(input,position,output);
 
-    return func;
+    auto wrap_function = std::make_unique<CPUWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(input);
+    wrap_function->register_tensor(position);
+    wrap_function->register_tensor(output);
+
+    return wrap_function;
 }
 
 /** Creates a backend embedding summing layer function
@@ -1960,7 +1988,15 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
         "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
                         << " Data Type: " << input->info()->data_type() << "Input Shape: " << input->info()->tensor_shape() << std::endl);
 
-    return func;
+    auto wrap_function = std::make_unique<CPUWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(input);
+    wrap_function->register_tensor(weight);
+    wrap_function->register_tensor(bias);
+    wrap_function->register_tensor(output);
+
+    return wrap_function;
 }
 
 /** Creates a backend attention linear function
@@ -2000,6 +2036,23 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
                     value_input,value_w,value_b,
                     query_output,key_output,value_output,
                     linear_info);
+    
+    auto wrap_function = std::make_unique<CPUWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(query_input);
+    wrap_function->register_tensor(query_w);
+    wrap_function->register_tensor(query_b);
+    wrap_function->register_tensor(key_input);
+    wrap_function->register_tensor(key_w);
+    wrap_function->register_tensor(key_b);
+    wrap_function->register_tensor(value_input);
+    wrap_function->register_tensor(value_w);
+    wrap_function->register_tensor(value_b);
+    wrap_function->register_tensor(query_output);
+    wrap_function->register_tensor(key_output);
+    wrap_function->register_tensor(value_output);
+
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
                                                << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
@@ -2083,6 +2136,13 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
                                                << " Input shape: " << input->info()->tensor_shape()
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
 
+
+    auto wrap_function = std::make_unique<CPUWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(input);
+    wrap_function->register_tensor(output);
+    
     return func;
 }
 
