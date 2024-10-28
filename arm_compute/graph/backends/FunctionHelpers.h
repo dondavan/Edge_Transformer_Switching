@@ -2059,7 +2059,7 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
                                                << " Input shape: " << input->info()->tensor_shape()
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
 
-    return func;
+    return wrap_function;
 }
 
 /** Creates a backend scale dot production function
