@@ -30,6 +30,11 @@
 #include "arm_compute/graph/Tensor.h"
 #include "arm_compute/graph/Utils.h"
 
+#ifdef MEASURE_TIME
+#include <chrono>
+#include <fstream>
+#endif
+
 namespace arm_compute
 {
 namespace graph
@@ -261,6 +266,9 @@ void prepare_all_tasks(ExecutionWorkload &workload)
 
 void call_all_tasks(ExecutionWorkload &workload)
 {
+#ifdef MEASURE_TIME
+        auto all_task_start_time = std::chrono::high_resolution_clock::now();
+#endif
     ARM_COMPUTE_ERROR_ON(workload.ctx == nullptr);
 
     // Acquire memory for the transition buffers
@@ -276,16 +284,16 @@ void call_all_tasks(ExecutionWorkload &workload)
     for (auto &task : workload.tasks)
     {
 #ifdef MEASURE_TIME
-        auto all_task_start_time = std::chrono::high_resolution_clock::now();
+        auto task_start_time = std::chrono::high_resolution_clock::now();
 #endif
         task();
 #ifdef MEASURE_TIME
-        auto   all_task_end_time  = std::chrono::high_resolution_clock::now();
-        double all_task_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(all_task_end_time - all_task_start_time).count();
+        auto   task_end_time  = std::chrono::high_resolution_clock::now();
+        double task_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(task_end_time - task_start_time).count();
 
         std::ofstream measure_out("measure_output.txt", std::ios::app);
         measure_out.precision(5);
-        measure_out << std::scientific << task.node->name() <<" cost: " << all_task_cost_time << std::endl;
+        measure_out << std::scientific << task.node->name() <<" cost: " << tasktask_cost_time << std::endl;
 #endif
     }
 
@@ -297,6 +305,13 @@ void call_all_tasks(ExecutionWorkload &workload)
             mm_ctx.second.cross_group->release();
         }
     }
+#ifdef MEASURE_TIME
+        auto   all_task_end_time  = std::chrono::high_resolution_clock::now();
+        double all_task_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(all_task_end_time - all_task_start_time).count();
+
+        measure_out.precision(5);
+        measure_out << std::scientific << "All task cost: " << all_task_cost_time << std::endl;
+#endif
 }
 
 bool call_all_output_node_accessors(ExecutionWorkload &workload)
