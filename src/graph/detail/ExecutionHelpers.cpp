@@ -147,7 +147,7 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
         if (node != nullptr)
         {
             Target                     assigned_target = node->assigned_target();
-            std::cout << node_id ;
+            /*
             switch (assigned_target)
             {
                 case Target::CL:
@@ -163,6 +163,7 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
                     std::cout << " Some other target" << std::endl;
                     break;
             }
+            */
             backends::IDeviceBackend  &backend         = backends::BackendRegistry::get().get_backend(assigned_target);
             std::unique_ptr<IFunction> func            = backend.configure_node(*node, ctx);
             if (func != nullptr || is_utility_node(node))
