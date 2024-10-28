@@ -111,8 +111,6 @@ IAllocator *NEDeviceBackend::backend_allocator()
 
 std::unique_ptr<ITensorHandle> NEDeviceBackend::create_tensor(const Tensor &tensor)
 {
-
-    std::cout << "NEDeviceBackend::create_tensor " <<std::endl;
     // Get tensor descriptor
     const TensorDescriptor &tensor_desc = tensor.desc();
     ARM_COMPUTE_ERROR_ON(tensor_desc.target != Target::NEON);
@@ -139,7 +137,6 @@ std::unique_ptr<arm_compute::IFunction> NEDeviceBackend::configure_node(INode &n
 {
     ARM_COMPUTE_LOG_GRAPH_VERBOSE("Configuring CPU node with ID : " << node.id() << std::endl);
     ARM_COMPUTE_ERROR_ON(node.assigned_target() != Target::NEON);
-    std::cout << "NEDeviceBackend::configure_node" << std::endl;
     // Configure node
     return NEFunctionFactory::create(&node, ctx);
 }
