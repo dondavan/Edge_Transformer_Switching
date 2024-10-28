@@ -239,7 +239,28 @@ ExecutionWorkload configure_all_nodes(Graph &g, GraphContext &ctx, const std::ve
             for(unsigned int i = 0; i < node->num_inputs(); ++i)
             {
                 Tensor *tensor = node->input(i);
-                std::cout << "Tensor id:" << tensor->id()<< " : ";
+                std::cout << "Input tensor id:" << tensor->id()<< " : ";
+                switch (tensor->desc().target)
+                {
+                    case Target::CL:
+                        std::cout << " CL" << std::endl;
+                        break;
+                    case Target::NEON:
+                        std::cout << " NEON" << std::endl;
+                        break;
+                    case Target::SWITCH:
+                        std::cout << " SWITCH" << std::endl;
+                        break;
+                    default:
+                        std::cout << " Some other target" << std::endl;
+                        break;
+                }
+            }
+
+            for(unsigned int i = 0; i < node->num_outputs(); ++i)
+            {
+                Tensor *tensor = node->output(i);
+                std::cout << "Input tensor id:" << tensor->id()<< " : ";
                 switch (tensor->desc().target)
                 {
                     case Target::CL:
