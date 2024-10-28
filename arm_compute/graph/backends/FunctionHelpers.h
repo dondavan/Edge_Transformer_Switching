@@ -875,13 +875,21 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
         ARM_COMPUTE_ERROR("Unsupported element-wise operation!");
     }
 
+
+    auto wrap_function = std::make_unique<CPPWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(input1);
+    wrap_function->register_tensor(input2);
+    wrap_function->register_tensor(output);
+
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type()
                                                << " Target: " << TargetInfo::TargetType << " Operation: " << func_name
                                                << " Data Type: " << input1->info()->data_type()
                                                << " Shape: " << input1->info()->tensor_shape() << std::endl);
 
-    return func;
+    return wrap_function;
 }
 
 /** Create a backend unary element-wise operation layer function
@@ -1967,13 +1975,21 @@ std::unique_ptr<IFunction> create_scale_dot_production_layer(ScaleDotProductionA
     auto func = std::make_unique<ScaleDotProductionLayerFunction>();
     func->configure(query,key,value,output,node.sdpa_info());
 
+    auto wrap_function = std::make_unique<CPPWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(query);
+    wrap_function->register_tensor(key);
+    wrap_function->register_tensor(value);
+    wrap_function->register_tensor(output);
+
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
                                                << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
                                                << " Input shape: " << input->info()->tensor_shape()
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
 
-    return func;
+    return wrap_function;
 }
 
 /** Creates a backend layer normalization function
