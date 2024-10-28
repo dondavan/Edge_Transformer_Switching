@@ -1915,7 +1915,15 @@ std::unique_ptr<IFunction> create_embedding_sum_layer(EmbeddingSumLayerNode &nod
     auto func = std::make_unique<EmbeddingSumLayerFunction>();
     func->configure(token,segment,position,output,info);
 
-    return func;
+    auto wrap_function = std::make_unique<CPUWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(token);
+    wrap_function->register_tensor(segment);
+    wrap_function->register_tensor(position);
+    wrap_function->register_tensor(output);
+
+    return wrap_function;
 }
 
 
