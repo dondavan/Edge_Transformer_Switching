@@ -70,10 +70,16 @@ void NEArithmeticAddition::configure(const ITensor             *input1,
 
 void NEArithmeticAddition::run()
 {
+    
     ITensorPack pack;
     pack.add_tensor(TensorType::ACL_SRC_0, _impl->src_0);
     pack.add_tensor(TensorType::ACL_SRC_1, _impl->src_1);
     pack.add_tensor(TensorType::ACL_DST, _impl->dst);
+   
     _impl->op->run(pack);
+
+    std::cout << "NEArithmeticAddition::run "<<*reinterpret_cast<float *>(_impl->src_0->ptr_to_element(Coordinates(0,0,0))) << std::endl;
+    std::cout << "NEArithmeticAddition::run "<<*reinterpret_cast<float *>(_impl->src_1->ptr_to_element(Coordinates(0,0,0)))  << std::endl;
+    std::cout << "NEArithmeticAddition::run "<<*reinterpret_cast<float *>(_impl->dst->ptr_to_element(Coordinates(0,0,0)))  << std::endl;
 }
 } // namespace arm_compute
