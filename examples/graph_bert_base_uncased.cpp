@@ -172,7 +172,7 @@ class GraphVanillaTransformerExample : public Example
     void add_encoder_block(std::string data_path, std::string layer_path,
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff)
     {
-        ARM_COMPUTE_UNUSED(h,eps,data_path);
+        ARM_COMPUTE_UNUSED(h,eps,data_path,layer_path,d_model,d_ff);
         /* Self output */
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("norm_1");
         /* Self output */
