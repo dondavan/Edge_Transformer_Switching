@@ -58,10 +58,10 @@ CLConvolutionLayer::CLConvolutionLayer(std::shared_ptr<IMemoryManager> memory_ma
 
 CLConvolutionLayer::~CLConvolutionLayer() = default;
 
-void CLConvolutionLayer::configure(ICLTensor                 *input,
-                                   const ICLTensor           *weights,
-                                   const ICLTensor           *biases,
-                                   ICLTensor                 *output,
+void CLConvolutionLayer::configure(ITensor                 *input,
+                                   const ITensor           *weights,
+                                   const ITensor           *biases,
+                                   ITensor                 *output,
                                    const PadStrideInfo       &conv_info,
                                    const WeightsInfo         &weights_info,
                                    const Size2D              &dilation,
@@ -74,10 +74,10 @@ void CLConvolutionLayer::configure(ICLTensor                 *input,
 }
 
 void CLConvolutionLayer::configure(const CLCompileContext    &compile_context,
-                                   ICLTensor                 *input,
-                                   const ICLTensor           *weights,
-                                   const ICLTensor           *biases,
-                                   ICLTensor                 *output,
+                                   ITensor                 *input,
+                                   const ITensor           *weights,
+                                   const ITensor           *biases,
+                                   ITensor                 *output,
                                    const PadStrideInfo       &conv_info,
                                    const WeightsInfo         &weights_info,
                                    const Size2D              &dilation,
@@ -108,13 +108,14 @@ void CLConvolutionLayer::configure(const CLCompileContext    &compile_context,
             _impl->op = std::move(f);
             break;
         }
+        /*
         case ConvolutionMethod::FFT:
         {
             auto f = std::make_unique<CLFFTConvolutionLayer>(_impl->memory_manager);
             f->configure(compile_context, input, weights, biases, output, conv_info, act_info, enable_fast_math);
             _impl->func = std::move(f);
             break;
-        }
+        }*/
         default:
             ARM_COMPUTE_ERROR("Not supported.");
             break;
