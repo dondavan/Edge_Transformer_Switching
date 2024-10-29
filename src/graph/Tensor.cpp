@@ -89,9 +89,10 @@ bool Tensor::call_accessor()
 
     if (access_data)
     {
-        #ifdef MEASURE_TIME
+#ifdef MEASURE_TIME
         auto task_start_time = std::chrono::high_resolution_clock::now();
 #endif
+
         // Map tensor
         _handle->map(true);
 #ifdef MEASURE_TIME
