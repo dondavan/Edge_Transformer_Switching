@@ -610,7 +610,7 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
     wrap_function->register_function(std::move(func));
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(weights);
-    wrap_function->register_tensor(bias);
+    wrap_function->register_tensor(biases);
     wrap_function->register_tensor(output);
 
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated "
