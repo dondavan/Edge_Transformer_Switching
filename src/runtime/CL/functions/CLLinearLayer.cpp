@@ -108,10 +108,6 @@ void CLLinearLayer::run()
     pack.add_tensor(TensorType::ACL_DST, _impl->dst);
 
     _impl->op->run(pack);
-
-    std::cout << _impl->dst->info()->tensor_shape().x() << std::endl;
-    std::cout << _impl->dst->info()->tensor_shape().y() << std::endl;
-    std::cout << _impl->dst->info()->tensor_shape().z() << std::endl;
 }
 
 } // namespace arm_compute

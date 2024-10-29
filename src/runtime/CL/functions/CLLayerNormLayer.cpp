@@ -73,16 +73,10 @@ Status CLLayerNormLayer::validate(const ITensor          *input,
 
 void CLLayerNormLayer::run()
 {
+    /*
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-
-    ITensorPack pack;
-
-    pack.add_tensor(TensorType::ACL_SRC, _impl->src);
-    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
-
-    _impl->op->run(pack);
 
 #ifdef MEASURE_TIME
     auto          end_time  = std::chrono::high_resolution_clock::now();
@@ -90,11 +84,16 @@ void CLLayerNormLayer::run()
     std::ofstream measure_out("measure_output.txt", std::ios::app);
     measure_out.precision(5);
     measure_out << std::scientific << "CLLayerNormLayer::run cost: " << cost_time << std::endl;
-    measure_out << std::scientific << "output x " << _impl->dst->info()->tensor_shape().x() << std::endl;
-    measure_out << std::scientific << "output y " << _impl->dst->info()->tensor_shape().y()<< std::endl;
-    measure_out << std::scientific << "output z " << _impl->dst->info()->tensor_shape().z()<< std::endl;
     measure_out.close();
 #endif
+    */
+   
+    ITensorPack pack;
+
+    pack.add_tensor(TensorType::ACL_SRC, _impl->src);
+    pack.add_tensor(TensorType::ACL_DST, _impl->dst);
+
+    _impl->op->run(pack);
 }
 
 } // namespace arm_compute

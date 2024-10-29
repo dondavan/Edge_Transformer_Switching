@@ -385,12 +385,10 @@ void call_all_tasks(ExecutionWorkload &workload)
     // Execute tasks
     for (auto &task : workload.tasks)
     {
-        for(int i =0;i<10;i++)
-        {
 #ifdef MEASURE_TIME
         auto task_start_time = std::chrono::high_resolution_clock::now();
 #endif
-            task();
+        task();
 #ifdef MEASURE_TIME
         auto   task_end_time  = std::chrono::high_resolution_clock::now();
         double task_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(task_end_time - task_start_time).count();
@@ -398,9 +396,7 @@ void call_all_tasks(ExecutionWorkload &workload)
         std::ofstream measure_out("measure_output.txt", std::ios::app);
         measure_out.precision(5);
         measure_out << std::scientific << task.node->name() <<" cost: " << task_cost_time << std::endl;
-        measure_out.close();
 #endif
-    }
     }
 
     // Release memory for the transition buffers
