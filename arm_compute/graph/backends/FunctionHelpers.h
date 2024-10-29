@@ -63,17 +63,16 @@ class CPUWrapperFunction : public IFunction
     void run() override
     {
 
-#ifdef MEASURE_TIME
-    auto start_time = std::chrono::high_resolution_clock::now();
-#endif
     for(auto &tensor : _tensors)
         {
             if(tensor->info()->tensor_target_type() == TensorTargetType::CL)
             {
                 ICLTensor *tensor_cl = static_cast<ICLTensor *>(tensor);
+#ifdef MEASURE_TIME
+    auto start_time = std::chrono::high_resolution_clock::now();
+#endif
                 tensor_cl->map(CLScheduler::get().queue());
-            }
-        }
+
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
     double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
@@ -82,6 +81,8 @@ class CPUWrapperFunction : public IFunction
     measure_out << std::scientific << "Mapping cost: " << cost_time << std::endl;
     measure_out.close();
 #endif
+            }
+        }
         _func->run();
 
         for(auto &tensor : _tensors)
