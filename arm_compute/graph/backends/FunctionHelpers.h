@@ -62,10 +62,11 @@ class CPUWrapperFunction : public IFunction
 
     void run() override
     {
+
 #ifdef MEASURE_TIME
-        auto start_time = std::chrono::high_resolution_clock::now();
+    auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-        for(auto &tensor : _tensors)
+    for(auto &tensor : _tensors)
         {
             if(tensor->info()->tensor_target_type() == TensorTargetType::CL)
             {
@@ -74,12 +75,12 @@ class CPUWrapperFunction : public IFunction
             }
         }
 #ifdef MEASURE_TIME
-        auto          end_time  = std::chrono::high_resolution_clock::now();
-        double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
-        std::ofstream measure_out("measure_output.txt", std::ios::app);
-        measure_out.precision(5);
-        measure_out << std::scientific << "Mapping cost: " << cost_time << std::endl;
-        measure_out.close();
+    auto   end_time  = std::chrono::high_resolution_clock::now();
+    double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+    std::ofstream measure_out("measure_output.txt",std::ios::app);
+    measure_out.precision(5);
+    measure_out << std::scientific << "Mapping cost: " << cost_time << std::endl;
+    measure_out.close();
 #endif
         _func->run();
 
@@ -556,10 +557,10 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
     //typename TargetInfo::TensorType *biases  = get_backing_tensor<TargetInfo>(node.input(2));
     //typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
 
-    ITensor *input   = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
+    ITensor *input  = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
     ITensor *weights = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
-    ITensor *biases  = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
-    ITensor *output  = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
+    ITensor *biases = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
+    ITensor *output = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
 
     const bool is_quantized = is_data_type_quantized_asymmetric(input->info()->data_type());
 
