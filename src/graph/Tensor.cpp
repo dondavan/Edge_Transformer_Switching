@@ -84,8 +84,19 @@ bool Tensor::call_accessor()
 
     if (access_data)
     {
+        #ifdef MEASURE_TIME
+        auto task_start_time = std::chrono::high_resolution_clock::now();
+#endif
         // Map tensor
         _handle->map(true);
+#ifdef MEASURE_TIME
+        auto   task_end_time  = std::chrono::high_resolution_clock::now();
+        double task_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(task_end_time - task_start_time).count();
+
+        std::ofstream measure_out("measure_output.txt", std::ios::app);
+        measure_out.precision(5);
+        measure_out << std::scientific <<"Handle mapping cost: " << task_cost_time << std::endl;
+#endif
 
         // Return in case of null backend buffer
         if (_handle->tensor().buffer() == nullptr)
