@@ -84,27 +84,20 @@ class GraphMobilenetExample : public Example
         float       depth_scale = (model_id == 0) ? 1.f : 0.75;
         std::unique_ptr<IPreprocessor> preprocessor = std::make_unique<TFPreproccessor>();
 
-        graph << InputLayer(input_descriptor, get_input_accessor(common_params, std::move(preprocessor), false))
+        graph << InputLayer(input_descriptor, get_input_accessor(common_params, std::move(preprocessor), false)).set_target(Target::CL)
               << ConvolutionLayer(3U, 3U, 32U * depth_scale,
                                   get_weights_accessor("", "Conv2d_0_weights.npy", DataLayout::NCHW),
                                   std::unique_ptr<arm_compute::graph::ITensorAccessor>(nullptr),
                                   PadStrideInfo(2, 2, 0, 1, 0, 1, DimensionRoundingType::FLOOR))
-                     .set_name("Conv2d_0")
-              << BatchNormalizationLayer(get_weights_accessor("", "Conv2d_0_BatchNorm_moving_mean.npy"),
-                                         get_weights_accessor("", "Conv2d_0_BatchNorm_moving_variance.npy"),
-                                         get_weights_accessor("", "Conv2d_0_BatchNorm_gamma.npy"),
-                                         get_weights_accessor("", "Conv2d_0_BatchNorm_beta.npy"), 0.001f)
-                     .set_name("Conv2d_0/BatchNorm")
-              << ActivationLayer(ActivationLayerInfo(ActivationLayerInfo::ActivationFunction::BOUNDED_RELU, 6.f))
-                     .set_name("Conv2d_0/Relu6")
+                     .set_name("Conv2d_0").set_target(Target::CL)
               << ConvolutionLayer(3U, 3U, 32U * depth_scale,
                                   get_weights_accessor("", "Conv2d_0_weights.npy", DataLayout::NCHW),
                                   std::unique_ptr<arm_compute::graph::ITensorAccessor>(nullptr),
                                   PadStrideInfo(2, 2, 0, 1, 0, 1, DimensionRoundingType::FLOOR))
-                     .set_name("Conv2d_0");
+                     .set_name("Conv2d_0").set_target(Target::NEON);
 
                  // Create common tail
-        graph << OutputLayer(get_output_accessor(common_params, 5));
+        graph << OutputLayer(get_output_accessor(common_params, 5)).set_target(Target::NEON);
 
         // Finalize graph
         GraphConfig config;

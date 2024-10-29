@@ -540,10 +540,15 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
     validate_node<TargetInfo>(node, 3 /* expected inputs */, 1 /* expected outputs */);
 
     // Extract IO and info
-    typename TargetInfo::TensorType *input   = get_backing_tensor<TargetInfo>(node.input(0));
-    typename TargetInfo::TensorType *weights = get_backing_tensor<TargetInfo>(node.input(1));
-    typename TargetInfo::TensorType *biases  = get_backing_tensor<TargetInfo>(node.input(2));
-    typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
+    //typename TargetInfo::TensorType *input   = get_backing_tensor<TargetInfo>(node.input(0));
+    //typename TargetInfo::TensorType *weights = get_backing_tensor<TargetInfo>(node.input(1));
+    //typename TargetInfo::TensorType *biases  = get_backing_tensor<TargetInfo>(node.input(2));
+    //typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
+
+    ITensor *input  = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
+    ITensor *weights = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
+    ITensor *biases = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
+    ITensor *output = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
 
     const bool is_quantized = is_data_type_quantized_asymmetric(input->info()->data_type());
 
@@ -600,6 +605,14 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
             << " Weights QuantInfo: " << weights->info()->quantization_info()
             << " Output QuantInfo: " << output->info()->quantization_info();
     }
+    auto wrap_function = std::make_unique<CPUWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+    wrap_function->register_tensor(input);
+    wrap_function->register_tensor(weights);
+    wrap_function->register_tensor(bias);
+    wrap_function->register_tensor(output);
+
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated "
                                << node.name() << " Type: " << func_name << " Target: " << TargetInfo::TargetType
                                << " Data Type: " << input->info()->data_type() << " Groups: " << num_groups
@@ -607,7 +620,7 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
                                << " Weights shape: " << weights->info()->tensor_shape()
                                << " Output shape: " << output->info()->tensor_shape() << qss.str()
                                << (fused_act.enabled() ? " " + to_string(fused_act.activation()) : "") << std::endl);
-    return func;
+    return wrap_function;
 }
 
 /** Create a backend deconvolution layer function
