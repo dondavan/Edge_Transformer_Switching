@@ -173,7 +173,7 @@ class GraphVanillaTransformerExample : public Example
     void add_encoder_block(std::string data_path, std::string layer_path,
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff)
     {
-        ARM_COMPUTE_UNUSED(h);
+        ARM_COMPUTE_UNUSED(h,eps);
         graph << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
                                                TensorShape(d_ff) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_0.npy"),
