@@ -34,7 +34,7 @@
 namespace arm_compute
 {
 class CLCompileContext;
-class ICLTensor;
+class ITensor;
 class ITensorInfo;
 
 /** Basic function to execute Winograd-based convolution on OpenCL. This function calls the following OpenCL functions/kernels:
@@ -84,10 +84,10 @@ public:
      * @param[in]  enable_fast_math (Optional) Enable fast math computation. In case this flag were set, the function could dispatch the fastest implementation
      *                              available which may introduce a drop of accuracy as well. Default is false
      */
-    void configure(ICLTensor                 *input,
-                   const ICLTensor           *weights,
-                   const ICLTensor           *biases,
-                   ICLTensor                 *output,
+    void configure(ITensor                 *input,
+                   const ITensor           *weights,
+                   const ITensor           *biases,
+                   ITensor                 *output,
                    const PadStrideInfo       &conv_info,
                    const ActivationLayerInfo &act_info         = ActivationLayerInfo(),
                    bool                       enable_fast_math = false);
@@ -110,10 +110,10 @@ public:
      *                              available which may introduce a drop of accuracy as well. Default is false
      */
     void configure(const CLCompileContext    &compile_context,
-                   ICLTensor                 *input,
-                   const ICLTensor           *weights,
-                   const ICLTensor           *biases,
-                   ICLTensor                 *output,
+                   ITensor                 *input,
+                   const ITensor           *weights,
+                   const ITensor           *biases,
+                   ITensor                 *output,
                    const PadStrideInfo       &conv_info,
                    const ActivationLayerInfo &act_info         = ActivationLayerInfo(),
                    bool                       enable_fast_math = false);

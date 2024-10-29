@@ -37,10 +37,10 @@ namespace arm_compute
 {
 struct CLDirectConvolutionLayer::Impl
 {
-    const ICLTensor                        *src{nullptr};
-    const ICLTensor                        *weights{nullptr};
-    const ICLTensor                        *biases{nullptr};
-    ICLTensor                              *dst{nullptr};
+    const ITensor                        *src{nullptr};
+    const ITensor                        *weights{nullptr};
+    const ITensor                        *biases{nullptr};
+    ITensor                              *dst{nullptr};
     std::unique_ptr<opencl::ClDirectConv2d> op{nullptr};
 };
 
@@ -51,10 +51,10 @@ CLDirectConvolutionLayer::CLDirectConvolutionLayer(CLDirectConvolutionLayer &&) 
 CLDirectConvolutionLayer &CLDirectConvolutionLayer::operator=(CLDirectConvolutionLayer &&) = default;
 CLDirectConvolutionLayer::~CLDirectConvolutionLayer()                                      = default;
 
-void CLDirectConvolutionLayer::configure(ICLTensor                 *input,
-                                         const ICLTensor           *weights,
-                                         const ICLTensor           *biases,
-                                         ICLTensor                 *output,
+void CLDirectConvolutionLayer::configure(ITensor                 *input,
+                                         const ITensor           *weights,
+                                         const ITensor           *biases,
+                                         ITensor                 *output,
                                          const PadStrideInfo       &conv_info,
                                          const ActivationLayerInfo &act_info)
 {
@@ -62,10 +62,10 @@ void CLDirectConvolutionLayer::configure(ICLTensor                 *input,
 }
 
 void CLDirectConvolutionLayer::configure(const CLCompileContext    &compile_context,
-                                         ICLTensor                 *input,
-                                         const ICLTensor           *weights,
-                                         const ICLTensor           *biases,
-                                         ICLTensor                 *output,
+                                         ITensor                 *input,
+                                         const ITensor           *weights,
+                                         const ITensor           *biases,
+                                         ITensor                 *output,
                                          const PadStrideInfo       &conv_info,
                                          const ActivationLayerInfo &act_info)
 {

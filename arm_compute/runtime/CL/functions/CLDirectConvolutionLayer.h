@@ -34,7 +34,7 @@
 namespace arm_compute
 {
 class CLCompileContext;
-class ICLTensor;
+class ITensor;
 class ITensorInfo;
 
 /** Basic function to execute direct convolution function:
@@ -79,10 +79,10 @@ public:
      * @param[in]  conv_info Contains padding and stride information described in @ref PadStrideInfo.
      * @param[in]  act_info  (Optional) Activation layer information in case of a fused activation.
      */
-    void configure(ICLTensor                 *input,
-                   const ICLTensor           *weights,
-                   const ICLTensor           *biases,
-                   ICLTensor                 *output,
+    void configure(ITensor                 *input,
+                   const ITensor           *weights,
+                   const ITensor           *biases,
+                   ITensor                 *output,
                    const PadStrideInfo       &conv_info,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Set the input and output tensors.
@@ -100,10 +100,10 @@ public:
      * @param[in]  act_info        (Optional) Activation layer information in case of a fused activation.
      */
     void configure(const CLCompileContext    &compile_context,
-                   ICLTensor                 *input,
-                   const ICLTensor           *weights,
-                   const ICLTensor           *biases,
-                   ICLTensor                 *output,
+                   ITensor                 *input,
+                   const ITensor           *weights,
+                   const ITensor           *biases,
+                   ITensor                 *output,
                    const PadStrideInfo       &conv_info,
                    const ActivationLayerInfo &act_info = ActivationLayerInfo());
     /** Static function to check if given info will lead to a valid configuration of @ref CLDirectConvolutionLayer

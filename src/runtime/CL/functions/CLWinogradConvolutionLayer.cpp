@@ -36,10 +36,10 @@ namespace arm_compute
 {
 struct CLWinogradConvolutionLayer::Impl
 {
-    const ICLTensor                          *src{nullptr};
-    const ICLTensor                          *weights{nullptr};
-    const ICLTensor                          *biases{nullptr};
-    ICLTensor                                *dst{nullptr};
+    const ITensor                          *src{nullptr};
+    const ITensor                          *weights{nullptr};
+    const ITensor                          *biases{nullptr};
+    ITensor                                *dst{nullptr};
     std::unique_ptr<opencl::ClWinogradConv2d> op{nullptr};
     ITensorPack                               run_pack{};
     MemoryGroup                               memory_group{};
@@ -55,10 +55,10 @@ CLWinogradConvolutionLayer::CLWinogradConvolutionLayer(std::shared_ptr<IMemoryMa
 
 CLWinogradConvolutionLayer::~CLWinogradConvolutionLayer() = default;
 
-void CLWinogradConvolutionLayer::configure(ICLTensor                 *input,
-                                           const ICLTensor           *weights,
-                                           const ICLTensor           *biases,
-                                           ICLTensor                 *output,
+void CLWinogradConvolutionLayer::configure(ITensor                 *input,
+                                           const ITensor           *weights,
+                                           const ITensor           *biases,
+                                           ITensor                 *output,
                                            const PadStrideInfo       &conv_info,
                                            const ActivationLayerInfo &act_info,
                                            bool                       enable_fast_math)
@@ -68,10 +68,10 @@ void CLWinogradConvolutionLayer::configure(ICLTensor                 *input,
 }
 
 void CLWinogradConvolutionLayer::configure(const CLCompileContext    &compile_context,
-                                           ICLTensor                 *input,
-                                           const ICLTensor           *weights,
-                                           const ICLTensor           *biases,
-                                           ICLTensor                 *output,
+                                           ITensor                 *input,
+                                           const ITensor           *weights,
+                                           const ITensor           *biases,
+                                           ITensor                 *output,
                                            const PadStrideInfo       &conv_info,
                                            const ActivationLayerInfo &act_info,
                                            bool                       enable_fast_math)

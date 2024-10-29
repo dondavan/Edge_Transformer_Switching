@@ -69,10 +69,10 @@ CLGEMMConvolutionLayer::CLGEMMConvolutionLayer(std::shared_ptr<IMemoryManager> m
 
 CLGEMMConvolutionLayer::~CLGEMMConvolutionLayer() = default;
 
-void CLGEMMConvolutionLayer::configure(const ICLTensor           *input,
-                                       const ICLTensor           *weights,
-                                       const ICLTensor           *biases,
-                                       ICLTensor                 *output,
+void CLGEMMConvolutionLayer::configure(const ITensor           *input,
+                                       const ITensor           *weights,
+                                       const ITensor           *biases,
+                                       ITensor                 *output,
                                        const PadStrideInfo       &conv_info,
                                        const WeightsInfo         &weights_info,
                                        const Size2D              &dilation,
@@ -84,10 +84,10 @@ void CLGEMMConvolutionLayer::configure(const ICLTensor           *input,
 }
 
 void CLGEMMConvolutionLayer::configure(const CLCompileContext    &compile_context,
-                                       const ICLTensor           *input,
-                                       const ICLTensor           *weights,
-                                       const ICLTensor           *biases,
-                                       ICLTensor                 *output,
+                                       const ITensor           *input,
+                                       const ITensor           *weights,
+                                       const ITensor           *biases,
+                                       ITensor                 *output,
                                        const PadStrideInfo       &conv_info,
                                        const WeightsInfo         &weights_info,
                                        const Size2D              &dilation,

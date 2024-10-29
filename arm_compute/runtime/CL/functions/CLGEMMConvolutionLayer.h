@@ -37,7 +37,7 @@ namespace arm_compute
 {
 // Forward declarations
 class CLCompileContext;
-class ICLTensor;
+class ITensor;
 class ITensorInfo;
 
 /** Basic function to compute the convolution layer. This function calls the following OpenCL kernels/functions:
@@ -96,10 +96,10 @@ public:
      * @param[in]  act_info     (Optional) Activation layer information in case of a fused activation.
      * @param[in]  num_groups   (Optional) Number of groups when performing a grouped convolution. num_groups != 1 is only supported for NCHW data layout
      */
-    void configure(const ICLTensor           *input,
-                   const ICLTensor           *weights,
-                   const ICLTensor           *biases,
-                   ICLTensor                 *output,
+    void configure(const ITensor           *input,
+                   const ITensor           *weights,
+                   const ITensor           *biases,
+                   ITensor                 *output,
                    const PadStrideInfo       &conv_info,
                    const WeightsInfo         &weights_info = WeightsInfo(),
                    const Size2D              &dilation     = Size2D(1U, 1U),
@@ -125,10 +125,10 @@ public:
      * @param[in]  num_groups      (Optional) Number of groups when performing a grouped convolution. num_groups != 1 is only supported for NCHW data layout
      */
     void configure(const CLCompileContext    &compile_context,
-                   const ICLTensor           *input,
-                   const ICLTensor           *weights,
-                   const ICLTensor           *biases,
-                   ICLTensor                 *output,
+                   const ITensor           *input,
+                   const ITensor           *weights,
+                   const ITensor           *biases,
+                   ITensor                 *output,
                    const PadStrideInfo       &conv_info,
                    const WeightsInfo         &weights_info = WeightsInfo(),
                    const Size2D              &dilation     = Size2D(1U, 1U),
