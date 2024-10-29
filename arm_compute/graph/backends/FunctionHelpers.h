@@ -67,6 +67,7 @@ class CPUWrapperFunction : public IFunction
         {
             if(tensor->info()->tensor_target_type() == TensorTargetType::CL)
             {
+                
                 ICLTensor *tensor_cl = static_cast<ICLTensor *>(tensor);
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
