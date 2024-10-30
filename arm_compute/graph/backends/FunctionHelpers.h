@@ -218,6 +218,7 @@ std::unique_ptr<IFunction> create_activation_layer(ActivationLayerNode &node)
     auto func = std::make_unique<ActivationLayerFunction>();
     func->configure(input, output, act_info);
 
+    /*
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -227,8 +228,8 @@ std::unique_ptr<IFunction> create_activation_layer(ActivationLayerNode &node)
 
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(output);
+    */
 
-    ARM_COMPUTE_UNUSED(wrap_function);
     ARM_COMPUTE_LOG_GRAPH_INFO(
         "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
                         << " Data Type: " << input->info()->data_type() << " Shape: " << input->info()->tensor_shape()
@@ -2039,6 +2040,7 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
         "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
                         << " Data Type: " << input->info()->data_type() << "Input Shape: " << input->info()->tensor_shape() << std::endl);
 
+    /*
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -2052,8 +2054,8 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
     wrap_function->register_tensor(weight);
     wrap_function->register_tensor(bias);
     wrap_function->register_tensor(output);
-
-    return wrap_function;
+    */
+    return func;
 }
 
 /** Creates a backend attention linear function
