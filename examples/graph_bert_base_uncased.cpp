@@ -175,10 +175,8 @@ class GraphVanillaTransformerExample : public Example
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff)
     {
         ARM_COMPUTE_UNUSED(h);
-        SubStream without_attention(graph);
-        SubStream with_attention(graph);
 
-        with_attention
+        graph
             /* Self Attention */
             << AttentionLinearLayer(LinearLayerInfo(d_model), get_weights_accessor(data_path + layer_path, "query_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "query_bias.npy"),
@@ -187,8 +185,6 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL).set_name("attention_linear")
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha").set_target(Target::NEON);
-
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::CL);
 
         /* Self output */
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("attention_norm");
