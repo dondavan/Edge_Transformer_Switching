@@ -33,7 +33,7 @@ ClLayerNorm::validate(const ITensorInfo        *input,
 void ClLayerNorm::run(ITensorPack &tensors)
 {
     // Run indirect convolution
-    CLScheduler::get().enqueue_op(*_layer_norm_kernel.get(), tensors, true);
+    CLScheduler::get().enqueue_op(*_layer_norm_kernel.get(), tensors, false);
 }
 
 } // namespace opencl
