@@ -79,11 +79,6 @@ class CPUWrapperFunction : public IFunction
     measure_out.close();
 #endif
         _func->run();
-
-        for(auto &tensor_handle : _tensor_handles)
-        {
-            tensor_handle->unmap();
-        }
     }
 
     void register_tensor(ITensor *tensor)
