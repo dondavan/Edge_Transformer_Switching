@@ -77,9 +77,5 @@ void NEArithmeticAddition::run()
     pack.add_tensor(TensorType::ACL_DST, _impl->dst);
    
     _impl->op->run(pack);
-
-    std::cout << "NEArithmeticAddition::run "<<*reinterpret_cast<float *>(_impl->src_0->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-    std::cout << "NEArithmeticAddition::run "<<*reinterpret_cast<float *>(_impl->src_1->ptr_to_element(Coordinates(0,0,0)))  << std::endl;
-    std::cout << "NEArithmeticAddition::run "<<*reinterpret_cast<float *>(_impl->dst->ptr_to_element(Coordinates(0,0,0)))  << std::endl;
 }
 } // namespace arm_compute

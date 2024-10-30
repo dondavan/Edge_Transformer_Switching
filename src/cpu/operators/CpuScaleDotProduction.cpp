@@ -161,11 +161,6 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     auto value  = tensors.get_const_tensor(ACL_SRC_2);
     auto output = tensors.get_tensor(ACL_DST);
 
-    std::cout << "CpuScaleDotProduction::run "<<*reinterpret_cast<float *>(query->ptr_to_element(Coordinates(0,0,0))) << std::endl;
-   std::cout << "CpuScaleDotProduction::run "<<*reinterpret_cast<float *>(key->ptr_to_element(Coordinates(0,0,0)))  << std::endl;
-   std::cout << "CpuScaleDotProduction::run "<<*reinterpret_cast<float *>(value->ptr_to_element(Coordinates(0,0,0)))  << std::endl;
-   
-
     CpuAuxTensorHandler reshaped_query(offset_int_vec(QueryReshape), _reshaped_query, tensors);
     CpuAuxTensorHandler permuted_query(offset_int_vec(QueryPermute), _permuted_query, tensors);
     CpuAuxTensorHandler reshaped_key(offset_int_vec(KeyReshape), _reshaped_key, tensors);
