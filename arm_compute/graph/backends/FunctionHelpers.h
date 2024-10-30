@@ -66,13 +66,9 @@ class CPUWrapperFunction : public IFunction
 #ifdef MEASURE_TIME
     auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    for(auto &tensor : _tensors)
+    for(auto &tensor_handle : _tensor_handles)
         {
-            if(tensor->info()->tensor_target_type() == TensorTargetType::CL)
-            {
-                ICLTensor *tensor_cl = static_cast<ICLTensor *>(tensor);
-                tensor_cl->map(CLScheduler::get().queue());
-            }
+            tensor_handle->map(true);
         }
 #ifdef MEASURE_TIME
     auto   end_time  = std::chrono::high_resolution_clock::now();
@@ -84,13 +80,9 @@ class CPUWrapperFunction : public IFunction
 #endif
         _func->run();
 
-        for(auto &tensor : _tensors)
+        for(auto &tensor_handle : _tensor_handles)
         {
-            if(tensor->info()->tensor_target_type() == TensorTargetType::CL)
-            {
-                ICLTensor *tensor_cl = static_cast<ICLTensor *>(tensor);
-                tensor_cl->unmap(CLScheduler::get().queue());
-            }
+            tensor_handle->unmap();
         }
     }
 
@@ -99,12 +91,18 @@ class CPUWrapperFunction : public IFunction
         _tensors.push_back(tensor);
     }
 
+    void register_handle(ITensorHandle * handle)
+    {
+        _tensor_handles.push_back(handle);
+    }
+
     void register_function(std::unique_ptr<IFunction> function)
     {
         _func = std::move(function);
     }
 
     private:
+    std::vector<ITensorHandle *> _tensor_handles;
     std::vector<arm_compute::ITensor *> _tensors;
     std::unique_ptr<IFunction>          _func;
 };
@@ -227,6 +225,10 @@ std::unique_ptr<IFunction> create_activation_layer(ActivationLayerNode &node)
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(output);
 
@@ -620,6 +622,12 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.input(1)->handle());
+    wrap_function->register_handle(node.input(2)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(weights);
     wrap_function->register_tensor(biases);
@@ -957,6 +965,11 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.input(1)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+
     wrap_function->register_tensor(input1);
     wrap_function->register_tensor(input2);
     wrap_function->register_tensor(output);
@@ -1856,6 +1869,11 @@ std::unique_ptr<IFunction> create_token_embedding_layer(TokenEmbeddingLayerNode 
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.input(1)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(vocab);
     wrap_function->register_tensor(output);
@@ -1892,6 +1910,11 @@ std::unique_ptr<IFunction> create_segment_embedding_layer(SegmentEmbeddingLayerN
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.input(1)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(segment);
     wrap_function->register_tensor(output);
@@ -1928,6 +1951,11 @@ std::unique_ptr<IFunction> create_position_embedding_layer(PositionEmbeddingLaye
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.input(1)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(position);
     wrap_function->register_tensor(output);
@@ -1967,6 +1995,12 @@ std::unique_ptr<IFunction> create_embedding_sum_layer(EmbeddingSumLayerNode &nod
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.input(1)->handle());
+    wrap_function->register_handle(node.input(2)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+
     wrap_function->register_tensor(token);
     wrap_function->register_tensor(segment);
     wrap_function->register_tensor(position);
@@ -2011,6 +2045,12 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.input(1)->handle());
+    wrap_function->register_handle(node.input(2)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(weight);
     wrap_function->register_tensor(bias);
@@ -2059,6 +2099,20 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.input(1)->handle());
+    wrap_function->register_handle(node.input(2)->handle());
+    wrap_function->register_handle(node.input(3)->handle());
+    wrap_function->register_handle(node.input(4)->handle());
+    wrap_function->register_handle(node.input(5)->handle());
+    wrap_function->register_handle(node.input(6)->handle());
+    wrap_function->register_handle(node.input(7)->handle());
+    wrap_function->register_handle(node.input(8)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+    wrap_function->register_handle(node.output(1)->handle());
+    wrap_function->register_handle(node.output(2)->handle());
+
     wrap_function->register_tensor(query_input);
     wrap_function->register_tensor(query_w);
     wrap_function->register_tensor(query_b);
@@ -2108,6 +2162,12 @@ std::unique_ptr<IFunction> create_scale_dot_production_layer(ScaleDotProductionA
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.input(1)->handle());
+    wrap_function->register_handle(node.input(2)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+
     wrap_function->register_tensor(query);
     wrap_function->register_tensor(key);
     wrap_function->register_tensor(value);
@@ -2158,6 +2218,10 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(output);
 
