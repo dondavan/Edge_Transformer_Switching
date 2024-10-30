@@ -56,7 +56,7 @@ class CPUWrapperFunction : public IFunction
     public:
     /* Default constructor */
     CPUWrapperFunction()
-        : _tensor_handles(), _tensors(), _func(nullptr),
+        : _tensor_handles(), _tensors(), _func(nullptr)
     {
     }
 
