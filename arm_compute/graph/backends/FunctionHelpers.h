@@ -228,13 +228,14 @@ std::unique_ptr<IFunction> create_activation_layer(ActivationLayerNode &node)
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(output);
 
+    ARM_COMPUTE_UNUSED(wrap_function);
     ARM_COMPUTE_LOG_GRAPH_INFO(
         "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
                         << " Data Type: " << input->info()->data_type() << " Shape: " << input->info()->tensor_shape()
                         << " Activation function: " << act_info.activation() << " a: " << act_info.a() << " b: "
                         << act_info.b() << " InPlace : " << is_in_place_operation(input, output) << std::endl);
 
-    return wrap_function;
+    return func;
 }
 
 /** Creates a backend argminmax layer function
@@ -2099,10 +2100,8 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.input(1)->handle());
     wrap_function->register_handle(node.input(2)->handle());
-    wrap_function->register_handle(node.input(3)->handle());
     wrap_function->register_handle(node.input(4)->handle());
     wrap_function->register_handle(node.input(5)->handle());
-    wrap_function->register_handle(node.input(6)->handle());
     wrap_function->register_handle(node.input(7)->handle());
     wrap_function->register_handle(node.input(8)->handle());
     wrap_function->register_handle(node.output(0)->handle());
