@@ -2095,7 +2095,7 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
                     value_input, value_w, value_b,
                     query_output, key_output, value_output,
                     linear_info);
-
+    /*
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -2123,14 +2123,14 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     wrap_function->register_tensor(query_output);
     wrap_function->register_tensor(key_output);
     wrap_function->register_tensor(value_output);
-
+    */
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
                                                << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
                                                << " Input shape: " << input->info()->tensor_shape()
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
 
-    return wrap_function;
+    return func;
 }
 
 /** Creates a backend scale dot production function
