@@ -156,7 +156,10 @@ class GraphVanillaTransformerExample : public Example
     {
         ARM_COMPUTE_UNUSED(h,d_model,eps,d_ff,data_path,layer_path);
         
-        
+        /* Output*/
+        graph << LinearLayer(LinearLayerInfo(d_model), get_weights_accessor(data_path + layer_path, "query_weight.npy"),
+                                    get_weights_accessor(data_path + layer_path, "query_bias.npy"))
+                   .set_name("conv1");
     }
 };
 
