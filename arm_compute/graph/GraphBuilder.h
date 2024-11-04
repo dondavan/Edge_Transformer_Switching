@@ -773,11 +773,11 @@ class GraphBuilder final
      * @return Node ID of the created node, EmptyNodeID in case of error
      */
     static NodeID add_distill_embedding_node(Graph              &g,
-                                     NodeParams          params,
-                                     NodeIdxPair         input,
-                                     EmbeddingLayerInfo  tkemb_info,
-                                     ITensorAccessorUPtr vocabs   = nullptr,
-                                     ITensorAccessorUPtr position = nullptr);
+                                             NodeParams          params,
+                                             NodeIdxPair         input,
+                                             EmbeddingLayerInfo  tkemb_info,
+                                             ITensorAccessorUPtr vocabs   = nullptr,
+                                             ITensorAccessorUPtr position = nullptr);
     /** Adds a linear layer computing Key, Value, Query to the graph
      *
      * @param[in] g             Graph to add the node to
@@ -793,14 +793,23 @@ class GraphBuilder final
      * 
      * @return Node ID of the created node, EmptyNodeID in case of error
      */
-    static NodeID add_attention_conv_layer(Graph &g, NodeParams params, NodeIdxPair input,
-                                             LinearLayerInfo     linear_info,
-                                             ITensorAccessorUPtr query_weights,
-                                             ITensorAccessorUPtr query_bias,
-                                             ITensorAccessorUPtr key_weights,
-                                             ITensorAccessorUPtr key_bias,
-                                             ITensorAccessorUPtr value_weights,
-                                             ITensorAccessorUPtr value_bias);
+    static NodeID add_attention_conv_layer(Graph                  &g,
+                                           NodeParams              params,
+                                           NodeIdxPair             input,
+                                           Size2D                  kernel_spatial_extend,
+                                           unsigned int            depth,
+                                           PadStrideInfo           conv_info,
+                                           unsigned int            num_groups,
+                                           ConvolutionMethod       method,
+                                           FastMathHint            fast_math_hint,
+                                           ITensorAccessorUPtr     q_weights_accessor,
+                                           ITensorAccessorUPtr     q_bias_accessor,
+                                           ITensorAccessorUPtr     k_weights_accessor,
+                                           ITensorAccessorUPtr     k_bias_accessor,
+                                           ITensorAccessorUPtr     v_weights_accessor,
+                                           ITensorAccessorUPtr     v_bias_accessor,
+                                           const QuantizationInfo &weights_quant_info,
+                                           const QuantizationInfo &out_quant_info);
 };
 } // namespace graph
 } // namespace arm_compute

@@ -210,7 +210,7 @@ enum class NodeType
     AttentionLinearLayer,
     ScaleDotProductionAttentionLayer,
     LayerNormLayer,
-    AttentionConvLayer
+    AttentionConvolutionLayer
 };
 
 /** Backend Memory Manager affinity **/

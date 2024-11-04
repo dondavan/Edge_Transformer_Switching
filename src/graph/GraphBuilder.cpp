@@ -1324,103 +1324,71 @@ NodeID GraphBuilder::add_distill_embedding_node(Graph              &g,
     return sum_nid;
 }
 
-NodeID GraphBuilder::add_attention_conv_layer(Graph &g, NodeParams params, NodeIdxPair input,
-                                                LinearLayerInfo     linear_info,
-                                                ITensorAccessorUPtr query_weights,
-                                                ITensorAccessorUPtr query_bias,
-                                                ITensorAccessorUPtr key_weights,
-                                                ITensorAccessorUPtr key_bias,
-                                                ITensorAccessorUPtr value_weights,
-                                                ITensorAccessorUPtr value_bias)
+NodeID GraphBuilder::add_attention_conv_layer(Graph                  &g,
+                                          NodeParams              params,
+                                          NodeIdxPair             input,
+                                          Size2D                  kernel_spatial_extend,
+                                          unsigned int            depth,
+                                          PadStrideInfo           conv_info,
+                                          unsigned int            num_groups,
+                                          ConvolutionMethod       method,
+                                          FastMathHint            fast_math_hint,
+                                          ITensorAccessorUPtr     q_weights_accessor,
+                                          ITensorAccessorUPtr     q_bias_accessor,
+                                          ITensorAccessorUPtr     k_weights_accessor,
+                                          ITensorAccessorUPtr     k_bias_accessor,
+                                          ITensorAccessorUPtr     v_weights_accessor,
+                                          ITensorAccessorUPtr     v_bias_accessor,
+                                          const QuantizationInfo &weights_quant_info,
+                                          const QuantizationInfo &out_quant_info)
 {
     check_nodeidx_pair(input, g);
+    ARM_COMPUTE_ERROR_ON(depth == 0);
+    ARM_COMPUTE_ERROR_ON((kernel_spatial_extend.width == 0) || (kernel_spatial_extend.height == 0));
+
+    bool has_bias = (q_bias_accessor != nullptr);
 
     // Get input tensor descriptor
     const TensorDescriptor input_tensor_desc = get_tensor_descriptor(g, g.node(input.node_id)->outputs()[0]);
+    const DataLayout       input_data_layout = input_tensor_desc.layout;
 
-    // Create weight and bias tensor shape
+    // Create weights node
     TensorDescriptor q_w_desc = input_tensor_desc;
-    q_w_desc.shape            = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
-    TensorDescriptor q_b_desc = input_tensor_desc;
-    q_b_desc.shape            = TensorShape(linear_info.d_linear_hidden());
-
-    TensorDescriptor k_w_desc = input_tensor_desc;
-    k_w_desc.shape            = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
-    TensorDescriptor k_b_desc = input_tensor_desc;
-    k_b_desc.shape            = TensorShape(linear_info.d_linear_hidden());
-
-    TensorDescriptor v_w_desc = input_tensor_desc;
-    v_w_desc.shape            = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
-    TensorDescriptor v_b_desc = input_tensor_desc;
-    v_b_desc.shape            = TensorShape(linear_info.d_linear_hidden());
-    
-    // Create weight and bias const node ids
-    NodeID q_w_nid, q_b_nid, k_w_nid, k_b_nid, v_w_nid, v_b_nid;
-    // Create attention linear node ids
-    NodeID attention_conv_nid;
-    if(params.target != Target::UNSPECIFIED)
-    {  
-        // Create weight and bias const node with npy tensor accessor
-        q_w_nid = add_const_node_with_name(g, params, params.target, "Query Weights", q_w_desc, std::move(query_weights));
-        q_b_nid = add_const_node_with_name(g, params, params.target, "Query Bias", q_b_desc, std::move(query_bias));
-
-        k_w_nid = add_const_node_with_name(g, params, params.target, "Key Weights", k_w_desc, std::move(key_weights));
-        k_b_nid = add_const_node_with_name(g, params, params.target, "Key Bias", k_b_desc, std::move(key_bias));
-
-        v_w_nid = add_const_node_with_name(g, params, params.target, "Value Weights", v_w_desc, std::move(value_weights));
-        v_b_nid = add_const_node_with_name(g, params, params.target, "Value Bias", v_b_desc, std::move(value_bias));
-
-        // Create token embedding node and connect
-        attention_conv_nid = add_convolution_node(g, params, input, Size2D(1,1), 1, PadStrideInfo(1, 1, 0, 0));
-
-        // Q
-        g.add_connection(params.target, input.node_id, input.index, attention_conv_nid, 0);
-        g.add_connection(params.target, q_w_nid, 0, attention_conv_nid, 1);
-        g.add_connection(params.target, q_b_nid, 0, attention_conv_nid, 2);
-
-        // K
-        g.add_connection(params.target, input.node_id, input.index, attention_conv_nid, 3);
-        g.add_connection(params.target, k_w_nid, 0, attention_conv_nid, 4);
-        g.add_connection(params.target, k_b_nid, 0, attention_conv_nid, 5);
-
-        // V
-        g.add_connection(params.target, input.node_id, input.index, attention_conv_nid, 6);
-        g.add_connection(params.target, v_w_nid, 0, attention_conv_nid, 7);
-        g.add_connection(params.target, v_b_nid, 0, attention_conv_nid, 8);
-        
-    }else
+    q_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::WIDTH), kernel_spatial_extend.width);
+    q_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::HEIGHT), kernel_spatial_extend.height);
+    q_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::CHANNEL),
+                     get_dimension_size(input_tensor_desc, DataLayoutDimension::CHANNEL) / num_groups);
+    q_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::BATCHES), depth);
+    if(!weights_quant_info.empty())
     {
-        // Create weight and bias const node with npy tensor accessor
-        q_w_nid = add_const_node_with_name(g, params, "Query Weights", q_w_desc, std::move(query_weights));
-        q_b_nid = add_const_node_with_name(g, params, "Query Bias", q_b_desc, std::move(query_bias));
-
-        k_w_nid = add_const_node_with_name(g, params, "Key Weights", k_w_desc, std::move(key_weights));
-        k_b_nid = add_const_node_with_name(g, params, "Key Bias", k_b_desc, std::move(key_bias));
-
-        v_w_nid = add_const_node_with_name(g, params, "Value Weights", v_w_desc, std::move(value_weights));
-        v_b_nid = add_const_node_with_name(g, params, "Value Bias", v_b_desc, std::move(value_bias));
-
-        attention_conv_nid = g.add_node<AttentionLinearNode>(linear_info);
-
-        // Q
-        g.add_connection(input.node_id, input.index, attention_conv_nid, 0);
-        g.add_connection(q_w_nid, 0, attention_conv_nid, 1);
-        g.add_connection(q_b_nid, 0, attention_conv_nid, 2);
-
-        // K
-        g.add_connection(input.node_id, input.index, attention_conv_nid, 3);
-        g.add_connection(k_w_nid, 0, attention_conv_nid, 4);
-        g.add_connection(k_b_nid, 0, attention_conv_nid, 5);
-
-        // V
-        g.add_connection(input.node_id, input.index, attention_conv_nid, 6);
-        g.add_connection(v_w_nid, 0, attention_conv_nid, 7);
-        g.add_connection(v_b_nid, 0, attention_conv_nid, 8);
+        q_w_desc.quant_info = weights_quant_info;
+    }
+    NodeID q_w_nid = add_const_node_with_name(g, params, "Weights", q_w_desc, std::move(q_weights_accessor));
+    // Create bias nodes
+    NodeID q_b_nid = EmptyNodeID;
+    if(has_bias)
+    {
+        TensorDescriptor q_b_desc = input_tensor_desc;
+        q_b_desc.shape            = TensorShape(depth);
+        if(is_data_type_quantized_asymmetric(input_tensor_desc.data_type))
+        {
+            q_b_desc.data_type = DataType::S32;
+        }
+        q_b_nid = add_const_node_with_name(g, params, "Bias", q_b_desc, std::move(q_bias_accessor));
     }
 
-    set_node_params(g, attention_conv_nid, params);
 
-    return attention_conv_nid;
+    // Create convolution node and connect
+    NodeID conv_nid = g.add_node<ConvolutionLayerNode>(conv_info, num_groups, method, fast_math_hint, out_quant_info);
+    g.add_connection(input.node_id, input.index, conv_nid, 0);
+    g.add_connection(q_w_nid, 0, conv_nid, 1);
+    if(has_bias)
+    {
+        g.add_connection(q_b_nid, 0, conv_nid, 2);
+    }
+    set_node_params(g, conv_nid, params);
+
+    return conv_nid;
 }
 
 } // namespace graph

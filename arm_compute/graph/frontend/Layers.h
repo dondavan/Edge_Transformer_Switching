@@ -1722,48 +1722,77 @@ class DistillEmbeddingLayer final : public ILayer
 class AttentionConvLayer final : public ILayer
 {
     public:
-    /** Construct a linear layer computing Key, Value, Query
+    /** Construct a convolution layer.
      *
+     * @param[in] conv_width         Convolution width.
+     * @param[in] conv_height        Convolution height.
+     * @param[in] ofm                Output feature map.
+     * @param[in] weights            Accessor to get kernel weights from.
+     * @param[in] bias               Accessor to get kernel bias from.
+     * @param[in] conv_info          Padding and stride information.
+     * @param[in] num_groups         (Optional) Number of groups. Default: 1.
+     * @param[in] weights_quant_info (Optional) Weights quantization information
+     * @param[in] out_quant_info     (Optional) Output quantization info
      */
-    AttentionConvLayer(LinearLayerInfo     info,
-                         ITensorAccessorUPtr query_weights,
-                         ITensorAccessorUPtr query_bias,
-                         ITensorAccessorUPtr key_weights,
-                         ITensorAccessorUPtr key_bias,
-                         ITensorAccessorUPtr value_weights,
-                         ITensorAccessorUPtr value_bias)
-        : _info(info),
+    AttentionConvLayer(unsigned int           conv_width,
+                       unsigned int           conv_height,
+                       unsigned int           ofm,
+                       ITensorAccessorUPtr    query_weights,
+                       ITensorAccessorUPtr    query_bias,
+                       ITensorAccessorUPtr    key_weights,
+                       ITensorAccessorUPtr    key_bias,
+                       ITensorAccessorUPtr    value_weights,
+                       ITensorAccessorUPtr    value_bias,
+                       PadStrideInfo          conv_info,
+                       unsigned int           num_groups         = 1,
+                       const QuantizationInfo weights_quant_info = QuantizationInfo(),
+                       const QuantizationInfo out_quant_info     = QuantizationInfo())
+        : _conv_width(conv_width),
+          _conv_height(conv_height),
+          _ofm(ofm),
+          _conv_info(std::move(conv_info)),
+          _num_groups(num_groups),
           _query_weights(std::move(query_weights)),
           _query_bias(std::move(query_bias)),
           _key_weights(std::move(key_weights)),
           _key_bias(std::move(key_bias)),
           _value_weights(std::move(value_weights)),
-          _value_bias(std::move(value_bias))
+          _value_bias(std::move(value_bias)),
+          _weights_quant_info(std::move(weights_quant_info)),
+          _out_quant_info(std::move(out_quant_info))
     {
     }
 
     NodeID create_layer(IStream &s) override
     {
-        NodeParams  common_params = { name(), s.hints().target_hint };
         NodeIdxPair input         = { s.tail_node(), 0 };
-        common_params.target      = assigned_target();
-        return GraphBuilder::add_attention_conv_layer(s.graph(), common_params, input, _info,
-                                                        std::move(_query_weights),
-                                                        std::move(_query_bias),
-                                                        std::move(_key_weights),
-                                                        std::move(_key_bias),
-                                                        std::move(_value_weights),
-                                                        std::move(_value_bias));
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        return GraphBuilder::add_attention_conv_layer(s.graph(), common_params, input, Size2D(_conv_width, _conv_height),
+                                                      _ofm, _conv_info, _num_groups, s.hints().convolution_method_hint,
+                                                      s.hints().fast_math_hint,
+                                                      std::move(_query_weights),
+                                                      std::move(_query_bias),
+                                                      std::move(_key_weights),
+                                                      std::move(_key_bias),
+                                                      std::move(_value_weights),
+                                                      std::move(_value_bias),
+                                                      std::move(_weights_quant_info), std::move(_out_quant_info));
     }
 
     private:
-    LinearLayerInfo     _info;
-    ITensorAccessorUPtr _query_weights;
-    ITensorAccessorUPtr _query_bias;
-    ITensorAccessorUPtr _key_weights;
-    ITensorAccessorUPtr _key_bias;
-    ITensorAccessorUPtr _value_weights;
-    ITensorAccessorUPtr _value_bias;
+    unsigned int           _conv_width;
+    unsigned int           _conv_height;
+    unsigned int           _ofm;
+    const PadStrideInfo    _conv_info;
+    unsigned int           _num_groups;
+    ITensorAccessorUPtr    _query_weights;
+    ITensorAccessorUPtr    _query_bias;
+    ITensorAccessorUPtr    _key_weights;
+    ITensorAccessorUPtr    _key_bias;
+    ITensorAccessorUPtr    _value_weights;
+    ITensorAccessorUPtr    _value_bias;
+    const QuantizationInfo _weights_quant_info;
+    const QuantizationInfo _out_quant_info;
 };
 
 } // namespace frontend

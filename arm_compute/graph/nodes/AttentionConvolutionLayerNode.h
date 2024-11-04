@@ -21,8 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef ARM_COMPUTE_GRAPH_ATTENTION_CONVOLUTION_LAYER_NODE_H
-#define ARM_COMPUTE_GRAPH_ATTENTION_CONVOLUTION_LAYER_NODE_H
+#ifndef ARM_COMPUTE_GRAPH_ATTENTIONCONVOLUTION_LAYER_NODE_H
+#define ARM_COMPUTE_GRAPH_ATTENTIONCONVOLUTION_LAYER_NODE_H
 
 #include "arm_compute/graph/INode.h"
 
@@ -114,7 +114,7 @@ public:
     void             accept(INodeVisitor &v) override;
 
 public:
-    static constexpr NodeType node_type = NodeType::AttentionConvLayer;
+    static constexpr NodeType node_type = NodeType::AttentionConvolutionLayer;
 
 private:
     PadStrideInfo       _info;
@@ -126,4 +126,4 @@ private:
 };
 } // namespace graph
 } // namespace arm_compute
-#endif /* ARM_COMPUTE_GRAPH_CONVOLUTION_LAYER_NODE_H */
+#endif /* ARM_COMPUTE_GRAPH_ATTENTIONCONVOLUTION_LAYER_NODE_H */
