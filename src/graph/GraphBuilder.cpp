@@ -1453,7 +1453,7 @@ NodeID GraphBuilder::add_attention_conv_layer(Graph                  &g,
     g.add_connection(v_w_nid, 0, conv_nid, 7);
     if(v_has_bias)
     {
-        g.add_connection(k_b_nid, 0, conv_nid, 8);
+        g.add_connection(v_b_nid, 0, conv_nid, 8);
     }
 
     set_node_params(g, conv_nid, params);
