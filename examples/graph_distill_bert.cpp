@@ -88,8 +88,7 @@ class GraphVanillaTransformerExample : public Example
         std::unique_ptr<IPreprocessor> at2_preproccessor = std::make_unique<atoiPreprocessor>();
 
         // Encode Input
-        graph << InputLayer(input_descriptor, get_token_accessor(common_params),
-                            get_segment_accessor(common_params.segment, move(at2_preproccessor)))
+        graph << InputLayer(input_descriptor, get_token_accessor(common_params))
                      .set_name("in").set_target(Target::NEON)
                 // No segement embedding
               << DistillEmbeddingLayer(EmbeddingLayerInfo(d_model,
