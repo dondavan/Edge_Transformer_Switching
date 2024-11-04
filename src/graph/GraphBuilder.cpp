@@ -297,11 +297,14 @@ NodeID GraphBuilder::add_convolution_node(Graph                  &g,
     w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::CHANNEL),
                      get_dimension_size(input_tensor_desc, DataLayoutDimension::CHANNEL) / num_groups);
     w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::BATCHES), depth);
+
     if(!weights_quant_info.empty())
     {
         w_desc.quant_info = weights_quant_info;
     }
-
+    std::cout << "w_desc.shape x " << w_desc.shape.x() << std::endl;
+    std::cout << "w_desc.shape y " << w_desc.shape.y() << std::endl;
+    std::cout << "w_desc.shape z " << w_desc.shape.z() << std::endl;
     NodeID w_nid = add_const_node_with_name(g, params, "Weights", w_desc, std::move(weights_accessor));
 
     // Create bias nodes
@@ -310,6 +313,10 @@ NodeID GraphBuilder::add_convolution_node(Graph                  &g,
     {
         TensorDescriptor b_desc = input_tensor_desc;
         b_desc.shape            = TensorShape(depth);
+
+    std::cout << "b_desc.shape x " << b_desc.shape.x() << std::endl;
+    std::cout << "b_desc.shape y " << b_desc.shape.y() << std::endl;
+    std::cout << "b_desc.shape z " << b_desc.shape.z() << std::endl;
         if(is_data_type_quantized_asymmetric(input_tensor_desc.data_type))
         {
             b_desc.data_type = DataType::S32;
