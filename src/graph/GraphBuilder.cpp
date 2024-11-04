@@ -1268,9 +1268,9 @@ NodeID GraphBuilder::add_distill_embedding_node(Graph              &g,
     p_desc.shape = TensorShape(emb_info.d_model(), emb_info.d_position());
     
     // Const node ids
-    NodeID v_c_nid, s_c_nid, p_c_nid;
+    NodeID v_c_nid, p_c_nid;
     // Embedding node ids
-    NodeID t_nid, s_nid, p_nid;
+    NodeID t_nid, p_nid;
     // Embedding sum node
     NodeID sum_nid;
 
@@ -1313,7 +1313,7 @@ NodeID GraphBuilder::add_distill_embedding_node(Graph              &g,
         sum_nid = g.add_node<EltwiseLayerNode>(params.target, EltwiseOperation::Add);
 
         g.add_connection(t_nid, 0, sum_nid, 0);
-        g.add_connection(s_nid, 0, sum_nid, 1);
+        g.add_connection(p_nid, 0, sum_nid, 1);
     }
 
     set_node_params(g, t_nid, params);
