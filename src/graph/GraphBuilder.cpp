@@ -1371,7 +1371,7 @@ NodeID GraphBuilder::add_attention_conv_layer(Graph &g, NodeParams params, NodeI
         v_b_nid = add_const_node_with_name(g, params, params.target, "Value Bias", v_b_desc, std::move(value_bias));
 
         // Create token embedding node and connect
-        attention_conv_nid = add_convolution_node(g, params, input, Size2D(1,1), 768, PadStrideInfo(1, 1, 0, 0));
+        attention_conv_nid = add_convolution_node(g, params, input, Size2D(1,1), 1, PadStrideInfo(1, 1, 0, 0));
 
         // Q
         g.add_connection(params.target, input.node_id, input.index, attention_conv_nid, 0);
