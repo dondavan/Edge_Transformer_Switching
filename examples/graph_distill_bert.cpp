@@ -109,14 +109,7 @@ class GraphVanillaTransformerExample : public Example
         add_encoder_block(data_path, "layer_5/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
 
         // Pooler
-        graph << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model),
-                                             TensorShape(d_model)),
-                             get_weights_accessor(data_path, "pooler_weight.npy"),
-                             get_weights_accessor(data_path, "pooler_bias.npy")).set_target(Target::CL).set_name("post_linear")
-
-              << ActivationLayer(ActivationLayerInfo(ActivationFunction::TANH, 1.f, 1.f)).set_target(Target::CL).set_name("post_acti")
-
-              << OutputLayer(get_output_accessor(common_params)).set_name("out").set_target(Target::NEON);
+        graph << OutputLayer(get_output_accessor(common_params)).set_name("out").set_target(Target::NEON);
 
         // Finalize graph
         GraphConfig config;
