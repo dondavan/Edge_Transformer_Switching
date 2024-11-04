@@ -778,6 +778,29 @@ class GraphBuilder final
                                      EmbeddingLayerInfo  tkemb_info,
                                      ITensorAccessorUPtr vocabs   = nullptr,
                                      ITensorAccessorUPtr position = nullptr);
+    /** Adds a linear layer computing Key, Value, Query to the graph
+     *
+     * @param[in] g             Graph to add the node to
+     * @param[in] params        Common node parameters
+     * @param[in] input         Input to the normalization layer node as a NodeID-Index pair
+     * @param[in] linear_info   Linear layer info
+     * @param[in] query_weights Query weight
+     * @param[in] query_bias    Query bias
+     * @param[in] key_weights   Key weight
+     * @param[in] key_bias      Key bias
+     * @param[in] value_weights Value weight
+     * @param[in] value_bias    Value bias
+     * 
+     * @return Node ID of the created node, EmptyNodeID in case of error
+     */
+    static NodeID add_attention_conv_layer(Graph &g, NodeParams params, NodeIdxPair input,
+                                             LinearLayerInfo     linear_info,
+                                             ITensorAccessorUPtr query_weights,
+                                             ITensorAccessorUPtr query_bias,
+                                             ITensorAccessorUPtr key_weights,
+                                             ITensorAccessorUPtr key_bias,
+                                             ITensorAccessorUPtr value_weights,
+                                             ITensorAccessorUPtr value_bias);
 };
 } // namespace graph
 } // namespace arm_compute

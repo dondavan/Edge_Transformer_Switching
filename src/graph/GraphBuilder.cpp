@@ -1245,6 +1245,7 @@ NodeID GraphBuilder::add_layer_norm_node(Graph &g, NodeParams params, NodeIdxPai
     return l_nid;
 }
 
+
 NodeID GraphBuilder::add_distill_embedding_node(Graph              &g,
                                         NodeParams          params,
                                         NodeIdxPair         input,
@@ -1323,6 +1324,104 @@ NodeID GraphBuilder::add_distill_embedding_node(Graph              &g,
     return sum_nid;
 }
 
+NodeID GraphBuilder::add_attention_conv_layer(Graph &g, NodeParams params, NodeIdxPair input,
+                                                LinearLayerInfo     linear_info,
+                                                ITensorAccessorUPtr query_weights,
+                                                ITensorAccessorUPtr query_bias,
+                                                ITensorAccessorUPtr key_weights,
+                                                ITensorAccessorUPtr key_bias,
+                                                ITensorAccessorUPtr value_weights,
+                                                ITensorAccessorUPtr value_bias)
+{
+    check_nodeidx_pair(input, g);
+
+    // Get input tensor descriptor
+    const TensorDescriptor input_tensor_desc = get_tensor_descriptor(g, g.node(input.node_id)->outputs()[0]);
+
+    // Create weight and bias tensor shape
+    TensorDescriptor q_w_desc = input_tensor_desc;
+    q_w_desc.shape            = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
+    TensorDescriptor q_b_desc = input_tensor_desc;
+    q_b_desc.shape            = TensorShape(linear_info.d_linear_hidden());
+
+    TensorDescriptor k_w_desc = input_tensor_desc;
+    k_w_desc.shape            = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
+    TensorDescriptor k_b_desc = input_tensor_desc;
+    k_b_desc.shape            = TensorShape(linear_info.d_linear_hidden());
+
+    TensorDescriptor v_w_desc = input_tensor_desc;
+    v_w_desc.shape            = TensorShape(linear_info.d_linear_hidden(), linear_info.d_linear_hidden());
+    TensorDescriptor v_b_desc = input_tensor_desc;
+    v_b_desc.shape            = TensorShape(linear_info.d_linear_hidden());
+    
+    // Create weight and bias const node ids
+    NodeID q_w_nid, q_b_nid, k_w_nid, k_b_nid, v_w_nid, v_b_nid;
+    // Create attention linear node ids
+    NodeID attention_conv_nid;
+    if(params.target != Target::UNSPECIFIED)
+    {  
+        // Create weight and bias const node with npy tensor accessor
+        q_w_nid = add_const_node_with_name(g, params, params.target, "Query Weights", q_w_desc, std::move(query_weights));
+        q_b_nid = add_const_node_with_name(g, params, params.target, "Query Bias", q_b_desc, std::move(query_bias));
+
+        k_w_nid = add_const_node_with_name(g, params, params.target, "Key Weights", k_w_desc, std::move(key_weights));
+        k_b_nid = add_const_node_with_name(g, params, params.target, "Key Bias", k_b_desc, std::move(key_bias));
+
+        v_w_nid = add_const_node_with_name(g, params, params.target, "Value Weights", v_w_desc, std::move(value_weights));
+        v_b_nid = add_const_node_with_name(g, params, params.target, "Value Bias", v_b_desc, std::move(value_bias));
+
+        // Create token embedding node and connect
+        attention_conv_nid = add_convolution_node(g, params, input, Size2D(1,1), 768, PadStrideInfo());
+
+        // Q
+        g.add_connection(params.target, input.node_id, input.index, attention_conv_nid, 0);
+        g.add_connection(params.target, q_w_nid, 0, attention_conv_nid, 1);
+        g.add_connection(params.target, q_b_nid, 0, attention_conv_nid, 2);
+
+        // K
+        g.add_connection(params.target, input.node_id, input.index, attention_conv_nid, 3);
+        g.add_connection(params.target, k_w_nid, 0, attention_conv_nid, 4);
+        g.add_connection(params.target, k_b_nid, 0, attention_conv_nid, 5);
+
+        // V
+        g.add_connection(params.target, input.node_id, input.index, attention_conv_nid, 6);
+        g.add_connection(params.target, v_w_nid, 0, attention_conv_nid, 7);
+        g.add_connection(params.target, v_b_nid, 0, attention_conv_nid, 8);
+        
+    }else
+    {
+        // Create weight and bias const node with npy tensor accessor
+        q_w_nid = add_const_node_with_name(g, params, "Query Weights", q_w_desc, std::move(query_weights));
+        q_b_nid = add_const_node_with_name(g, params, "Query Bias", q_b_desc, std::move(query_bias));
+
+        k_w_nid = add_const_node_with_name(g, params, "Key Weights", k_w_desc, std::move(key_weights));
+        k_b_nid = add_const_node_with_name(g, params, "Key Bias", k_b_desc, std::move(key_bias));
+
+        v_w_nid = add_const_node_with_name(g, params, "Value Weights", v_w_desc, std::move(value_weights));
+        v_b_nid = add_const_node_with_name(g, params, "Value Bias", v_b_desc, std::move(value_bias));
+
+        attention_conv_nid = g.add_node<AttentionLinearNode>(linear_info);
+
+        // Q
+        g.add_connection(input.node_id, input.index, attention_conv_nid, 0);
+        g.add_connection(q_w_nid, 0, attention_conv_nid, 1);
+        g.add_connection(q_b_nid, 0, attention_conv_nid, 2);
+
+        // K
+        g.add_connection(input.node_id, input.index, attention_conv_nid, 3);
+        g.add_connection(k_w_nid, 0, attention_conv_nid, 4);
+        g.add_connection(k_b_nid, 0, attention_conv_nid, 5);
+
+        // V
+        g.add_connection(input.node_id, input.index, attention_conv_nid, 6);
+        g.add_connection(v_w_nid, 0, attention_conv_nid, 7);
+        g.add_connection(v_b_nid, 0, attention_conv_nid, 8);
+    }
+
+    set_node_params(g, attention_conv_nid, params);
+
+    return attention_conv_nid;
+}
 
 } // namespace graph
 } // namespace arm_compute

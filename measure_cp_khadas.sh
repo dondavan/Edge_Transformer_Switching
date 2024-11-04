@@ -3,4 +3,5 @@ scons Werror=1 debug=0 asserts=0 neon=1 opencl=1 examples=1 os=linux arch=armv8a
 sshpass -p 'khadas' scp build/libarm_compute* Khadas.local:/home/khadas/run/lib 
 sshpass -p 'khadas' scp build/examples/graph_bert_* Khadas.local:/home/khadas/run
 sshpass -p 'khadas' scp build/examples/graph_distill_bert* Khadas.local:/home/khadas/run
+sshpass -p 'khadas' scp build/examples/graph_squeeze_bert* Khadas.local:/home/khadas/run
 sshpass -p 'khadas' scp build/examples/graph_dummy* Khadas.local:/home/khadas/run
