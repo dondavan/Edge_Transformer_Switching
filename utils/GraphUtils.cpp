@@ -880,10 +880,13 @@ void RawResultAccessor::access_typed_tensor(ITensor &tensor)
     _output_stream << std::scientific;
 
     _output_stream << "---------- Result ----------" << std::endl;
+    _output_stream << "x: "<<tensor.info()->tensor_shape().x() << std::endl;
+    _output_stream << "y: "<<tensor.info()->tensor_shape().y() << std::endl;
+    _output_stream << "z: "<<tensor.info()->tensor_shape().z() << std::endl;
+    
     for(size_t z = 0; z < tensor.info()->tensor_shape().z(); z++)
     {   
         _output_stream << " ################# " << z << " ################# " << std::endl;
-        _output_stream << tensor.info()->strides_in_bytes().z() << std::endl;
         for(size_t y = 0; y < tensor.info()->tensor_shape().y(); y++)
         {
             size_t x = tensor.info()->tensor_shape().x();
