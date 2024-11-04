@@ -160,7 +160,7 @@ class GraphVanillaTransformerExample : public Example
         graph << ConvolutionLayer(1U, 1U, 1U,
                                 get_weights_accessor(data_path + layer_path, "query_weight.npy"),
                                 get_weights_accessor(data_path + layer_path, "query_bias.npy"),
-                                PadStrideInfo(1, 1, 0, 0))
+                                PadStrideInfo(1, 1, 0, 0),4)
                    .set_name("conv1");
     }
 };
