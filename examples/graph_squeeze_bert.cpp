@@ -157,7 +157,7 @@ class GraphVanillaTransformerExample : public Example
         ARM_COMPUTE_UNUSED(h,d_model,eps,d_ff,data_path,layer_path);
         
         /* Output*/
-        graph << ConvolutionLayer(1U, 1U, 1U,
+        graph << ConvolutionLayer(1U, 1U, 7U,
                                 get_weights_accessor(data_path + layer_path, "query_weight.npy"),
                                 get_weights_accessor(data_path + layer_path, "query_bias.npy"),
                                 PadStrideInfo(1, 1, 0, 0))
