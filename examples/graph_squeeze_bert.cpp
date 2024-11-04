@@ -154,14 +154,8 @@ class GraphVanillaTransformerExample : public Example
     void add_encoder_block(std::string data_path, std::string layer_path,
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff)
     {
-        ARM_COMPUTE_UNUSED(h,d_model,eps,d_ff);
+        ARM_COMPUTE_UNUSED(h,d_model,eps,d_ff,data_path,layer_path);
         
-        /* Output*/
-        graph << ConvolutionLayer(1U, 1U, 1U,
-                                get_weights_accessor(data_path + layer_path, "query_weight.npy"),
-                                get_weights_accessor(data_path + layer_path, "query_bias.npy"),
-                                PadStrideInfo(1, 1, 0, 0))
-                   .set_name("conv1");
     }
 };
 
