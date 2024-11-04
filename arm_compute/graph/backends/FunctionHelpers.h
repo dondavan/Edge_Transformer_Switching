@@ -2268,7 +2268,7 @@ std::unique_ptr<IFunction> create_attention_conv_layer(AttentionLinearNode &node
 
 
 
-    const bool is_quantized = is_data_type_quantized_asymmetric(input->info()->data_type());
+    const bool is_quantized = is_data_type_quantized_asymmetric(query_input->info()->data_type());
 
     if(is_quantized)
     {
