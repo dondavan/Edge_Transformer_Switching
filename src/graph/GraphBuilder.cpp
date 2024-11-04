@@ -1346,13 +1346,16 @@ NodeID GraphBuilder::add_attention_conv_layer(Graph                  &g,
     ARM_COMPUTE_ERROR_ON(depth == 0);
     ARM_COMPUTE_ERROR_ON((kernel_spatial_extend.width == 0) || (kernel_spatial_extend.height == 0));
 
-    bool has_bias = (q_bias_accessor != nullptr);
+    bool q_has_bias = (q_bias_accessor != nullptr);
+    bool k_has_bias = (k_bias_accessor != nullptr);
+    bool v_has_bias = (v_bias_accessor != nullptr);
 
     // Get input tensor descriptor
     const TensorDescriptor input_tensor_desc = get_tensor_descriptor(g, g.node(input.node_id)->outputs()[0]);
     const DataLayout       input_data_layout = input_tensor_desc.layout;
 
     // Create weights node
+    // Q
     TensorDescriptor q_w_desc = input_tensor_desc;
     q_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::WIDTH), kernel_spatial_extend.width);
     q_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::HEIGHT), kernel_spatial_extend.height);
@@ -1363,10 +1366,36 @@ NodeID GraphBuilder::add_attention_conv_layer(Graph                  &g,
     {
         q_w_desc.quant_info = weights_quant_info;
     }
-    NodeID q_w_nid = add_const_node_with_name(g, params, "Weights", q_w_desc, std::move(q_weights_accessor));
+    NodeID q_w_nid = add_const_node_with_name(g, params, "Q_Weights", q_w_desc, std::move(q_weights_accessor));
+    // K
+    TensorDescriptor k_w_desc = input_tensor_desc;
+    k_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::WIDTH), kernel_spatial_extend.width);
+    k_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::HEIGHT), kernel_spatial_extend.height);
+    k_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::CHANNEL),
+                     get_dimension_size(input_tensor_desc, DataLayoutDimension::CHANNEL) / num_groups);
+    k_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::BATCHES), depth);
+    if(!weights_quant_info.empty())
+    {
+        k_w_desc.quant_info = weights_quant_info;
+    }
+    NodeID k_w_nid = add_const_node_with_name(g, params, "K_Weights", k_w_desc, std::move(k_weights_accessor));
+    // V
+    TensorDescriptor v_w_desc = input_tensor_desc;
+    v_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::WIDTH), kernel_spatial_extend.width);
+    v_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::HEIGHT), kernel_spatial_extend.height);
+    v_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::CHANNEL),
+                     get_dimension_size(input_tensor_desc, DataLayoutDimension::CHANNEL) / num_groups);
+    v_w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::BATCHES), depth);
+    if(!weights_quant_info.empty())
+    {
+        v_w_desc.quant_info = weights_quant_info;
+    }
+    NodeID v_w_nid = add_const_node_with_name(g, params, "V_Weights", v_w_desc, std::move(v_weights_accessor));
+    
     // Create bias nodes
+    // Q
     NodeID q_b_nid = EmptyNodeID;
-    if(has_bias)
+    if(q_has_bias)
     {
         TensorDescriptor q_b_desc = input_tensor_desc;
         q_b_desc.shape            = TensorShape(depth);
@@ -1374,18 +1403,59 @@ NodeID GraphBuilder::add_attention_conv_layer(Graph                  &g,
         {
             q_b_desc.data_type = DataType::S32;
         }
-        q_b_nid = add_const_node_with_name(g, params, "Bias", q_b_desc, std::move(q_bias_accessor));
+        q_b_nid = add_const_node_with_name(g, params, "Q_Bias", q_b_desc, std::move(q_bias_accessor));
+    }
+    // K
+    NodeID k_b_nid = EmptyNodeID;
+    if(k_has_bias)
+    {
+        TensorDescriptor k_b_desc = input_tensor_desc;
+        k_b_desc.shape            = TensorShape(depth);
+        if(is_data_type_quantized_asymmetric(input_tensor_desc.data_type))
+        {
+            k_b_desc.data_type = DataType::S32;
+        }
+        k_b_nid = add_const_node_with_name(g, params, "K_Bias", k_b_desc, std::move(k_bias_accessor));
+    }
+    // V
+    NodeID v_b_nid = EmptyNodeID;
+    if(v_has_bias)
+    {
+        TensorDescriptor v_b_desc = input_tensor_desc;
+        v_b_desc.shape            = TensorShape(depth);
+        if(is_data_type_quantized_asymmetric(input_tensor_desc.data_type))
+        {
+            v_b_desc.data_type = DataType::S32;
+        }
+        v_b_nid = add_const_node_with_name(g, params, "V_Bias", v_b_desc, std::move(v_bias_accessor));
     }
 
 
     // Create convolution node and connect
     NodeID conv_nid = g.add_node<ConvolutionLayerNode>(conv_info, num_groups, method, fast_math_hint, out_quant_info);
+
+    // Q
     g.add_connection(input.node_id, input.index, conv_nid, 0);
     g.add_connection(q_w_nid, 0, conv_nid, 1);
-    if(has_bias)
+    if(q_has_bias)
     {
         g.add_connection(q_b_nid, 0, conv_nid, 2);
     }
+    // K
+    g.add_connection(input.node_id, input.index, conv_nid, 3);
+    g.add_connection(k_w_nid, 0, conv_nid, 4);
+    if(k_has_bias)
+    {
+        g.add_connection(k_b_nid, 0, conv_nid, 5);
+    }
+    // V
+    g.add_connection(input.node_id, input.index, conv_nid, 6);
+    g.add_connection(v_w_nid, 0, conv_nid, 7);
+    if(v_has_bias)
+    {
+        g.add_connection(k_b_nid, 0, conv_nid, 8);
+    }
+
     set_node_params(g, conv_nid, params);
 
     return conv_nid;
