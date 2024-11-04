@@ -2041,7 +2041,7 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
         "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
                         << " Data Type: " << input->info()->data_type() << "Input Shape: " << input->info()->tensor_shape() << std::endl);
 
-    /*
+    
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -2055,8 +2055,8 @@ std::unique_ptr<IFunction> create_linear_layer(LinearLayerNode &node)
     wrap_function->register_tensor(weight);
     wrap_function->register_tensor(bias);
     wrap_function->register_tensor(output);
-    */
-    return func;
+    
+    return wrap_function;
 }
 
 /** Creates a backend attention linear function
@@ -2095,7 +2095,7 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
                     value_input, value_w, value_b,
                     query_output, key_output, value_output,
                     linear_info);
-    /*
+    
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -2123,14 +2123,14 @@ std::unique_ptr<IFunction> create_attention_linear_layer(AttentionLinearNode &no
     wrap_function->register_tensor(query_output);
     wrap_function->register_tensor(key_output);
     wrap_function->register_tensor(value_output);
-    */
+    
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type() << " Target: "
                                                << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
                                                << " Input shape: " << input->info()->tensor_shape()
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
 
-    return func;
+    return wrap_function;
 }
 
 /** Creates a backend scale dot production function
@@ -2213,7 +2213,7 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
                                                << " Input shape: " << input->info()->tensor_shape()
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
     
-    /*
+    
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -2223,9 +2223,9 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
 
     wrap_function->register_tensor(input);
     wrap_function->register_tensor(output);
-    */
+    
 
-    return func;
+    return wrap_function;
 }
 
 } // namespace detail
