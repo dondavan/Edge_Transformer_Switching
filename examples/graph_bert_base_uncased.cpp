@@ -154,11 +154,7 @@ class GraphVanillaTransformerExample : public Example
     {
         auto start_time = std::chrono::high_resolution_clock::now();
 
-        for(int i = 0; i<4;i++)
-        {
-            // Run graph
-            graph.run();
-        }
+        graph.run();
 
         auto   end_time  = std::chrono::high_resolution_clock::now();
         double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
@@ -186,7 +182,7 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "key_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL).set_name("attention_linear")
-            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha").set_target(Target::CL);
+            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha").set_target(Target::NEON);
 
         graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::CL);
 
