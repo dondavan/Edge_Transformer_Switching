@@ -1680,6 +1680,44 @@ class LayerNormLayer final : public ILayer
     LayerNormLayerInfo _info;
 };
 
+/** Embedding Layer */
+class DistillEmbeddingLayer final : public ILayer
+{
+    public:
+    /** Construct a token embedding  layer.
+     *
+     * @param[in] emb_info            Embedding layer info.
+     * @param[in] vocabs              Vocabulary weight accessor.
+     * @param[in] segments            Segments   weight accessor.
+     * @param[in] position_accessor   Positional weight accessor.
+     */
+    DistillEmbeddingLayer(const EmbeddingLayerInfo &emb_info,
+                          ITensorAccessorUPtr       vocabs,
+                          ITensorAccessorUPtr       position_accessor)
+        : _emb_info(emb_info),
+          _vocabs(std::move(vocabs)),
+          _position(std::move(position_accessor))
+    {
+    }
+
+    NodeID create_layer(IStream &s) override
+    {
+        NodeParams  common_params = { name(), s.hints().target_hint };
+        NodeIdxPair input         = { s.tail_node(), 0 };
+        common_params.target      = assigned_target();
+        return GraphBuilder::add_distill_embedding_node(s.graph(), common_params,
+                                                        input, _emb_info,
+                                                        std::move(_vocabs),
+                                                        std::move(_position));
+    }
+
+    private:
+    Target                    _assigned_target{ Target::UNSPECIFIED };
+    const EmbeddingLayerInfo &_emb_info;
+    ITensorAccessorUPtr       _vocabs;
+    ITensorAccessorUPtr       _position;
+};
+
 } // namespace frontend
 } // namespace graph
 } // namespace arm_compute

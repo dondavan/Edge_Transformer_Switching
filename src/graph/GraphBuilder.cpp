@@ -1245,5 +1245,84 @@ NodeID GraphBuilder::add_layer_norm_node(Graph &g, NodeParams params, NodeIdxPai
     return l_nid;
 }
 
+NodeID GraphBuilder::add_distill_embedding_node(Graph              &g,
+                                        NodeParams          params,
+                                        NodeIdxPair         input,
+                                        EmbeddingLayerInfo  emb_info,
+                                        ITensorAccessorUPtr vocabs_accessor,
+                                        ITensorAccessorUPtr position_accessor)
+{
+    check_nodeidx_pair(input, g);
+
+    // Get input tensor descriptor
+    const TensorDescriptor input_tensor_desc = get_tensor_descriptor(g, g.node(input.node_id)->outputs()[0]);
+
+    // Vocabulary const node output tensor descriptor
+    TensorDescriptor v_desc = input_tensor_desc;
+    // Reshape tensor to store weight with size of vocabulary and depth of d_model.
+    v_desc.shape = TensorShape(emb_info.d_model(), emb_info.d_vocab());
+
+    // Position const node output tensor descriptor
+    TensorDescriptor p_desc = input_tensor_desc;
+    // Reshape tensor to store weight with size of vocabulary and depth of d_model.
+    p_desc.shape = TensorShape(emb_info.d_model(), emb_info.d_position());
+    
+    // Const node ids
+    NodeID v_c_nid, s_c_nid, p_c_nid;
+    // Embedding node ids
+    NodeID t_nid, s_nid, p_nid;
+    // Embedding sum node
+    NodeID sum_nid;
+
+    if(params.target != Target::UNSPECIFIED)
+    {
+        v_c_nid = add_const_node_with_name(g, params, params.target, "vocabs", v_desc, std::move(vocabs_accessor));
+        p_c_nid = add_const_node_with_name(g, params, params.target, "position", p_desc, std::move(position_accessor));
+
+        // Create token embedding node and connect
+        t_nid = g.add_node<TokenEmbeddingLayerNode>(params.target, emb_info);
+        g.add_connection(params.target, input.node_id, 0 /* text input*/, t_nid, 0);
+        g.add_connection(params.target, v_c_nid, 0, t_nid, 1);
+
+        // Create positional embedding node
+        p_nid = g.add_node<PositionEmbeddingLayerNode>(params.target);
+        g.add_connection(params.target, input.node_id, 0 /* text input*/, p_nid, 0);
+        g.add_connection(params.target, p_c_nid, 0, p_nid, 1);
+
+        // Sum token embedding vector and segment embedding vector
+        sum_nid = g.add_node<EltwiseLayerNode>(params.target, EltwiseOperation::Add);
+
+        g.add_connection(params.target, t_nid, 0, sum_nid, 0);
+        g.add_connection(params.target, p_nid, 0, sum_nid, 1);
+    }else
+    {
+        v_c_nid = add_const_node_with_name(g, params, "vocabs", v_desc, std::move(vocabs_accessor));
+        p_c_nid = add_const_node_with_name(g, params, "position", p_desc, std::move(position_accessor));
+
+        // Create token embedding node and connect
+        t_nid = g.add_node<TokenEmbeddingLayerNode>(emb_info);
+        g.add_connection(input.node_id, 0 /* text input*/, t_nid, 0);
+        g.add_connection(v_c_nid, 0, t_nid, 1);
+
+        // Create positional embedding node
+        p_nid = g.add_node<PositionEmbeddingLayerNode>();
+        g.add_connection(input.node_id, 0 /* text input*/, p_nid, 0);
+        g.add_connection(p_c_nid, 0, p_nid, 1);
+
+        // Sum token embedding vector and segment embedding vector
+        sum_nid = g.add_node<EltwiseLayerNode>(params.target, EltwiseOperation::Add);
+
+        g.add_connection(t_nid, 0, sum_nid, 0);
+        g.add_connection(s_nid, 0, sum_nid, 1);
+    }
+
+    set_node_params(g, t_nid, params);
+    set_node_params(g, p_nid, params);
+    set_node_params(g, sum_nid, params);
+
+    return sum_nid;
+}
+
+
 } // namespace graph
 } // namespace arm_compute
