@@ -292,8 +292,8 @@ NodeID GraphBuilder::add_convolution_node(Graph                  &g,
 
     // Create weights node
     TensorDescriptor w_desc = input_tensor_desc;
-    w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::WIDTH), kernel_spatial_extend.width);
-    w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::HEIGHT), kernel_spatial_extend.height);
+    w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::WIDTH), 768);
+    w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::HEIGHT), 192);
     w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::CHANNEL),
                      get_dimension_size(input_tensor_desc, DataLayoutDimension::CHANNEL) / num_groups);
     w_desc.shape.set(get_dimension_idx(input_data_layout, DataLayoutDimension::BATCHES), depth);
