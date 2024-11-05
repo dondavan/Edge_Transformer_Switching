@@ -76,7 +76,6 @@ class CPUWrapperFunction : public IFunction
         std::ofstream measure_out("measure_output.txt", std::ios::app);
         measure_out.precision(5);
         measure_out << std::scientific << "Mapping cost: " << cost_time << std::endl;
-        measure_out.close();
 #endif
         _func->run();
 #ifdef MEASURE_TIME
@@ -91,7 +90,6 @@ class CPUWrapperFunction : public IFunction
         auto   unmap_end_time  = std::chrono::high_resolution_clock::now();
         double unmap_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(unmap_end_time - unmap_start_time).count();
         measure_out.precision(5);
-        std::ofstream measure_out("measure_output.txt", std::ios::app);
         measure_out << std::scientific << "Unapping cost: " << unmap_cost_time << std::endl;
         measure_out.close();
 #endif
