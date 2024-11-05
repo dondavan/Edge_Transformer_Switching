@@ -2291,7 +2291,6 @@ std::unique_ptr<IFunction> create_attention_convolution_layer(ConvolutionLayerNo
 
     const PadStrideInfo       conv_info      = node.convolution_info();
     const unsigned int        num_groups     = node.num_groups();
-    const ConvolutionMethod   conv_algorithm = node.convolution_method();
     const bool                fast_math      = node.fast_math_hint() == FastMathHint::Enabled;
     const ActivationLayerInfo fused_act      = node.fused_activation();
 
