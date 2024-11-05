@@ -159,7 +159,7 @@ class GraphVanillaTransformerExample : public Example
         SubStream without_attention(graph);
         SubStream with_attention(graph);
 
-        graph
+        with_attention
             /* Self Attention */
             << AttentionLinearLayer(LinearLayerInfo(d_model), get_weights_accessor(data_path + layer_path, "query_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "query_bias.npy"),
@@ -181,6 +181,7 @@ class GraphVanillaTransformerExample : public Example
                                                TensorShape(d_ff) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_0.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_0.npy")).set_target(Target::CL).set_name("ff_linear_1")
+                
                 << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_acti")
                 << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_ff, d_model) /*weight*/,
                                                TensorShape(d_model) /*bias*/),
