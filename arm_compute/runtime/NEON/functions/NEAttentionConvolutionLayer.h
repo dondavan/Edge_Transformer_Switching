@@ -119,10 +119,10 @@ public:
      *                              available which may introduce a drop of accuracy as well. Default is false
      * @param[in]  num_groups       (Optional) Number of groups when performing a grouped convolution. num_groups != 1 is not supported
      */
-    void configure(ITensor                   *input,
-                   const ITensor             *weights,
-                   const ITensor             *biases,
-                   ITensor                   *output,
+    void configure(ITensor *query_input, const ITensor *query_w, const ITensor *query_b,
+                   ITensor *key_input, const ITensor *key_w, const ITensor *key_b,
+                   ITensor *value_input, const ITensor *value_w, const ITensor *value_b,
+                   ITensor *query_output, ITensor *key_output, ITensor *value_output,
                    const PadStrideInfo       &conv_info,
                    const WeightsInfo         &weights_info     = WeightsInfo(),
                    const Size2D              &dilation         = Size2D(1U, 1U),

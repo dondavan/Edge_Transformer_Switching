@@ -252,6 +252,9 @@ std::unique_ptr<IFunction> NEFunctionFactory::create(INode *node, GraphContext &
         case NodeType::LayerNormLayer:
             return detail::create_layer_norm_layer<NELayerNormLayer, NETargetInfo>(
                 *polymorphic_downcast<LayerNormNode *>(node));
+        case NodeType::AttentionConvolutionLayer:
+            return detail::create_attention_convolution_layer<NEConvolutionLayer,NETargetInfo>(
+                *polymorphic_downcast<ConvolutionLayerNode *>(node));
         default:
             return nullptr;
     }

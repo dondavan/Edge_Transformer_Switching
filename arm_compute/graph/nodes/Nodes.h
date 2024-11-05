@@ -76,5 +76,6 @@
 #include "arm_compute/graph/nodes/AttentionLinearNode.h"
 #include "arm_compute/graph/nodes/ScaleDotProductionAttentionNode.h"
 #include "arm_compute/graph/nodes/LayerNormNode.h"
+#include "arm_compute/graph/nodes/AttentionConvolutionLayerNode.h"
 
 #endif // ACL_ARM_COMPUTE_GRAPH_NODES_NODES_H

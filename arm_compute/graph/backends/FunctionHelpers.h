@@ -2242,6 +2242,74 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
 
     return func;
 }
+
+
+/** Create a backend convolution layer function
+ *
+ * @tparam ConvolutionLayerFunctions Backend convolution functions
+ * @tparam TargetInfo                Target-specific information
+ *
+ * @param[in] node Node to create the backend function for
+ * @param[in] ctx  Graph context
+ *
+ * @return Backend convolution layer function
+ */
+template <typename ConvolutionLayerFunction, typename TargetInfo>
+std::unique_ptr<IFunction> create_attention_convolution_layer(ConvolutionLayerNode &node)
+{
+    validate_node<TargetInfo>(node, 9 /* expected inputs */,3 /* expected outputs */);
+
+    // Extract IO and info
+    //typename TargetInfo::TensorType *input   = get_backing_tensor<TargetInfo>(node.input(0));
+    //typename TargetInfo::TensorType *weights = get_backing_tensor<TargetInfo>(node.input(1));
+    //typename TargetInfo::TensorType *biases  = get_backing_tensor<TargetInfo>(node.input(2));
+    //typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
+
+    // Extract IO and info
+    ITensor *query_input = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
+    ITensor *query_w     = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
+    ITensor *query_b     = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
+    ITensor *key_input   = get_backing_tensor_from_TensorType<ITensor>(node.input(3));
+    ITensor *key_w       = get_backing_tensor_from_TensorType<ITensor>(node.input(4));
+    ITensor *key_b       = get_backing_tensor_from_TensorType<ITensor>(node.input(5));
+    ITensor *value_input = get_backing_tensor_from_TensorType<ITensor>(node.input(6));
+    ITensor *value_w     = get_backing_tensor_from_TensorType<ITensor>(node.input(7));
+    ITensor *value_b     = get_backing_tensor_from_TensorType<ITensor>(node.input(8));
+
+    ITensor              *query_output = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
+    ITensor              *key_output   = get_backing_tensor_from_TensorType<ITensor>(node.output(1));
+    ITensor              *value_output = get_backing_tensor_from_TensorType<ITensor>(node.output(2));
+
+    const bool is_quantized = is_data_type_quantized_asymmetric(input->info()->data_type());
+
+    if(is_quantized)
+    {
+        biases->info()->set_data_type(DataType::S32);
+    }
+
+    const PadStrideInfo       conv_info      = node.convolution_info();
+    const unsigned int        num_groups     = node.num_groups();
+    const ConvolutionMethod   conv_algorithm = node.convolution_method();
+    const bool                fast_math      = node.fast_math_hint() == FastMathHint::Enabled;
+    const ActivationLayerInfo fused_act      = node.fused_activation();
+
+    // Create and configure function (we assume that functions have been validated before creation)
+    std::shared_ptr<IMemoryManager> mm = get_memory_manager(ctx, TargetInfo::TargetType);
+
+    auto func = std::make_unique<ConvolutionLayerFunction>();
+    func->configure(input, weights, biases, output,
+                 conv_info, WeightsInfo(), Size2D(1U, 1U), fused_act, fast_math, num_groups);
+
+
+    ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated "
+                               << node.name() << " Type: " << func_name << " Target: " << TargetInfo::TargetType
+                               << " Data Type: " << input->info()->data_type() << " Groups: " << num_groups
+                               << " Input shape: " << input->info()->tensor_shape()
+                               << " Weights shape: " << weights->info()->tensor_shape()
+                               << " Output shape: " << output->info()->tensor_shape() << qss.str()
+                               << (fused_act.enabled() ? " " + to_string(fused_act.activation()) : "") << std::endl);
+    return wrap_function;
+}
     
 } // namespace detail
 } // namespace backends

@@ -1432,7 +1432,7 @@ NodeID GraphBuilder::add_attention_conv_layer(Graph                  &g,
 
 
     // Create convolution node and connect
-    NodeID conv_nid = g.add_node<ConvolutionLayerNode>(conv_info, num_groups, method, fast_math_hint, out_quant_info);
+    NodeID conv_nid = g.add_node<AttentionConvolutionLayerNode>(conv_info, num_groups, method, fast_math_hint, out_quant_info);
 
     // Q
     g.add_connection(input.node_id, input.index, conv_nid, 0);

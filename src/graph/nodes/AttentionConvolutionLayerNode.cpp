@@ -44,8 +44,8 @@ AttentionConvolutionLayerNode::AttentionConvolutionLayerNode(PadStrideInfo     i
       _out_quant_info(std::move(out_quant_info)),
       _fused_activation()
 {
-    _input_edges.resize(3, EmptyEdgeID);
-    _outputs.resize(1, NullTensorID);
+    _input_edges.resize(9, EmptyEdgeID);
+    _outputs.resize(3, NullTensorID);
 }
 
 void AttentionConvolutionLayerNode::set_convolution_method(ConvolutionMethod method)
@@ -120,6 +120,28 @@ TensorDescriptor AttentionConvolutionLayerNode::compute_output_descriptor(const 
 
 bool AttentionConvolutionLayerNode::forward_descriptors()
 {
+        if ((input_id(0) != NullTensorID) && (output_id(0) != NullTensorID) 
+        && (input_id(3) != NullTensorID) && (output_id(1) != NullTensorID) 
+        && (input_id(6) != NullTensorID) && (output_id(2) != NullTensorID))
+    {
+        // Query
+        Tensor *dst0 = output(0);
+        ARM_COMPUTE_ERROR_ON(dst0 == nullptr);
+        dst0->desc() = configure_output(0);
+
+        // Key
+        Tensor *dst1 = output(1);
+        ARM_COMPUTE_ERROR_ON(dst1 == nullptr);
+        dst1->desc() = configure_output(1);
+
+        // Value
+        Tensor *dst2 = output(2);
+        ARM_COMPUTE_ERROR_ON(dst2 == nullptr);
+        dst2->desc() = configure_output(2);
+        return true;
+    }
+    return false;
+    /*
     if ((input_id(0) != NullTensorID) && (input_id(1) != NullTensorID) && (output_id(0) != NullTensorID))
     {
         Tensor *dst = output(0);
@@ -128,6 +150,7 @@ bool AttentionConvolutionLayerNode::forward_descriptors()
         return true;
     }
     return false;
+    */
 }
 
 TensorDescriptor AttentionConvolutionLayerNode::configure_output(size_t idx) const

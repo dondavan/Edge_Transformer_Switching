@@ -370,11 +370,9 @@ std::unique_ptr<IFunction> CLFunctionFactory::create(INode *node, GraphContext &
         case NodeType::ScaleDotProductionAttentionLayer:
             return detail::create_scale_dot_production_layer<CLScaleDotProductionAttentionLayer,CLTargetInfo>(
                 *polymorphic_downcast<ScaleDotProductionAttentionNode *>(node));
-        /*
-        case NodeType::AttentionConvLayer:
-            return detail::create_attention_conv_layer<CLConvolutionLayer,CLTargetInfo>(
-                *polymorphic_downcast<AttentionConvolutionLayerNode *>(node));
-        */
+        case NodeType::AttentionConvolutionLayer:
+            return detail::create_attention_convolution_layer<CLConvolutionLayer,CLTargetInfo>(
+                *polymorphic_downcast<ConvolutionLayerNode *>(node));
         default:
             return nullptr;
     }
