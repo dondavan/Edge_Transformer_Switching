@@ -62,38 +62,37 @@ class CPUWrapperFunction : public IFunction
 
     void run() override
     {
-
 #ifdef MEASURE_TIME
-    auto start_time = std::chrono::high_resolution_clock::now();
+        auto start_time = std::chrono::high_resolution_clock::now();
 #endif
-    for(auto &tensor_handle : _tensor_handles)
+        for(auto &tensor_handle : _tensor_handles)
         {
-            std::cout << tensor_handle->tensor().info()->id()<<std::endl;
+            std::cout << tensor_handle->tensor().info()->id() << std::endl;
             tensor_handle->map(true);
         }
 #ifdef MEASURE_TIME
-    auto   end_time  = std::chrono::high_resolution_clock::now();
-    double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
-    std::ofstream measure_out("measure_output.txt",std::ios::app);
-    measure_out.precision(5);
-    measure_out << std::scientific << "Mapping cost: " << cost_time << std::endl;
-    measure_out.close();
+        auto          end_time  = std::chrono::high_resolution_clock::now();
+        double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+        std::ofstream measure_out("measure_output.txt", std::ios::app);
+        measure_out.precision(5);
+        measure_out << std::scientific << "Mapping cost: " << cost_time << std::endl;
+        measure_out.close();
 #endif
         _func->run();
 #ifdef MEASURE_TIME
-    auto unmap_start_time = std::chrono::high_resolution_clock::now();
+        auto unmap_start_time = std::chrono::high_resolution_clock::now();
 #endif
-    for(auto &tensor_handle : _tensor_handles)
+        for(auto &tensor_handle : _tensor_handles)
         {
-            std::cout << tensor_handle->tensor().info()->id()<<std::endl;
+            std::cout << tensor_handle->tensor().info()->id() << std::endl;
             tensor_handle->unmap();
         }
 #ifdef MEASURE_TIME
-    auto   unmap_end_time  = std::chrono::high_resolution_clock::now();
-    double unmap_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(unmap_end_time - unmap_start_time).count();
-    measure_out.precision(5);
-    measure_out << std::scientific << "Unapping cost: " << unmap_cost_time << std::endl;
-    measure_out.close();
+        auto   unmap_end_time  = std::chrono::high_resolution_clock::now();
+        double unmap_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(unmap_end_time - unmap_start_time).count();
+        measure_out.precision(5);
+        measure_out << std::scientific << "Unapping cost: " << unmap_cost_time << std::endl;
+        measure_out.close();
 #endif
     }
 
@@ -102,7 +101,7 @@ class CPUWrapperFunction : public IFunction
         _tensors.push_back(tensor);
     }
 
-    void register_handle(ITensorHandle * handle)
+    void register_handle(ITensorHandle *handle)
     {
         _tensor_handles.push_back(handle);
     }
@@ -113,7 +112,7 @@ class CPUWrapperFunction : public IFunction
     }
 
     private:
-    std::vector<ITensorHandle *> _tensor_handles;
+    std::vector<ITensorHandle *>        _tensor_handles;
     std::vector<arm_compute::ITensor *> _tensors;
     std::unique_ptr<IFunction>          _func;
 };
@@ -572,10 +571,10 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
     //typename TargetInfo::TensorType *biases  = get_backing_tensor<TargetInfo>(node.input(2));
     //typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
 
-    ITensor *input  = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
+    ITensor *input   = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
     ITensor *weights = get_backing_tensor_from_TensorType<ITensor>(node.input(1));
-    ITensor *biases = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
-    ITensor *output = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
+    ITensor *biases  = get_backing_tensor_from_TensorType<ITensor>(node.input(2));
+    ITensor *output  = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
 
     const bool is_quantized = is_data_type_quantized_asymmetric(input->info()->data_type());
 
@@ -2227,7 +2226,7 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
                                                << TargetInfo::TargetType << " Data Type: " << input->info()->data_type()
                                                << " Input shape: " << input->info()->tensor_shape()
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
-    
+
     /*
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
@@ -2243,7 +2242,6 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
     return func;
 }
 
-
 /** Create a backend convolution layer function
  *
  * @tparam ConvolutionLayerFunctions Backend convolution functions
@@ -2255,15 +2253,9 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
  * @return Backend convolution layer function
  */
 template <typename ConvolutionLayerFunction, typename TargetInfo>
-std::unique_ptr<IFunction> create_attention_convolution_layer(ConvolutionLayerNode &node)
+std::unique_ptr<IFunction> create_attention_convolution_layer(ConvolutionLayerNode &node, GraphContext &ctx)
 {
-    validate_node<TargetInfo>(node, 9 /* expected inputs */,3 /* expected outputs */);
-
-    // Extract IO and info
-    //typename TargetInfo::TensorType *input   = get_backing_tensor<TargetInfo>(node.input(0));
-    //typename TargetInfo::TensorType *weights = get_backing_tensor<TargetInfo>(node.input(1));
-    //typename TargetInfo::TensorType *biases  = get_backing_tensor<TargetInfo>(node.input(2));
-    //typename TargetInfo::TensorType *output  = get_backing_tensor<TargetInfo>(node.output(0));
+    validate_node<TargetInfo>(node, 9 /* expected inputs */, 3 /* expected outputs */);
 
     // Extract IO and info
     ITensor *query_input = get_backing_tensor_from_TensorType<ITensor>(node.input(0));
@@ -2276,15 +2268,25 @@ std::unique_ptr<IFunction> create_attention_convolution_layer(ConvolutionLayerNo
     ITensor *value_w     = get_backing_tensor_from_TensorType<ITensor>(node.input(7));
     ITensor *value_b     = get_backing_tensor_from_TensorType<ITensor>(node.input(8));
 
-    ITensor              *query_output = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
-    ITensor              *key_output   = get_backing_tensor_from_TensorType<ITensor>(node.output(1));
-    ITensor              *value_output = get_backing_tensor_from_TensorType<ITensor>(node.output(2));
+    ITensor *query_output = get_backing_tensor_from_TensorType<ITensor>(node.output(0));
+    ITensor *key_output   = get_backing_tensor_from_TensorType<ITensor>(node.output(1));
+    ITensor *value_output = get_backing_tensor_from_TensorType<ITensor>(node.output(2));
 
-    const bool is_quantized = is_data_type_quantized_asymmetric(input->info()->data_type());
+    const bool query_is_quantized = is_data_type_quantized_asymmetric(query_input->info()->data_type());
+    const bool value_is_quantized = is_data_type_quantized_asymmetric(value_input->info()->data_type());
+    const bool key_is_quantized   = is_data_type_quantized_asymmetric(key_input->info()->data_type());
 
-    if(is_quantized)
+    if(query_is_quantized)
     {
-        biases->info()->set_data_type(DataType::S32);
+        query_b->info()->set_data_type(DataType::S32);
+    }
+    if(value_is_quantized)
+    {
+        value_b->info()->set_data_type(DataType::S32);
+    }
+    if(key_is_quantized)
+    {
+        key_b->info()->set_data_type(DataType::S32);
     }
 
     const PadStrideInfo       conv_info      = node.convolution_info();
@@ -2297,9 +2299,11 @@ std::unique_ptr<IFunction> create_attention_convolution_layer(ConvolutionLayerNo
     std::shared_ptr<IMemoryManager> mm = get_memory_manager(ctx, TargetInfo::TargetType);
 
     auto func = std::make_unique<ConvolutionLayerFunction>();
-    func->configure(input, weights, biases, output,
-                 conv_info, WeightsInfo(), Size2D(1U, 1U), fused_act, fast_math, num_groups);
-
+    func->configure(query_input, query_w, query_b, 
+                    key_input, key_w, key_b,
+                    value_input, value_w, value_b,  
+                    query_output, key_output, value_output,
+                    conv_info, WeightsInfo(), Size2D(1U, 1U), fused_act, fast_math, num_groups);
 
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated "
                                << node.name() << " Type: " << func_name << " Target: " << TargetInfo::TargetType
@@ -2308,9 +2312,9 @@ std::unique_ptr<IFunction> create_attention_convolution_layer(ConvolutionLayerNo
                                << " Weights shape: " << weights->info()->tensor_shape()
                                << " Output shape: " << output->info()->tensor_shape() << qss.str()
                                << (fused_act.enabled() ? " " + to_string(fused_act.activation()) : "") << std::endl);
-    return wrap_function;
+    return func
 }
-    
+
 } // namespace detail
 } // namespace backends
 } // namespace graph
