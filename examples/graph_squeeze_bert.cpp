@@ -155,16 +155,45 @@ class GraphVanillaTransformerExample : public Example
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff)
     {
         ARM_COMPUTE_UNUSED(h,d_model,eps,d_ff,data_path,layer_path);
-        
+        SubStream without_attention(graph);
+        SubStream with_attention(graph);
+
+        with_attention
+            /* Self Attention */
+            << AttentionConvLayer(1U, 1U, 1U, 
+                                    get_weights_accessor(data_path + layer_path, "query_weight.npy"),
+                                    get_weights_accessor(data_path + layer_path, "query_bias.npy"),
+                                    get_weights_accessor(data_path + layer_path, "key_weight.npy"),
+                                    get_weights_accessor(data_path + layer_path, "key_bias.npy"),
+                                    get_weights_accessor(data_path + layer_path, "value_weight.npy"),
+                                    get_weights_accessor(data_path + layer_path, "value_bias.npy"),
+                                    PadStrideInfo(1,1,0,0)).set_target(Target::CL).set_name("attention_conv")
+            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha").set_target(Target::NEON);
+
+        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::CL);
+
         /* Self output */
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("attention_norm");
 
+        SubStream without_ff(graph);
+        SubStream with_ff(graph);
+        /* Self Intermediate(Feed Forward)*/
+        with_ff << ConvolutionLayer(1U, 1U, 1U,
+                               get_weights_accessor(data_path + layer_path, "ff_weight_0.npy"),
+                               get_weights_accessor(data_path + layer_path, "ff_bias_0.npy"),
+                                PadStrideInfo(1, 1, 0, 0)).set_target(Target::CL).set_name("ff_linear_1")
+                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_acti")
+                << ConvolutionLayer(1U, 1U, 1U,
+                               get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
+                               get_weights_accessor(data_path + layer_path, "ff_bias_1.npy"),
+                                PadStrideInfo(1, 1, 0, 0)).set_target(Target::CL).set_name("ff_linear_2");
+
+        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("ff_res_add").set_target(Target::CL);
+
         /* Output*/
-        graph << ConvolutionLayer(1U, 1U, 1U,
-                                get_weights_accessor(data_path + layer_path, "query_weight.npy"),
-                                get_weights_accessor(data_path + layer_path, "query_bias.npy"),
-                                PadStrideInfo(1, 1, 0, 0))
-                   .set_name("conv1");
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("ff_norm");
+
+        
     }
 };
 
