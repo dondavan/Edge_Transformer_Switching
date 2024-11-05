@@ -953,6 +953,13 @@
             "src/runtime/CL/functions/CLScaleDotProductionAttentionLayer.cpp"
           ]
         }
+      },
+      "AttentionConv": {
+        "files": {
+          "common": [
+            "src/runtime/CL/functions/CLAttentionConvolutionLayer.cpp"
+          ]
+        }
       }
   }
 },
@@ -2563,6 +2570,13 @@
           "common": [
             "src/cpu/operators/CpuEmbedSum.cpp",
             "src/runtime/NEON/functions/NEEmbeddingSumLayer.cpp"
+          ]
+        }
+      },
+      "AttentionConv": {
+        "files": {
+          "common": [
+            "src/runtime/NEON/functions/NEAttentionConvolutionLayer.cpp"
           ]
         }
       }
