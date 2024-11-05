@@ -103,7 +103,7 @@ CLScheduler::CLScheduler()
       _cl_tuner(nullptr),
       _gemm_heuristics(nullptr),
       _backend_type(CLBackendType::Native),
-      _job_chaining_enabled(true),
+      _job_chaining_enabled(false),
       _job_chaining_size(1),
       _job_chaining_count(0)
 {
