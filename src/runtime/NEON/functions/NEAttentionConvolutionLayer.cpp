@@ -48,9 +48,15 @@ struct NEAttentionConvolutionLayer::Impl
     std::unique_ptr<cpu::ICpuOperator> op1{ nullptr };
     std::unique_ptr<cpu::ICpuOperator> op2{ nullptr };
     std::unique_ptr<cpu::ICpuOperator> op3{ nullptr };
-    ITensorPack                        run_pack{};
-    ITensorPack                        prep_pack{};
-    WorkspaceData<Tensor>              workspace{};
+    ITensorPack                        q_run_pack{};
+    ITensorPack                        k_run_pack{};
+    ITensorPack                        v_run_pack{};
+    ITensorPack                        q_prep_pack{};
+    ITensorPack                        k_prep_pack{};
+    ITensorPack                        v_prep_pack{};
+    WorkspaceData<Tensor>              q_workspace{};
+    WorkspaceData<Tensor>              k_workspace{};
+    WorkspaceData<Tensor>              v_workspace{};
     experimental::MemoryRequirements   aux_mem_req{};
     std::unique_ptr<IFunction>         func1{ nullptr };
     std::unique_ptr<IFunction>         func2{ nullptr };
@@ -133,28 +139,28 @@ void NEAttentionConvolutionLayer::configure(ITensor *query_input, ITensor *query
     {
         _impl->memory_group = MemoryGroup(std::move(_impl->memory_manager));
         _impl->aux_mem_req  = _impl->op1->workspace();
-        _impl->run_pack     = { { ACL_SRC_0, query_input }, { ACL_SRC_1, query_w }, { ACL_SRC_2, query_b }, { ACL_DST, query_output } };
-        _impl->prep_pack    = { { ACL_SRC_1, query_w }, { ACL_SRC_2, query_b } };
-        _impl->workspace =
-            manage_workspace<Tensor>(_impl->aux_mem_req, _impl->memory_group, _impl->run_pack, _impl->prep_pack);
+        _impl->q_run_pack     = { { ACL_SRC_0, query_input }, { ACL_SRC_1, query_w }, { ACL_SRC_2, query_b }, { ACL_DST, query_output } };
+        _impl->q_prep_pack    = { { ACL_SRC_1, query_w }, { ACL_SRC_2, query_b } };
+        _impl->q_workspace =
+            manage_workspace<Tensor>(_impl->aux_mem_req, _impl->memory_group, _impl->q_run_pack, _impl->q_prep_pack);
     }
     if(_impl->op2)
     {
         _impl->memory_group = MemoryGroup(std::move(_impl->memory_manager));
         _impl->aux_mem_req  = _impl->op2->workspace();
-        _impl->run_pack     = { { ACL_SRC_0, key_input }, { ACL_SRC_1, key_w }, { ACL_SRC_2, key_b }, { ACL_DST, key_output } };
-        _impl->prep_pack    = { { ACL_SRC_1, key_w }, { ACL_SRC_2, key_b } };
-        _impl->workspace =
-            manage_workspace<Tensor>(_impl->aux_mem_req, _impl->memory_group, _impl->run_pack, _impl->prep_pack);
+        _impl->k_run_pack     = { { ACL_SRC_0, key_input }, { ACL_SRC_1, key_w }, { ACL_SRC_2, key_b }, { ACL_DST, key_output } };
+        _impl->k_prep_pack    = { { ACL_SRC_1, key_w }, { ACL_SRC_2, key_b } };
+        _impl->k_workspace =
+            manage_workspace<Tensor>(_impl->aux_mem_req, _impl->memory_group, _impl->k_run_pack, _impl->k_prep_pack);
     }
     if(_impl->op3)
     {
         _impl->memory_group = MemoryGroup(std::move(_impl->memory_manager));
         _impl->aux_mem_req  = _impl->op3->workspace();
-        _impl->run_pack     = { { ACL_SRC_0, value_input }, { ACL_SRC_1, value_w }, { ACL_SRC_2, value_b }, { ACL_DST, value_output } };
-        _impl->prep_pack    = { { ACL_SRC_1, value_w }, { ACL_SRC_2, value_b } };
-        _impl->workspace =
-            manage_workspace<Tensor>(_impl->aux_mem_req, _impl->memory_group, _impl->run_pack, _impl->prep_pack);
+        _impl->v_run_pack     = { { ACL_SRC_0, value_input }, { ACL_SRC_1, value_w }, { ACL_SRC_2, value_b }, { ACL_DST, value_output } };
+        _impl->v_prep_pack    = { { ACL_SRC_1, value_w }, { ACL_SRC_2, value_b } };
+        _impl->v_workspace =
+            manage_workspace<Tensor>(_impl->aux_mem_req, _impl->memory_group, _impl->v_run_pack, _impl->v_prep_pack);
     }
 }
 
@@ -227,7 +233,7 @@ void NEAttentionConvolutionLayer::run()
     }
     else
     {
-        _impl->op1->run(_impl->run_pack);
+        _impl->op1->run(_impl->q_run_pack);
     }
 
     if(_impl->func2)
@@ -236,7 +242,7 @@ void NEAttentionConvolutionLayer::run()
     }
     else
     {
-        _impl->op2->run(_impl->run_pack);
+        _impl->op2->run(_impl->k_run_pack);
     }
 
     if(_impl->func3)
@@ -245,7 +251,7 @@ void NEAttentionConvolutionLayer::run()
     }
     else
     {
-        _impl->op3->run(_impl->run_pack);
+        _impl->op3->run(_impl->v_run_pack);
     }
 }
 
@@ -257,10 +263,10 @@ void NEAttentionConvolutionLayer::prepare()
     }
     else
     {
-        _impl->op1->prepare(_impl->prep_pack);
+        _impl->op1->prepare(_impl->q_prep_pack);
 
         // Release temporary tensors that are only used in prepare stage
-        release_temporaries<Tensor>(_impl->aux_mem_req, _impl->workspace);
+        release_temporaries<Tensor>(_impl->aux_mem_req, _impl->q_workspace);
     }
 
     if(_impl->func2)
@@ -269,10 +275,10 @@ void NEAttentionConvolutionLayer::prepare()
     }
     else
     {
-        _impl->op2->prepare(_impl->prep_pack);
+        _impl->op2->prepare(_impl->k_prep_pack);
 
         // Release temporary tensors that are only used in prepare stage
-        release_temporaries<Tensor>(_impl->aux_mem_req, _impl->workspace);
+        release_temporaries<Tensor>(_impl->aux_mem_req, _impl->k_workspace);
     }
 
     if(_impl->func3)
@@ -281,10 +287,10 @@ void NEAttentionConvolutionLayer::prepare()
     }
     else
     {
-        _impl->op3->prepare(_impl->prep_pack);
+        _impl->op3->prepare(_impl->v_prep_pack);
 
         // Release temporary tensors that are only used in prepare stage
-        release_temporaries<Tensor>(_impl->aux_mem_req, _impl->workspace);
+        release_temporaries<Tensor>(_impl->aux_mem_req, _impl->v_workspace);
     }
 }
 } // namespace arm_compute

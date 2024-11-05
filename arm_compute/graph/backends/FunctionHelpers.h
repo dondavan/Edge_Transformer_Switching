@@ -2311,7 +2311,7 @@ std::unique_ptr<IFunction> create_attention_convolution_layer(ConvolutionLayerNo
                                << " Weights shape: " << weights->info()->tensor_shape()
                                << " Output shape: " << output->info()->tensor_shape() << qss.str()
                                << (fused_act.enabled() ? " " + to_string(fused_act.activation()) : "") << std::endl);
-    return func
+    return func;
 }
 
 } // namespace detail
