@@ -167,12 +167,7 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "key_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL).set_name("attention_linear")
-            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha").set_target(Target::NEON)
-            // This is new
-            << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model),
-                                             TensorShape(d_model)),
-                             get_weights_accessor(data_path, "pooler_weight.npy"),
-                             get_weights_accessor(data_path, "pooler_bias.npy")).set_target(Target::CL).set_name("post_linear");
+            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha").set_target(Target::NEON);
 
         graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::CL);
 
@@ -186,11 +181,11 @@ class GraphVanillaTransformerExample : public Example
                                                TensorShape(d_ff) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_0.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_0.npy")).set_target(Target::CL).set_name("ff_linear_1")
+                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_acti")
                 << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_ff, d_model) /*weight*/,
                                                TensorShape(d_model) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
-                               get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::CL).set_name("ff_linear_2")
-                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_acti");
+                               get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::CL).set_name("ff_linear_2");
 
         graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("ff_res_add").set_target(Target::CL);
 
