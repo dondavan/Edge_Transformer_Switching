@@ -72,6 +72,7 @@ class GraphVanillaTransformerExample : public Example
         constexpr unsigned int h          = 12U;    // Parallel attention (Heads)
         constexpr float        eps        = 1e-12;  // Layer normalization eplision
         constexpr unsigned int d_ff       = 3072U;  // Dim feedforward
+        ARM_COMPUTE_UNUSED(d_model,d_vocab,d_segemnt,d_position,h,eps,d_ff);
 
         // Create input tensor
         const TensorShape src_tensor = TensorShape(common_params.input_len);
