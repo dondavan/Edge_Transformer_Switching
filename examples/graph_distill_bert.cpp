@@ -72,7 +72,6 @@ class GraphVanillaTransformerExample : public Example
         constexpr unsigned int h          = 12U;    // Parallel attention (Heads)
         constexpr float        eps        = 1e-12;  // Layer normalization eplision
         constexpr unsigned int d_ff       = 3072U;  // Dim feedforward
-        ARM_COMPUTE_UNUSED(d_model,d_vocab,d_segemnt,d_position,h,eps,d_ff);
 
         // Create input tensor
         const TensorShape src_tensor = TensorShape(common_params.input_len);
@@ -101,6 +100,13 @@ class GraphVanillaTransformerExample : public Example
                                 get_weights_accessor(data_path, "token_embedding.npy", operation_layout),
                                 get_weights_accessor(data_path, "positional_embedding.npy", operation_layout))
                      .set_name("tkemb").set_target(Target::NEON);
+
+        add_encoder_block(data_path, "layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_1/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_2/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_3/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_4/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
+        add_encoder_block(data_path, "layer_5/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
 
         // Pooler
         graph << OutputLayer(get_output_accessor(common_params)).set_name("out").set_target(Target::NEON);
@@ -149,11 +155,9 @@ class GraphVanillaTransformerExample : public Example
     void add_encoder_block(std::string data_path, std::string layer_path,
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff)
     {
-        ARM_COMPUTE_UNUSED(h);
-        SubStream without_attention(graph);
-        SubStream with_attention(graph);
+        ARM_COMPUTE_UNUSED(h,eps,d_ff);
 
-        with_attention
+        graph
             /* Self Attention */
             << AttentionLinearLayer(LinearLayerInfo(d_model), get_weights_accessor(data_path + layer_path, "query_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "query_bias.npy"),
@@ -163,28 +167,7 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL).set_name("attention_linear")
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha").set_target(Target::NEON);
 
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::CL);
-
-        /* Self output */
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("attention_norm");
-
-        SubStream without_ff(graph);
-        SubStream with_ff(graph);
-        /* Self Intermediate(Feed Forward)*/
-        with_ff << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
-                                               TensorShape(d_ff) /*bias*/),
-                               get_weights_accessor(data_path + layer_path, "ff_weight_0.npy"),
-                               get_weights_accessor(data_path + layer_path, "ff_bias_0.npy")).set_target(Target::CL).set_name("ff_linear_1")
-                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_acti")
-                << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_ff, d_model) /*weight*/,
-                                               TensorShape(d_model) /*bias*/),
-                               get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
-                               get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::CL).set_name("ff_linear_2");
-
-        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("ff_res_add").set_target(Target::CL);
-
-        /* Output*/
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("ff_norm");
+        
     }
 };
 
