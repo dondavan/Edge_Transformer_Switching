@@ -201,10 +201,12 @@ void CLScheduler::enqueue_common(ICLKernel &kernel, ITensorPack &tensors, bool f
 
 void CLScheduler::flush_queue(bool flush)
 {
+    std::cout << "flush_queue  ";
     if (flush)
     {
         _queue.flush();
         _job_chaining_count = 0;
+        std::cout << "flushed  " << std::endl;
         return;
     }
 

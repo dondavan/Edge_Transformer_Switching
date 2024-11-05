@@ -78,6 +78,21 @@ class CPUWrapperFunction : public IFunction
         measure_out << std::scientific << "Mapping cost: " << cost_time << std::endl;
 #endif
         _func->run();
+#ifdef MEASURE_TIME
+        auto unmap_start_time = std::chrono::high_resolution_clock::now();
+#endif
+        for(auto &tensor_handle : _tensor_handles)
+        {
+            std::cout << tensor_handle->tensor().info()->id() << std::endl;
+            tensor_handle->unmap();
+        }
+#ifdef MEASURE_TIME
+        auto   unmap_end_time  = std::chrono::high_resolution_clock::now();
+        double unmap_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(unmap_end_time - unmap_start_time).count();
+        measure_out.precision(5);
+        measure_out << std::scientific << "Unapping cost: " << unmap_cost_time << std::endl;
+        measure_out.close();
+#endif
     }
 
     void register_tensor(ITensor *tensor)
