@@ -123,5 +123,6 @@
 #include "arm_compute/runtime/CL/functions/CLLayerNormLayer.h"
 #include "arm_compute/runtime/CL/functions/CLScaleDotProductionAttentionLayer.h"
 #include "arm_compute/runtime/CL/functions/CLAttentionLinearLayer.h"
+#include "arm_compute/runtime/CL/functions/CLAttentionConvolutionLayer.h"
 
 #endif // ACL_ARM_COMPUTE_RUNTIME_CL_CLFUNCTIONS_H
