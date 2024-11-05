@@ -120,5 +120,6 @@
 #include "arm_compute/runtime/NEON/functions/NETokenEmbeddingLayer.h"
 #include "arm_compute/runtime/NEON/functions/NESegmentEmbeddingLayer.h"
 #include "arm_compute/runtime/NEON/functions/NEScaleDotProductionAttentionLayer.h"
+#include "arm_compute/runtime/NEON/functions/NEAttentionConvolutionLayer.h"
 
 #endif // ACL_ARM_COMPUTE_RUNTIME_NEON_NEFUNCTIONS_H
