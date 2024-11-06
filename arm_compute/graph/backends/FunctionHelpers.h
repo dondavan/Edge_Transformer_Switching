@@ -78,6 +78,21 @@ class CPUWrapperFunction : public IFunction
         measure_out << std::scientific << "Mapping cost: " << cost_time << std::endl;
 #endif
         _func->run();
+#ifdef MEASURE_TIME
+        auto unmap_start_time = std::chrono::high_resolution_clock::now();
+#endif
+        for(auto &tensor_handle : _tensor_handles)
+        {
+            std::cout << tensor_handle->tensor().info()->id() << std::endl;
+            tensor_handle->unmap();
+        }
+#ifdef MEASURE_TIME
+        auto   unmap_end_time  = std::chrono::high_resolution_clock::now();
+        double unmap_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(unmap_end_time - unmap_start_time).count();
+        measure_out.precision(5);
+        measure_out << std::scientific << "Unapping cost: " << unmap_cost_time << std::endl;
+        measure_out.close();
+#endif
     }
 
     void register_tensor(ITensor *tensor)
@@ -1863,7 +1878,6 @@ std::unique_ptr<IFunction> create_token_embedding_layer(TokenEmbeddingLayerNode 
         "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
                         << " Data Type: " << input->info()->data_type() << "Input Shape: " << input->info()->tensor_shape() << std::endl);
 
-    /*
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -1871,9 +1885,12 @@ std::unique_ptr<IFunction> create_token_embedding_layer(TokenEmbeddingLayerNode 
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.input(1)->handle());
     wrap_function->register_handle(node.output(0)->handle());
-*/
 
-    return func;
+    wrap_function->register_tensor(input);
+    wrap_function->register_tensor(vocab);
+    wrap_function->register_tensor(output);
+
+    return wrap_function;
 }
 
 /** Creates a backend segment embedding layer function
@@ -1902,7 +1919,6 @@ std::unique_ptr<IFunction> create_segment_embedding_layer(SegmentEmbeddingLayerN
     auto func = std::make_unique<SegmentEmbeddingLayerFunction>();
     func->configure(input, segment, output);
 
-    /*
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -1910,9 +1926,12 @@ std::unique_ptr<IFunction> create_segment_embedding_layer(SegmentEmbeddingLayerN
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.input(1)->handle());
     wrap_function->register_handle(node.output(0)->handle());
-    */
 
-    return func;
+    wrap_function->register_tensor(input);
+    wrap_function->register_tensor(segment);
+    wrap_function->register_tensor(output);
+
+    return wrap_function;
 }
 
 /** Creates a backend position embedding layer function
@@ -1943,14 +1962,17 @@ std::unique_ptr<IFunction> create_position_embedding_layer(PositionEmbeddingLaye
 
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
-    /*
     wrap_function->register_function(std::move(func));
 
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.input(1)->handle());
     wrap_function->register_handle(node.output(0)->handle());
-*/
-    return func;
+
+    wrap_function->register_tensor(input);
+    wrap_function->register_tensor(position);
+    wrap_function->register_tensor(output);
+
+    return wrap_function;
 }
 
 /** Creates a backend embedding summing layer function
