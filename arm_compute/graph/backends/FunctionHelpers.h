@@ -1863,6 +1863,7 @@ std::unique_ptr<IFunction> create_token_embedding_layer(TokenEmbeddingLayerNode 
         "Instantiated " << node.name() << " Type: " << node.type() << " Target: " << TargetInfo::TargetType
                         << " Data Type: " << input->info()->data_type() << "Input Shape: " << input->info()->tensor_shape() << std::endl);
 
+    /*
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -1870,12 +1871,9 @@ std::unique_ptr<IFunction> create_token_embedding_layer(TokenEmbeddingLayerNode 
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.input(1)->handle());
     wrap_function->register_handle(node.output(0)->handle());
+*/
 
-    wrap_function->register_tensor(input);
-    wrap_function->register_tensor(vocab);
-    wrap_function->register_tensor(output);
-
-    return wrap_function;
+    return func;
 }
 
 /** Creates a backend segment embedding layer function
@@ -1904,6 +1902,7 @@ std::unique_ptr<IFunction> create_segment_embedding_layer(SegmentEmbeddingLayerN
     auto func = std::make_unique<SegmentEmbeddingLayerFunction>();
     func->configure(input, segment, output);
 
+    /*
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -1911,12 +1910,9 @@ std::unique_ptr<IFunction> create_segment_embedding_layer(SegmentEmbeddingLayerN
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.input(1)->handle());
     wrap_function->register_handle(node.output(0)->handle());
+    */
 
-    wrap_function->register_tensor(input);
-    wrap_function->register_tensor(segment);
-    wrap_function->register_tensor(output);
-
-    return wrap_function;
+    return func;
 }
 
 /** Creates a backend position embedding layer function
@@ -1947,17 +1943,14 @@ std::unique_ptr<IFunction> create_position_embedding_layer(PositionEmbeddingLaye
 
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
+    /*
     wrap_function->register_function(std::move(func));
 
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.input(1)->handle());
     wrap_function->register_handle(node.output(0)->handle());
-
-    wrap_function->register_tensor(input);
-    wrap_function->register_tensor(position);
-    wrap_function->register_tensor(output);
-
-    return wrap_function;
+*/
+    return func;
 }
 
 /** Creates a backend embedding summing layer function
