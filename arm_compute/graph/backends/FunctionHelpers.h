@@ -637,11 +637,6 @@ std::unique_ptr<IFunction> create_convolution_layer(ConvolutionLayerNode &node, 
     wrap_function->register_handle(node.input(2)->handle());
     wrap_function->register_handle(node.output(0)->handle());
 
-    wrap_function->register_tensor(input);
-    wrap_function->register_tensor(weights);
-    wrap_function->register_tensor(biases);
-    wrap_function->register_tensor(output);
-
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated "
                                << node.name() << " Type: " << func_name << " Target: " << TargetInfo::TargetType
                                << " Data Type: " << input->info()->data_type() << " Groups: " << num_groups
@@ -2282,7 +2277,23 @@ std::unique_ptr<IFunction> create_attention_convolution_layer(ConvolutionLayerNo
                                << " Weights shape: " << weights->info()->tensor_shape()
                                << " Output shape: " << output->info()->tensor_shape() << qss.str()
                                << (fused_act.enabled() ? " " + to_string(fused_act.activation()) : "") << std::endl);
-    return func;
+    
+    auto wrap_function = std::make_unique<CPUWrapperFunction>();
+
+    wrap_function->register_function(std::move(func));
+
+    wrap_function->register_handle(node.input(0)->handle());
+    wrap_function->register_handle(node.input(1)->handle());
+    wrap_function->register_handle(node.input(2)->handle());
+    wrap_function->register_handle(node.input(4)->handle());
+    wrap_function->register_handle(node.input(5)->handle());
+    wrap_function->register_handle(node.input(7)->handle());
+    wrap_function->register_handle(node.input(8)->handle());
+    wrap_function->register_handle(node.output(0)->handle());
+    wrap_function->register_handle(node.output(1)->handle());
+    wrap_function->register_handle(node.output(2)->handle());
+
+    return wrap_function;
 }
 
 } // namespace detail
