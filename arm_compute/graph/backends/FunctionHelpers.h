@@ -67,7 +67,6 @@ class CPUWrapperFunction : public IFunction
 #endif
         for(auto &tensor_handle : _tensor_handles)
         {
-            std::cout << tensor_handle->tensor().info()->id() << std::endl;
             tensor_handle->map(true);
         }
 #ifdef MEASURE_TIME
@@ -83,7 +82,6 @@ class CPUWrapperFunction : public IFunction
 #endif
         for(auto &tensor_handle : _tensor_handles)
         {
-            std::cout << tensor_handle->tensor().info()->id() << std::endl;
             tensor_handle->unmap();
         }
 #ifdef MEASURE_TIME
