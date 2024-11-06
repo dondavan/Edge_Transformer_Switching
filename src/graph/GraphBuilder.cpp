@@ -302,29 +302,56 @@ NodeID GraphBuilder::add_convolution_node(Graph                  &g,
         w_desc.quant_info = weights_quant_info;
     }
 
-    NodeID w_nid = add_const_node_with_name(g, params, "Weights", w_desc, std::move(weights_accessor));
-
-    // Create bias nodes
     NodeID b_nid = EmptyNodeID;
-    if(has_bias)
-    {
-        TensorDescriptor b_desc = input_tensor_desc;
-        b_desc.shape            = TensorShape(depth);
-        if(is_data_type_quantized_asymmetric(input_tensor_desc.data_type))
-        {
-            b_desc.data_type = DataType::S32;
-        }
-        b_nid = add_const_node_with_name(g, params, "Bias", b_desc, std::move(bias_accessor));
-    }
+    NodeID w_nid = EmptyNodeID;
+    NodeID conv_nid = EmptyNodeID;
 
-    // Create convolution node and connect
-    NodeID conv_nid = g.add_node<ConvolutionLayerNode>(conv_info, num_groups, method, fast_math_hint, out_quant_info);
-    g.add_connection(input.node_id, input.index, conv_nid, 0);
-    g.add_connection(w_nid, 0, conv_nid, 1);
-    if(has_bias)
+    if(params.target != Target::UNSPECIFIED)
     {
-        g.add_connection(b_nid, 0, conv_nid, 2);
+        w_nid = add_const_node_with_name(g, params, params.target, "Weights", w_desc, std::move(weights_accessor));
+
+        if(has_bias)
+        {
+            TensorDescriptor b_desc = input_tensor_desc;
+            b_desc.shape            = TensorShape(depth);
+            if(is_data_type_quantized_asymmetric(input_tensor_desc.data_type))
+            {
+                b_desc.data_type = DataType::S32;
+            }
+            b_nid = add_const_node_with_name(g, params, params.target, "Bias", b_desc, std::move(bias_accessor));
+        }
+        
+        conv_nid = g.add_node<ConvolutionLayerNode>(params.target, conv_info, num_groups, method, fast_math_hint, out_quant_info);
+        g.add_connection(params.target, input.node_id, input.index, conv_nid, 0);
+        g.add_connection(params.target, w_nid, 0, conv_nid, 1);
+        if(has_bias)
+        {
+            g.add_connection(params.target, b_nid, 0, conv_nid, 2);
+        }
+    }else
+    {
+        w_nid = add_const_node_with_name(g, params, "Weights", w_desc, std::move(weights_accessor));
+
+        if(has_bias)
+        {
+            TensorDescriptor b_desc = input_tensor_desc;
+            b_desc.shape            = TensorShape(depth);
+            if(is_data_type_quantized_asymmetric(input_tensor_desc.data_type))
+            {
+                b_desc.data_type = DataType::S32;
+            }
+            b_nid = add_const_node_with_name(g, params, "Bias", b_desc, std::move(bias_accessor));
+        }
+
+        conv_nid = g.add_node<ConvolutionLayerNode>(conv_info, num_groups, method, fast_math_hint, out_quant_info);
+        g.add_connection(input.node_id, input.index, conv_nid, 0);
+        g.add_connection(w_nid, 0, conv_nid, 1);
+        if(has_bias)
+        {
+            g.add_connection(b_nid, 0, conv_nid, 2);
+        }
     }
+    
     set_node_params(g, conv_nid, params);
 
     return conv_nid;
