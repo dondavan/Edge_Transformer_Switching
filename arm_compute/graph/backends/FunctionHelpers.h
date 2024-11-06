@@ -972,7 +972,7 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
     {
         ARM_COMPUTE_ERROR("Unsupported element-wise operation!");
     }
-    /*
+    
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -980,11 +980,7 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.input(1)->handle());
     wrap_function->register_handle(node.output(0)->handle());
-
-    wrap_function->register_tensor(input1);
-    wrap_function->register_tensor(input2);
-    wrap_function->register_tensor(output);
-    */
+    
 
     // Log info
     ARM_COMPUTE_LOG_GRAPH_INFO("Instantiated " << node.name() << " Type: " << node.type()
@@ -992,7 +988,7 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
                                                << " Data Type: " << input1->info()->data_type()
                                                << " Shape: " << input1->info()->tensor_shape() << std::endl);
 
-    return func;
+    return wrap_function;
 }
 
 /** Create a backend unary element-wise operation layer function
