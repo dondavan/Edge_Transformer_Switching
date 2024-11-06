@@ -41,7 +41,7 @@ void ICLOperator::run(ITensorPack &tensors)
         ARM_COMPUTE_ERROR("No inputs provided");
     }
 
-    CLScheduler::get().enqueue_op(*_kernel.get(), tensors, false);
+    CLScheduler::get().enqueue_op(*_kernel.get(), tensors, true);
 }
 
 void ICLOperator::prepare(ITensorPack &constants)
