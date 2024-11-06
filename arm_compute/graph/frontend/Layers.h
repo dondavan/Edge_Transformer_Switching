@@ -391,6 +391,7 @@ class ConvolutionLayer final : public ILayer
     {
         NodeIdxPair input         = { s.tail_node(), 0 };
         NodeParams  common_params = { name(), s.hints().target_hint };
+        common_params.target      = assigned_target();
         return GraphBuilder::add_convolution_node(s.graph(), common_params, input, Size2D(_conv_width, _conv_height),
                                                   _ofm, _conv_info, _num_groups, s.hints().convolution_method_hint,
                                                   s.hints().fast_math_hint, std::move(_weights), std::move(_bias),
@@ -1767,6 +1768,7 @@ class AttentionConvLayer final : public ILayer
     {
         NodeIdxPair input         = { s.tail_node(), 0 };
         NodeParams  common_params = { name(), s.hints().target_hint };
+        common_params.target      = assigned_target();
         return GraphBuilder::add_attention_conv_layer(s.graph(), common_params, input, Size2D(_conv_width, _conv_height),
                                                       _ofm, _conv_info, _num_groups, s.hints().convolution_method_hint,
                                                       s.hints().fast_math_hint,
