@@ -2208,7 +2208,7 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
                                                << " Input shape: " << input->info()->tensor_shape()
                                                << " Output shape: " << output->info()->tensor_shape() << std::endl);
 
-    /*
+    
     auto wrap_function = std::make_unique<CPUWrapperFunction>();
 
     wrap_function->register_function(std::move(func));
@@ -2216,11 +2216,7 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.output(0)->handle());
 
-    wrap_function->register_tensor(input);
-    wrap_function->register_tensor(output);
-    */
-
-    return func;
+    return wrap_function;
 }
 
 /** Create a backend convolution layer function
