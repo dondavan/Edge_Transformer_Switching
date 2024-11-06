@@ -187,10 +187,10 @@ class GraphVanillaTransformerExample : public Example
                                     PadStrideInfo(1,1,0,0)).set_target(Target::CL).set_name("attention_conv")
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha").set_target(Target::NEON);
 
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON);
+        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::CL);
 
         /* Self output */
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attention_norm");
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("attention_norm");
 
         SubStream without_ff(graph);
         SubStream with_ff(graph);
@@ -205,10 +205,10 @@ class GraphVanillaTransformerExample : public Example
                                get_weights_accessor(data_path + layer_path, "ff_bias_1.npy"),
                                 PadStrideInfo(1, 1, 0, 0)).set_target(Target::CL).set_name("ff_linear_2");
 
-        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("ff_res_add").set_target(Target::NEON);
+        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("ff_res_add").set_target(Target::CL);
 
         /* Output*/
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_norm");
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::CL).set_name("ff_norm");
 
         
     }
