@@ -1395,12 +1395,13 @@ NodeID GraphBuilder::add_attention_conv_layer(Graph                  &g,
     NodeID q_w_nid = EmptyNodeID;
     NodeID k_w_nid = EmptyNodeID;
     NodeID v_w_nid = EmptyNodeID;
+    NodeID conv_nid = EmptyNodeID;
 
     if(params.target != Target::UNSPECIFIED)
     {  
 
         // Create convolution node and connect
-        NodeID conv_nid = g.add_node<AttentionConvolutionLayerNode>(params.target,conv_info, num_groups, method, fast_math_hint, out_quant_info);
+        conv_nid = g.add_node<AttentionConvolutionLayerNode>(params.target,conv_info, num_groups, method, fast_math_hint, out_quant_info);
 
         q_w_nid = add_const_node_with_name(g, params, params.target, "Q_Weights", q_w_desc, std::move(q_weights_accessor));
         k_w_nid = add_const_node_with_name(g, params, params.target, "K_Weights", k_w_desc, std::move(k_weights_accessor));
@@ -1464,7 +1465,7 @@ NodeID GraphBuilder::add_attention_conv_layer(Graph                  &g,
     {   
 
         // Create convolution node and connect
-        NodeID conv_nid = g.add_node<AttentionConvolutionLayerNode>(conv_info, num_groups, method, fast_math_hint, out_quant_info);
+        conv_nid = g.add_node<AttentionConvolutionLayerNode>(conv_info, num_groups, method, fast_math_hint, out_quant_info);
 
         q_w_nid = add_const_node_with_name(g, params, "Q_Weights", q_w_desc, std::move(q_weights_accessor));
         k_w_nid = add_const_node_with_name(g, params, "K_Weights", k_w_desc, std::move(k_weights_accessor));
