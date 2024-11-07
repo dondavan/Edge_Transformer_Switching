@@ -103,7 +103,7 @@ CLScheduler::CLScheduler()
       _cl_tuner(nullptr),
       _gemm_heuristics(nullptr),
       _backend_type(CLBackendType::Native),
-      _job_chaining_enabled(true),
+      _job_chaining_enabled(false),
       _job_chaining_size(1),
       _job_chaining_count(0)
 {
@@ -201,10 +201,12 @@ void CLScheduler::enqueue_common(ICLKernel &kernel, ITensorPack &tensors, bool f
 
 void CLScheduler::flush_queue(bool flush)
 {
+    flush ? std::cout << "not flushing" << std::endl : std::cout << "flushing" << std::endl;
     if (flush)
     {
         _queue.flush();
         _job_chaining_count = 0;
+        std::cout << "flushed" << std::endl;
         return;
     }
 
