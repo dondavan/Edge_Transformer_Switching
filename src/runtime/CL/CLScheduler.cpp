@@ -201,7 +201,7 @@ void CLScheduler::enqueue_common(ICLKernel &kernel, ITensorPack &tensors, bool f
 
 void CLScheduler::flush_queue(bool flush)
 {
-    flush ? std::cout << "not flushing" << std::endl : std::cout << "flushing" << std::endl;
+    flush ? std::cout << "flushing" << std::endl : std::cout << "not flushing" << std::endl;
     if (flush)
     {
         _queue.flush();
