@@ -207,8 +207,6 @@ void CLScheduler::flush_queue(bool flush)
         _queue.flush();
         _job_chaining_count = 0;
         std::cout << "flushed" << std::endl;
-        _queue.finish();
-        std::cout << "finished" << std::endl;
         return;
     }
 
