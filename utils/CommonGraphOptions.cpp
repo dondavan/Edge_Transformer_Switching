@@ -150,10 +150,10 @@ CommonGraphOptions::CommonGraphOptions(CommandLineParser &parser)
 
       raw_output(parser.add_option<ToggleOption>("raw-output")),
       input_len(parser.add_option<SimpleOption<int>>("input_len")),
-      d_model(parser.add_option<SimpleOption<int>>("d_model")),
       text(parser.add_option<SimpleOption<std::string>>("text")),
       segment(parser.add_option<SimpleOption<std::string>>("segment")),
-      vocabulary(parser.add_option<SimpleOption<std::string>>("vocabulary"))
+      vocabulary(parser.add_option<SimpleOption<std::string>>("vocabulary")),
+      d_model(parser.add_option<SimpleOption<int>>("d_model"))
 {
     std::set<arm_compute::graph::Target> supported_targets{
         Target::NEON,
