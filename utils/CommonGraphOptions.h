@@ -117,6 +117,7 @@ struct CommonGraphParams
     std::string                      segment{};
     std::string                      vocabulary{};
     bool                             raw_output{false};
+    int                              d_model{};
 };
 
 /** Formatted output of the CommonGraphParams type
@@ -180,6 +181,7 @@ public:
     SimpleOption<std::string>              *text;             /**< Text */
     SimpleOption<std::string>              *segment;          /**< segment */
     SimpleOption<std::string>              *vocabulary;       /**< Vocabulary */
+    SimpleOption<int>                      *d_model;          /**< Model Depth */
 };
 
 /** Consumes the common graph options and creates a structure containing any information

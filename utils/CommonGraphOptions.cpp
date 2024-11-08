@@ -150,6 +150,7 @@ CommonGraphOptions::CommonGraphOptions(CommandLineParser &parser)
 
       raw_output(parser.add_option<ToggleOption>("raw-output")),
       input_len(parser.add_option<SimpleOption<int>>("input_len")),
+      d_model(parser.add_option<SimpleOption<int>>("d_model")),
       text(parser.add_option<SimpleOption<std::string>>("text")),
       segment(parser.add_option<SimpleOption<std::string>>("segment")),
       vocabulary(parser.add_option<SimpleOption<std::string>>("vocabulary"))
@@ -207,6 +208,7 @@ CommonGraphOptions::CommonGraphOptions(CommandLineParser &parser)
     text->set_help("Input text for the graph");
     segment->set_help("Input sentence segmentation");
     vocabulary->set_help("Path to vocabulary file for tex tokenization");
+    d_model->set_help("Model depth");
 }
 
 CommonGraphParams consume_common_graph_parameters(CommonGraphOptions &options)
@@ -246,6 +248,7 @@ CommonGraphParams consume_common_graph_parameters(CommonGraphOptions &options)
     common_params.text                   = options.text->value();
     common_params.segment                = options.segment->value();
     common_params.vocabulary             = options.vocabulary->value();
+    common_params.d_model                = options.d_model->value();
 
     return common_params;
 }
