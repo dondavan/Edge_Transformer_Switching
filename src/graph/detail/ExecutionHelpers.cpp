@@ -63,6 +63,7 @@ void configure_all_tensors(Graph &g)
     auto &nodes = g.nodes();
     for (auto &node : nodes)
     {
+        std::cout << node.get()->name() << std::endl;
         //Upgrade NEON output tensor to CL tensor
         for(unsigned int i = 0; i < node.get()->num_outputs(); ++i)
         {
