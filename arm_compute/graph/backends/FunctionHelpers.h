@@ -63,28 +63,14 @@ class CPUWrapperFunction : public IFunction
     void run() override
     {
 
-#ifdef MEASURE_TIME
-        auto start_time = std::chrono::high_resolution_clock::now();
-#endif
 
         for(auto &tensor_handle : _tensor_handles)
         {
             tensor_handle->map(true);
         }
 
-#ifdef MEASURE_TIME
-        auto          end_time  = std::chrono::high_resolution_clock::now();
-        double        cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
-        std::ofstream measure_out("measure_output.txt", std::ios::app);
-        measure_out.precision(5);
-        measure_out << std::scientific << "Mapping cost: " << cost_time << std::endl;
-#endif
-
         _func->run();
 
-#ifdef MEASURE_TIME
-        auto unmap_start_time = std::chrono::high_resolution_clock::now();
-#endif
         if(_unmap_flag)
         {
             for(auto &tensor_handle : _tensor_handles)
@@ -92,15 +78,6 @@ class CPUWrapperFunction : public IFunction
                 tensor_handle->unmap();
             }
         }
-
-#ifdef MEASURE_TIME
-        auto   unmap_end_time  = std::chrono::high_resolution_clock::now();
-        double unmap_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(unmap_end_time - unmap_start_time).count();
-        measure_out.precision(5);
-        measure_out << std::scientific << "UnMapping cost: " << unmap_cost_time << std::endl;
-        measure_out.close();
-#endif
-
     }
 
     void register_tensor(ITensor *tensor)
