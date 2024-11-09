@@ -1338,7 +1338,7 @@ NodeID GraphBuilder::add_distill_embedding_node(Graph              &g,
         g.add_connection(p_c_nid, 0, p_nid, 1);
 
         // Sum token embedding vector and segment embedding vector
-        sum_nid = g.add_node<EltwiseLayerNode>(params.target, EltwiseOperation::Add);
+        sum_nid = g.add_node<EltwiseLayerNode>(EltwiseOperation::Add);
 
         g.add_connection(t_nid, 0, sum_nid, 0);
         g.add_connection(p_nid, 0, sum_nid, 1);

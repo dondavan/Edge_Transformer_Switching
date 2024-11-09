@@ -139,7 +139,7 @@ class GraphVanillaTransformerExample : public Example
         auto start_time = std::chrono::high_resolution_clock::now();
 
          // Run graph
-        for (int i = 0; i<10;i++)
+        for (int i = 0; i<16;i++)
         {
             graph.run();
         }
