@@ -84,10 +84,10 @@ void configure_all_tensors(Graph &g)
                     switch (cnode->assigned_target())
                     {
                     case Target::CL:
-                        std::cout << "consumer CL";
+                        std::cout << "consumer CL" <<std::endl;
                         break;
                     case Target::NEON:
-                        std::cout << "consumer NEON";
+                        std::cout << "consumer NEON"<<std::endl;
                         break;
                     
                     default:
@@ -97,10 +97,10 @@ void configure_all_tensors(Graph &g)
                     switch (pnode->assigned_target())
                     {
                     case Target::CL:
-                        std::cout << "producer CL";
+                        std::cout << "producer CL"<<std::endl;
                         break;
                     case Target::NEON:
-                        std::cout << "producer NEON";
+                        std::cout << "producer NEON"<<std::endl;
                         break;
                     
                     default:
