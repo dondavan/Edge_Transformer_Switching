@@ -1320,8 +1320,8 @@ NodeID GraphBuilder::add_distill_embedding_node(Graph              &g,
         // Sum token embedding vector and segment embedding vector
         sum_nid = g.add_node<EltwiseLayerNode>(params.target, EltwiseOperation::Add);
 
-        g.add_connection(params.target, t_nid, 0, sum_nid, 1);
-        g.add_connection(params.target, p_nid, 0, sum_nid, 0);
+        g.add_connection(params.target, t_nid, 0, sum_nid, 0);
+        g.add_connection(params.target, p_nid, 0, sum_nid, 1);
     }else
     {
         v_c_nid = add_const_node_with_name(g, params, "vocabs", v_desc, std::move(vocabs_accessor));
