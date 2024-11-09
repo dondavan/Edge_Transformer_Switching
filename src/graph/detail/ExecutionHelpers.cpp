@@ -63,23 +63,52 @@ void configure_all_tensors(Graph &g)
     auto &nodes = g.nodes();
     for (auto &node : nodes)
     {
+        std::cout << node.get()->name() << std::endl;
+        std::cout << "node.get()->num_outputs()"<<std::endl;
+        std::cout << node.get()->num_outputs()<<std::endl;
         //Upgrade NEON output tensor to CL tensor
         for(unsigned int i = 0; i < node.get()->num_outputs(); ++i)
         {
             Tensor *tensor = node.get()->output(i);
-            bool up_scaled = false;
 
             if(tensor != nullptr && !tensor->bound_edges().empty())
             {
                 auto eids = tensor->bound_edges();
+                std::cout << "tensor->bound_edges().size()" <<std::endl;
+                std::cout << eids.size() <<std::endl;
                 for(auto eid:eids)
                 {
                     auto cnode = g.edge(eid)->consumer();
                     auto pnode = g.edge(eid)->producer();
-                    if((cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL) && !up_scaled)
+                    if(cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL)
                     {
                         tensor->desc().target = Target::CL;
-                        up_scaled = true;
+                    }
+
+                    switch (cnode->assigned_target())
+                    {
+                    case Target::CL:
+                        std::cout << "consumer CL" <<std::endl;
+                        break;
+                    case Target::NEON:
+                        std::cout << "consumer NEON"<<std::endl;
+                        break;
+                    
+                    default:
+                        break;
+                    }
+
+                    switch (pnode->assigned_target())
+                    {
+                    case Target::CL:
+                        std::cout << "producer CL"<<std::endl;
+                        break;
+                    case Target::NEON:
+                        std::cout << "producer NEON"<<std::endl;
+                        break;
+                    
+                    default:
+                        break;
                     }
                 }
             }
@@ -89,7 +118,6 @@ void configure_all_tensors(Graph &g)
         for(unsigned int i = 0; i < node.get()->num_inputs(); ++i)
         {
             Tensor *tensor = node.get()->input(i);
-            bool up_scaled = false;
 
             if(tensor != nullptr && !tensor->bound_edges().empty())
             {
@@ -98,10 +126,9 @@ void configure_all_tensors(Graph &g)
                 {
                     auto cnode = g.edge(eid)->consumer();
                     auto pnode = g.edge(eid)->producer();
-                    if((cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL) && !up_scaled)
+                    if(cnode->assigned_target() == Target::CL || pnode->assigned_target() == Target::CL)
                     {
                         tensor->desc().target = Target::CL;
-                        up_scaled = true;
                     }
                 }
             }
