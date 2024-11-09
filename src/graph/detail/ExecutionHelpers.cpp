@@ -80,6 +80,32 @@ void configure_all_tensors(Graph &g)
                     {
                         tensor->desc().target = Target::CL;
                     }
+
+                    switch (cnode->assigned_target())
+                    {
+                    case Target::CL:
+                        std::cout << "consumer CL";
+                        break;
+                    case Target::NEON:
+                        std::cout << "consumer NEON";
+                        break;
+                    
+                    default:
+                        break;
+                    }
+
+                    switch (pnode->assigned_target())
+                    {
+                    case Target::CL:
+                        std::cout << "producer CL";
+                        break;
+                    case Target::NEON:
+                        std::cout << "producer NEON";
+                        break;
+                    
+                    default:
+                        break;
+                    }
                 }
             }
         }
