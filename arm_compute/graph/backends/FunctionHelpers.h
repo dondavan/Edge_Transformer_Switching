@@ -118,6 +118,11 @@ class CPUWrapperFunction : public IFunction
         _func = std::move(function);
     }
 
+    void set_unmap_flag(bool unmap_flag)
+    {
+        _unmap_flag = unmap_flag;
+    }
+
     private:
     bool                                _unmap_flag{false};
     std::vector<ITensorHandle *>        _tensor_handles;
@@ -2209,7 +2214,7 @@ std::unique_ptr<IFunction> create_layer_norm_layer(LayerNormNode &node)
 
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.output(0)->handle());
-    wrap_function->_unmap_flag =true;
+    wrap_function->set_unmap_flag(true);
 
     return wrap_function;
 }
