@@ -966,6 +966,7 @@ std::unique_ptr<IFunction> create_eltwise_layer(EltwiseLayerNode &node)
     wrap_function->register_handle(node.input(0)->handle());
     wrap_function->register_handle(node.input(1)->handle());
     wrap_function->register_handle(node.output(0)->handle());
+    wrap_function->set_unmap_flag(true);
     
 
     // Log info
