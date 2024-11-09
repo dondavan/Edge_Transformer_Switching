@@ -67,7 +67,7 @@ class GraphVanillaTransformerExample : public Example
         std::string data_path = common_params.data_path;
 
         // Model parameters
-        constexpr unsigned int d_model    = 768U;   // Dim layer output
+        unsigned int d_model    = common_params.d_model;   // Dim layer output
         constexpr unsigned int d_vocab    = 30522U; // Vocaboary size
         constexpr unsigned int d_segemnt  = 2U;     // Sentence segmentation size
         constexpr unsigned int d_position = 512U;   // Pretrained positional encoding length
@@ -151,7 +151,7 @@ class GraphVanillaTransformerExample : public Example
         auto start_time = std::chrono::high_resolution_clock::now();
 
         // Run graph
-        for (int i = 0; i<10;i++)
+        for (int i = 0; i<16;i++)
         {
             graph.run();
         }
@@ -197,12 +197,12 @@ class GraphVanillaTransformerExample : public Example
         with_ff << ConvolutionLayer(1U, 1U, 1U,
                                get_weights_accessor(data_path + layer_path, "ff_weight_0.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_0.npy"),
-                                PadStrideInfo(1, 1, 0, 0)).set_target(Target::NEON).set_name("ff_linear_1")
-                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::NEON).set_name("ff_acti")
+                                PadStrideInfo(1, 1, 0, 0)).set_target(Target::CL).set_name("ff_linear_1")
+                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_acti")
                 << ConvolutionLayer(1U, 1U, 1U,
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_1.npy"),
-                                PadStrideInfo(1, 1, 0, 0)).set_target(Target::NEON).set_name("ff_linear_2");
+                                PadStrideInfo(1, 1, 0, 0)).set_target(Target::CL).set_name("ff_linear_2");
 
         graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("ff_res_add").set_target(Target::NEON);
 
