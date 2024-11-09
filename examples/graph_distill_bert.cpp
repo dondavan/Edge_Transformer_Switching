@@ -65,7 +65,7 @@ class GraphVanillaTransformerExample : public Example
         std::string data_path = common_params.data_path;
 
         // Model parameters
-        constexpr unsigned int d_model    = 768U;   // Dim layer output
+        unsigned int d_model    = common_params.d_model;   // Dim layer output
         constexpr unsigned int d_vocab    = 30522U; // Vocaboary size
         constexpr unsigned int d_segemnt  = 2U;     // Sentence segmentation size
         constexpr unsigned int d_position = 512U;   // Pretrained positional encoding length
