@@ -110,6 +110,7 @@ void configure_all_tensors(Graph &g)
         if (tensor && tensor->handle() == nullptr)
         {
             Target                         target  = tensor->desc().target;
+            if(tensor.get()->id()==3)target==Target::CL;
             backends::IDeviceBackend      &backend = backends::BackendRegistry::get().get_backend(target);
             std::unique_ptr<ITensorHandle> handle  = backend.create_tensor(*tensor);
             ARM_COMPUTE_ERROR_ON_MSG(!handle, "Couldn't create backend handle!");
