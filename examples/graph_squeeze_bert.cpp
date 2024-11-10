@@ -183,8 +183,8 @@ class GraphVanillaTransformerExample : public Example
                                     get_weights_accessor(data_path + layer_path, "key_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy"),
-                                    PadStrideInfo(1,1,0,0)).set_target(Target::CL).set_name("attention_conv")
-            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha").set_target(Target::NEON);
+                                    PadStrideInfo(1,1,0,0)).set_target(Target::NEON).set_name("attention_linear")
+            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha").set_target(Target::CL);
 
         graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON);
 
@@ -197,12 +197,12 @@ class GraphVanillaTransformerExample : public Example
         with_ff << ConvolutionLayer(1U, 1U, 1U,
                                get_weights_accessor(data_path + layer_path, "ff_weight_0.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_0.npy"),
-                                PadStrideInfo(1, 1, 0, 0)).set_target(Target::CL).set_name("ff_linear_1")
-                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_acti")
+                                PadStrideInfo(1, 1, 0, 0)).set_target(Target::NEON).set_name("ff_linear_1")
+                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::NEON).set_name("ff_acti")
                 << ConvolutionLayer(1U, 1U, 1U,
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_1.npy"),
-                                PadStrideInfo(1, 1, 0, 0)).set_target(Target::CL).set_name("ff_linear_2");
+                                PadStrideInfo(1, 1, 0, 0)).set_target(Target::NEON).set_name("ff_linear_2");
 
         graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("ff_res_add").set_target(Target::NEON);
 
