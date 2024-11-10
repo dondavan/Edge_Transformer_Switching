@@ -175,17 +175,21 @@ class GraphVanillaTransformerExample : public Example
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff)
     {
         ARM_COMPUTE_UNUSED(h);
-        SubStream ori_for_mha(graph);
         SubStream with_all(graph);
+        SubStream ori_for_mha(graph);
         SubStream ori_for_post(graph);
         SubStream only_linear(graph);
 
         only_linear << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
                                                TensorShape(d_ff) /*bias*/),
-                               get_weights_accessor(data_path + layer_path, "first_linear_weight.npy"),
-                               get_weights_accessor(data_path + layer_path, "first_linear_bias.npy")).set_target(Target::CL).set_name("first_linear");
+                               get_weights_accessor(data_path + layer_path, "input_bottlenek_weight.npy"),
+                               get_weights_accessor(data_path + layer_path, "input_bottlenek_bias.npy")).set_target(Target::CL).set_name("input_bottlenek");
 
         ori_for_mha /* Self Attention */
+            << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
+                                               TensorShape(d_ff) /*bias*/),
+                               get_weights_accessor(data_path + layer_path, "attention_bottleneck_weight.npy"),
+                               get_weights_accessor(data_path + layer_path, "attention_bottleneck_bias.npy")).set_target(Target::CL).set_name("attention_bottlenek")
             << AttentionLinearLayer(LinearLayerInfo(d_model), get_weights_accessor(data_path + layer_path, "query_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "query_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "key_weight.npy"),
@@ -246,11 +250,27 @@ class GraphVanillaTransformerExample : public Example
         with_all << EltwiseLayer(std::move(with_ff_3), std::move(without_ff_3), EltwiseOperation::Add).set_name("ff_3_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_3_norm");
         
+        SubStream without_ff_4(with_all);
+        SubStream with_ff_4(with_all);
+        /* Self Intermediate(Feed Forward)*/
+        with_ff_4 << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
+                                               TensorShape(d_ff) /*bias*/),
+                               get_weights_accessor(data_path + layer_path, "ff_4_weight_0.npy"),
+                               get_weights_accessor(data_path + layer_path, "ff_4_bias_0.npy")).set_target(Target::CL).set_name("ff_4_linear_1")
+                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_4_acti")
+                << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_ff, d_model) /*weight*/,
+                                               TensorShape(d_model) /*bias*/),
+                               get_weights_accessor(data_path + layer_path, "ff_4_weight_1.npy"),
+                               get_weights_accessor(data_path + layer_path, "ff_4_bias_1.npy")).set_target(Target::CL).set_name("ff_4_linear_2");
+
+        with_all << EltwiseLayer(std::move(with_ff_4), std::move(without_ff_4), EltwiseOperation::Add).set_name("ff_4_res_add").set_target(Target::NEON)
+                 << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_4_norm");
+        
         /* Last Linear */
         with_all << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
                                                TensorShape(d_ff) /*bias*/),
-                               get_weights_accessor(data_path + layer_path, "last_linear_weight.npy"),
-                               get_weights_accessor(data_path + layer_path, "last_linear_bias.npy")).set_target(Target::CL).set_name("last_linear");
+                               get_weights_accessor(data_path + layer_path, "output_bottleneck_weight.npy"),
+                               get_weights_accessor(data_path + layer_path, "output_bottleneck_bias.npy")).set_target(Target::CL).set_name("output_bottleneck");
 
         graph  << EltwiseLayer(std::move(ori_for_post), std::move(with_all), EltwiseOperation::Add).set_name("last_res_add").set_target(Target::NEON)
                << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("last_norm");
