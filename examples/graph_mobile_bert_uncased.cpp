@@ -120,6 +120,21 @@ class GraphVanillaTransformerExample : public Example
         add_encoder_block(data_path, "layer_10/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
         add_encoder_block(data_path, "layer_11/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
 
+
+        add_encoder_block(data_path, "layer_12/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+        add_encoder_block(data_path, "layer_13/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+        add_encoder_block(data_path, "layer_14/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+        add_encoder_block(data_path, "layer_15/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+        add_encoder_block(data_path, "layer_16/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+        add_encoder_block(data_path, "layer_17/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+
+        add_encoder_block(data_path, "layer_18/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+        add_encoder_block(data_path, "layer_19/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+        add_encoder_block(data_path, "layer_20/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+        add_encoder_block(data_path, "layer_21/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+        add_encoder_block(data_path, "layer_21/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+        add_encoder_block(data_path, "layer_23/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
+
         // Pooler
         graph << OutputLayer(get_output_accessor(common_params)).set_name("out").set_target(Target::CL);
 
@@ -170,10 +185,10 @@ class GraphVanillaTransformerExample : public Example
     {
         ARM_COMPUTE_UNUSED(h);
         SubStream with_all(graph);
-        SubStream ori_for_mha(graph);
         SubStream ori_for_post(graph);
-        SubStream only_linear(graph);
 
+        SubStream ori_for_mha(graph);
+        SubStream only_linear(graph);
         only_linear << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
                                                    TensorShape(d_bottle) /*bias*/),
                                    get_weights_accessor(data_path + layer_path, "input_bottleneck_weight.npy"),
