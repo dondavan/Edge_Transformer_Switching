@@ -389,9 +389,7 @@ void call_all_tasks(ExecutionWorkload &workload)
 #ifdef MEASURE_TIME
         auto task_start_time = std::chrono::high_resolution_clock::now();
 #endif
-        std::cout << task.node->name() <<" start"<< std::endl;
         task();
-        std::cout << task.node->name() <<" end"<< std::endl;
 #ifdef MEASURE_TIME
         auto   task_end_time  = std::chrono::high_resolution_clock::now();
         double task_cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(task_end_time - task_start_time).count();
