@@ -172,7 +172,6 @@ class GraphVanillaTransformerExample : public Example
     {
         ARM_COMPUTE_UNUSED(h);
         SubStream ori_for_mha(graph);
-        SubStream ori_for_post(graph);
         SubStream only_linear(graph);
 
         only_linear << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
