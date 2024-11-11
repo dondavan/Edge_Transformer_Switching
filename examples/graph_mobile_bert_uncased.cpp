@@ -224,66 +224,6 @@ class GraphVanillaTransformerExample : public Example
         with_all << EltwiseLayer(std::move(with_ff_1), std::move(without_ff_1), EltwiseOperation::Add).set_name("ff_1_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_1_norm");
 
-        SubStream without_ff_2(with_all);
-        SubStream with_ff_2(with_all);
-        /* Self Intermediate(Feed Forward)*/
-        with_ff_2 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
-                                                 TensorShape(d_model) /*bias*/),
-                                 get_weights_accessor(data_path + layer_path, "ff_2_weight_0.npy"),
-                                 get_weights_accessor(data_path + layer_path, "ff_2_bias_0.npy"))
-                         .set_target(Target::CL)
-                         .set_name("ff_2_linear_1")
-                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_2_acti")
-                  << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
-                                                 TensorShape(d_bottle) /*bias*/),
-                                 get_weights_accessor(data_path + layer_path, "ff_2_weight_1.npy"),
-                                 get_weights_accessor(data_path + layer_path, "ff_2_bias_1.npy"))
-                         .set_target(Target::CL)
-                         .set_name("ff_2_linear_2");
-
-        with_all << EltwiseLayer(std::move(with_ff_2), std::move(without_ff_2), EltwiseOperation::Add).set_name("ff_2_res_add").set_target(Target::NEON)
-                 << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_2_norm");
-
-        SubStream without_ff_3(with_all);
-        SubStream with_ff_3(with_all);
-        /* Self Intermediate(Feed Forward)*/
-        with_ff_3 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
-                                                 TensorShape(d_model) /*bias*/),
-                                 get_weights_accessor(data_path + layer_path, "ff_3_weight_0.npy"),
-                                 get_weights_accessor(data_path + layer_path, "ff_3_bias_0.npy"))
-                         .set_target(Target::CL)
-                         .set_name("ff_3_linear_1")
-                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_3_acti")
-                  << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
-                                                 TensorShape(d_bottle) /*bias*/),
-                                 get_weights_accessor(data_path + layer_path, "ff_3_weight_1.npy"),
-                                 get_weights_accessor(data_path + layer_path, "ff_3_bias_1.npy"))
-                         .set_target(Target::CL)
-                         .set_name("ff_3_linear_2");
-
-        with_all << EltwiseLayer(std::move(with_ff_3), std::move(without_ff_3), EltwiseOperation::Add).set_name("ff_3_res_add").set_target(Target::NEON)
-                 << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_3_norm");
-
-        SubStream without_ff_4(with_all);
-        SubStream with_ff_4(with_all);
-        /* Self Intermediate(Feed Forward)*/
-        with_ff_4 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
-                                                 TensorShape(d_model) /*bias*/),
-                                 get_weights_accessor(data_path + layer_path, "ff_4_weight_0.npy"),
-                                 get_weights_accessor(data_path + layer_path, "ff_4_bias_0.npy"))
-                         .set_target(Target::CL)
-                         .set_name("ff_4_linear_1")
-                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_4_acti")
-                  << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
-                                                 TensorShape(d_bottle) /*bias*/),
-                                 get_weights_accessor(data_path + layer_path, "ff_4_weight_1.npy"),
-                                 get_weights_accessor(data_path + layer_path, "ff_4_bias_1.npy"))
-                         .set_target(Target::CL)
-                         .set_name("ff_4_linear_2");
-
-        with_all << EltwiseLayer(std::move(with_ff_4), std::move(without_ff_4), EltwiseOperation::Add).set_name("ff_4_res_add").set_target(Target::NEON)
-                 << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_4_norm");
-
         /* Last Linear */
         with_all << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_bottle, d_model) /*weight*/,
                                                 TensorShape(d_model) /*bias*/),
