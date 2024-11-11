@@ -151,7 +151,10 @@ class GraphVanillaTransformerExample : public Example
         auto start_time = std::chrono::high_resolution_clock::now();
 
         // Run graph
-        graph.run();
+        for(int i = 0; i < 16; i++)
+        {
+            graph.run();
+        }
 
         auto   end_time  = std::chrono::high_resolution_clock::now();
         double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
@@ -168,7 +171,9 @@ class GraphVanillaTransformerExample : public Example
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff, unsigned int d_bottle)
     {
         ARM_COMPUTE_UNUSED(h);
+        SubStream with_all(graph);
         SubStream ori_for_mha(graph);
+        SubStream ori_for_post(graph);
         SubStream only_linear(graph);
 
         only_linear << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
@@ -196,11 +201,11 @@ class GraphVanillaTransformerExample : public Example
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_bottle, h)).set_name("mha").set_target(Target::NEON);
 
         // Add & Norm
-        graph << EltwiseLayer(std::move(ori_for_mha),std::move(only_linear), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
+        with_all << EltwiseLayer(std::move(only_linear), std::move(ori_for_mha), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attention_norm");
 
-        SubStream without_ff_1(graph);
-        SubStream with_ff_1(graph);
+        SubStream without_ff_1(with_all);
+        SubStream with_ff_1(with_all);
         /* Self Intermediate(Feed Forward)*/
         with_ff_1 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
                                                  TensorShape(d_model) /*bias*/),
@@ -216,18 +221,79 @@ class GraphVanillaTransformerExample : public Example
                          .set_target(Target::CL)
                          .set_name("ff_1_linear_2");
 
-        graph << EltwiseLayer(std::move(with_ff_1), std::move(without_ff_1), EltwiseOperation::Add).set_name("ff_1_res_add").set_target(Target::NEON)
+        with_all << EltwiseLayer(std::move(with_ff_1), std::move(without_ff_1), EltwiseOperation::Add).set_name("ff_1_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_1_norm");
 
+        SubStream without_ff_2(with_all);
+        SubStream with_ff_2(with_all);
+        /* Self Intermediate(Feed Forward)*/
+        with_ff_2 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
+                                                 TensorShape(d_model) /*bias*/),
+                                 get_weights_accessor(data_path + layer_path, "ff_2_weight_0.npy"),
+                                 get_weights_accessor(data_path + layer_path, "ff_2_bias_0.npy"))
+                         .set_target(Target::CL)
+                         .set_name("ff_2_linear_1")
+                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_2_acti")
+                  << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
+                                                 TensorShape(d_bottle) /*bias*/),
+                                 get_weights_accessor(data_path + layer_path, "ff_2_weight_1.npy"),
+                                 get_weights_accessor(data_path + layer_path, "ff_2_bias_1.npy"))
+                         .set_target(Target::CL)
+                         .set_name("ff_2_linear_2");
+
+        with_all << EltwiseLayer(std::move(with_ff_2), std::move(without_ff_2), EltwiseOperation::Add).set_name("ff_2_res_add").set_target(Target::NEON)
+                 << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_2_norm");
+
+        SubStream without_ff_3(with_all);
+        SubStream with_ff_3(with_all);
+        /* Self Intermediate(Feed Forward)*/
+        with_ff_3 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
+                                                 TensorShape(d_model) /*bias*/),
+                                 get_weights_accessor(data_path + layer_path, "ff_3_weight_0.npy"),
+                                 get_weights_accessor(data_path + layer_path, "ff_3_bias_0.npy"))
+                         .set_target(Target::CL)
+                         .set_name("ff_3_linear_1")
+                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_3_acti")
+                  << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
+                                                 TensorShape(d_bottle) /*bias*/),
+                                 get_weights_accessor(data_path + layer_path, "ff_3_weight_1.npy"),
+                                 get_weights_accessor(data_path + layer_path, "ff_3_bias_1.npy"))
+                         .set_target(Target::CL)
+                         .set_name("ff_3_linear_2");
+
+        with_all << EltwiseLayer(std::move(with_ff_3), std::move(without_ff_3), EltwiseOperation::Add).set_name("ff_3_res_add").set_target(Target::NEON)
+                 << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_3_norm");
+
+        SubStream without_ff_4(with_all);
+        SubStream with_ff_4(with_all);
+        /* Self Intermediate(Feed Forward)*/
+        with_ff_4 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
+                                                 TensorShape(d_model) /*bias*/),
+                                 get_weights_accessor(data_path + layer_path, "ff_4_weight_0.npy"),
+                                 get_weights_accessor(data_path + layer_path, "ff_4_bias_0.npy"))
+                         .set_target(Target::CL)
+                         .set_name("ff_4_linear_1")
+                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_4_acti")
+                  << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
+                                                 TensorShape(d_bottle) /*bias*/),
+                                 get_weights_accessor(data_path + layer_path, "ff_4_weight_1.npy"),
+                                 get_weights_accessor(data_path + layer_path, "ff_4_bias_1.npy"))
+                         .set_target(Target::CL)
+                         .set_name("ff_4_linear_2");
+
+        with_all << EltwiseLayer(std::move(with_ff_4), std::move(without_ff_4), EltwiseOperation::Add).set_name("ff_4_res_add").set_target(Target::NEON)
+                 << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_4_norm");
+
         /* Last Linear */
-        graph << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_bottle, d_model) /*weight*/,
+        with_all << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_bottle, d_model) /*weight*/,
                                                 TensorShape(d_model) /*bias*/),
                                 get_weights_accessor(data_path + layer_path, "output_bottleneck_weight.npy"),
                                 get_weights_accessor(data_path + layer_path, "output_bottleneck_bias.npy"))
                         .set_target(Target::CL)
                         .set_name("output_bottleneck");
 
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("last_norm");
+        graph << EltwiseLayer(std::move(ori_for_post), std::move(with_all), EltwiseOperation::Add).set_name("last_res_add").set_target(Target::NEON)
+              << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("last_norm");
     }
 };
 
