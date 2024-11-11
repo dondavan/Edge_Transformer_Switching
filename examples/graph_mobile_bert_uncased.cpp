@@ -120,7 +120,6 @@ class GraphVanillaTransformerExample : public Example
         add_encoder_block(data_path, "layer_10/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
         add_encoder_block(data_path, "layer_11/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
 
-
         add_encoder_block(data_path, "layer_12/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
         add_encoder_block(data_path, "layer_13/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
         add_encoder_block(data_path, "layer_14/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff, d_bottle);
@@ -184,12 +183,11 @@ class GraphVanillaTransformerExample : public Example
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff, unsigned int d_bottle)
     {
         ARM_COMPUTE_UNUSED(h);
-        SubStream with_all(graph);
         SubStream ori_for_post(graph);
 
         SubStream ori_for_mha(graph);
-        SubStream only_linear(graph);
-        only_linear << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
+        SubStream ori_for_linear(graph);
+        ori_for_linear << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
                                                    TensorShape(d_bottle) /*bias*/),
                                    get_weights_accessor(data_path + layer_path, "input_bottleneck_weight.npy"),
                                    get_weights_accessor(data_path + layer_path, "input_bottleneck_bias.npy"))
@@ -214,9 +212,10 @@ class GraphVanillaTransformerExample : public Example
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_bottle, h)).set_name("mha").set_target(Target::NEON);
 
         // Add & Norm
-        with_all << EltwiseLayer(std::move(ori_for_mha), std::move(only_linear), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
+        graph << EltwiseLayer(std::move(ori_for_mha), std::move(ori_for_linear), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attention_norm");
 
+        SubStream with_all(graph);
         SubStream without_ff_1(with_all);
         SubStream with_ff_1(with_all);
         /* Self Intermediate(Feed Forward)*/
