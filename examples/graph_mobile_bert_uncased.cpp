@@ -172,7 +172,7 @@ class GraphVanillaTransformerExample : public Example
     {
         ARM_COMPUTE_UNUSED(h);
         graph /* Self Attention */
-            << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
+            << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model,d_bottle) /*weight*/,
                                            TensorShape(d_bottle) /*bias*/),
                            get_weights_accessor(data_path + layer_path, "attention_bottleneck_weight.npy"),
                            get_weights_accessor(data_path + layer_path, "attention_bottleneck_bias.npy"))
