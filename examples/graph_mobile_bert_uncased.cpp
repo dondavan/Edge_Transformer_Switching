@@ -171,8 +171,18 @@ class GraphVanillaTransformerExample : public Example
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff, unsigned int d_bottle)
     {
         ARM_COMPUTE_UNUSED(h);
-        graph /* Self Attention */
-            << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model,d_bottle) /*weight*/,
+        SubStream ori_for_mha(graph);
+        SubStream only_linear(graph);
+
+        only_linear << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
+                                                   TensorShape(d_bottle) /*bias*/),
+                                   get_weights_accessor(data_path + layer_path, "input_bottleneck_weight.npy"),
+                                   get_weights_accessor(data_path + layer_path, "input_bottleneck_bias.npy"))
+                           .set_target(Target::CL)
+                           .set_name("input_bottlenek");
+
+        ori_for_mha /* Self Attention */
+            << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
                                            TensorShape(d_bottle) /*bias*/),
                            get_weights_accessor(data_path + layer_path, "attention_bottleneck_weight.npy"),
                            get_weights_accessor(data_path + layer_path, "attention_bottleneck_bias.npy"))
@@ -189,7 +199,8 @@ class GraphVanillaTransformerExample : public Example
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_bottle, h)).set_name("mha").set_target(Target::NEON);
 
         // Add & Norm
-        graph  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attention_norm");
+        graph << EltwiseLayer(std::move(only_linear), std::move(ori_for_mha), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
+                 << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attention_norm");
 
         SubStream without_ff_1(graph);
         SubStream with_ff_1(graph);
