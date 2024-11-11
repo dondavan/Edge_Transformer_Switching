@@ -169,7 +169,7 @@ class GraphVanillaTransformerExample : public Example
         {
             graph.run();
         }
-        
+
         auto   end_time  = std::chrono::high_resolution_clock::now();
         double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
         std::cout << "Run cost: " << cost_time << std::endl;
@@ -300,7 +300,7 @@ class GraphVanillaTransformerExample : public Example
                                                 TensorShape(d_model) /*bias*/),
                                 get_weights_accessor(data_path + layer_path, "output_bottleneck_weight.npy"),
                                 get_weights_accessor(data_path + layer_path, "output_bottleneck_bias.npy"))
-                        .set_target(Target::CL)
+                        .set_target(Target::NEON)
                         .set_name("output_bottleneck");
 
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("last_norm");
