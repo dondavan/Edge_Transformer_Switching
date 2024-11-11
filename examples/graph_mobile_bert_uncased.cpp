@@ -182,7 +182,7 @@ class GraphVanillaTransformerExample : public Example
                            .set_name("input_bottlenek");
 
         ori_for_mha /* Self Attention */
-            << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
+            << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
                                            TensorShape(d_bottle) /*bias*/),
                            get_weights_accessor(data_path + layer_path, "attention_bottleneck_weight.npy"),
                            get_weights_accessor(data_path + layer_path, "attention_bottleneck_bias.npy"))
