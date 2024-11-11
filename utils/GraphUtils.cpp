@@ -794,6 +794,7 @@ bool NumPyBinLoader::access_tensor(ITensor &tensor)
     {
         utils::NPYLoader loader;
         loader.open(_filename, _file_layout);
+        std::cout << _filename << std::endl;
         loader.fill_tensor(tensor);
     }
 
