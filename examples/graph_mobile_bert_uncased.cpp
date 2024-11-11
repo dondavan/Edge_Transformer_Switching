@@ -183,8 +183,6 @@ class GraphVanillaTransformerExample : public Example
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff, unsigned int d_bottle)
     {
         ARM_COMPUTE_UNUSED(h);
-        SubStream ori_for_post(graph);
-
         SubStream ori_for_mha(graph);
         SubStream ori_for_linear(graph);
         ori_for_linear << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
