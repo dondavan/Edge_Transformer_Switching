@@ -386,6 +386,7 @@ void call_all_tasks(ExecutionWorkload &workload)
     // Execute tasks
     for (auto &task : workload.tasks)
     {
+        std::cout << task.node->name() << std::endl;
 #ifdef MEASURE_TIME
         auto task_start_time = std::chrono::high_resolution_clock::now();
 #endif
