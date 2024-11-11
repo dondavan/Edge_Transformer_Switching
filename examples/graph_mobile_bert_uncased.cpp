@@ -183,6 +183,8 @@ class GraphVanillaTransformerExample : public Example
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff, unsigned int d_bottle)
     {
         ARM_COMPUTE_UNUSED(h);
+        SubStream ori_for_post(graph);
+
         SubStream ori_for_mha(graph);
         SubStream ori_for_linear(graph);
         ori_for_linear << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
@@ -210,7 +212,7 @@ class GraphVanillaTransformerExample : public Example
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_bottle, h)).set_name("mha").set_target(Target::NEON);
 
         // Add & Norm
-        graph << EltwiseLayer(std::move(ori_for_linear), std::move(ori_for_mha), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
+        graph << EltwiseLayer(std::move(ori_for_mha), std::move(ori_for_linear), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attention_norm");
 
         SubStream without_ff_1(graph);
