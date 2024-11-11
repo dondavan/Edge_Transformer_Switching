@@ -224,8 +224,8 @@ class GraphVanillaTransformerExample : public Example
         with_all << EltwiseLayer(std::move(with_ff_1), std::move(without_ff_1), EltwiseOperation::Add).set_name("ff_1_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_1_norm");
 
-        SubStream without_ff_2(with_all);
-        SubStream with_ff_2(with_all);
+        SubStream without_ff_2(graph);
+        SubStream with_ff_2(graph);
         /* Self Intermediate(Feed Forward)*/
         with_ff_2 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
                                                  TensorShape(d_model) /*bias*/),
