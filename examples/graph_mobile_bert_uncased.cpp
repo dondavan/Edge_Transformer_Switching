@@ -171,7 +171,6 @@ class GraphVanillaTransformerExample : public Example
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff, unsigned int d_bottle)
     {
         ARM_COMPUTE_UNUSED(h);
-        SubStream with_all(graph);
         SubStream ori_for_mha(graph);
         SubStream ori_for_post(graph);
         SubStream only_linear(graph);
@@ -201,11 +200,11 @@ class GraphVanillaTransformerExample : public Example
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_bottle, h)).set_name("mha").set_target(Target::NEON);
 
         // Add & Norm
-        with_all << EltwiseLayer(std::move(only_linear), std::move(ori_for_mha), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
+        graph << EltwiseLayer(std::move(only_linear), std::move(ori_for_mha), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attention_norm");
 
-        SubStream without_ff_1(with_all);
-        SubStream with_ff_1(with_all);
+        SubStream without_ff_1(graph);
+        SubStream with_ff_1(graph);
         /* Self Intermediate(Feed Forward)*/
         with_ff_1 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
                                                  TensorShape(d_model) /*bias*/),
@@ -221,11 +220,11 @@ class GraphVanillaTransformerExample : public Example
                          .set_target(Target::CL)
                          .set_name("ff_1_linear_2");
 
-        with_all << EltwiseLayer(std::move(with_ff_1), std::move(without_ff_1), EltwiseOperation::Add).set_name("ff_1_res_add").set_target(Target::NEON)
+        graph << EltwiseLayer(std::move(with_ff_1), std::move(without_ff_1), EltwiseOperation::Add).set_name("ff_1_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_1_norm");
 
-        SubStream without_ff_2(with_all);
-        SubStream with_ff_2(with_all);
+        SubStream without_ff_2(graph);
+        SubStream with_ff_2(graph);
         /* Self Intermediate(Feed Forward)*/
         with_ff_2 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
                                                  TensorShape(d_model) /*bias*/),
@@ -241,11 +240,11 @@ class GraphVanillaTransformerExample : public Example
                          .set_target(Target::CL)
                          .set_name("ff_2_linear_2");
 
-        with_all << EltwiseLayer(std::move(with_ff_2), std::move(without_ff_2), EltwiseOperation::Add).set_name("ff_2_res_add").set_target(Target::NEON)
+        graph << EltwiseLayer(std::move(with_ff_2), std::move(without_ff_2), EltwiseOperation::Add).set_name("ff_2_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_2_norm");
 
-        SubStream without_ff_3(with_all);
-        SubStream with_ff_3(with_all);
+        SubStream without_ff_3(graph);
+        SubStream with_ff_3(graph);
         /* Self Intermediate(Feed Forward)*/
         with_ff_3 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
                                                  TensorShape(d_model) /*bias*/),
@@ -261,11 +260,11 @@ class GraphVanillaTransformerExample : public Example
                          .set_target(Target::CL)
                          .set_name("ff_3_linear_2");
 
-        with_all << EltwiseLayer(std::move(with_ff_3), std::move(without_ff_3), EltwiseOperation::Add).set_name("ff_3_res_add").set_target(Target::NEON)
+        graph << EltwiseLayer(std::move(with_ff_3), std::move(without_ff_3), EltwiseOperation::Add).set_name("ff_3_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_3_norm");
 
-        SubStream without_ff_4(with_all);
-        SubStream with_ff_4(with_all);
+        SubStream without_ff_4(graph);
+        SubStream with_ff_4(graph);
         /* Self Intermediate(Feed Forward)*/
         with_ff_4 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
                                                  TensorShape(d_model) /*bias*/),
@@ -281,19 +280,18 @@ class GraphVanillaTransformerExample : public Example
                          .set_target(Target::CL)
                          .set_name("ff_4_linear_2");
 
-        with_all << EltwiseLayer(std::move(with_ff_4), std::move(without_ff_4), EltwiseOperation::Add).set_name("ff_4_res_add").set_target(Target::NEON)
+        graph << EltwiseLayer(std::move(with_ff_4), std::move(without_ff_4), EltwiseOperation::Add).set_name("ff_4_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_4_norm");
 
         /* Last Linear */
-        with_all << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_bottle, d_model) /*weight*/,
+        graph << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_bottle, d_model) /*weight*/,
                                                 TensorShape(d_model) /*bias*/),
                                 get_weights_accessor(data_path + layer_path, "output_bottleneck_weight.npy"),
                                 get_weights_accessor(data_path + layer_path, "output_bottleneck_bias.npy"))
                         .set_target(Target::CL)
                         .set_name("output_bottleneck");
 
-        graph << EltwiseLayer(std::move(ori_for_post), std::move(with_all), EltwiseOperation::Add).set_name("last_res_add").set_target(Target::NEON)
-              << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("last_norm");
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("last_norm");
     }
 };
 
