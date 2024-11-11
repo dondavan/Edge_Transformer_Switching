@@ -100,9 +100,9 @@ class GraphVanillaTransformerExample : public Example
                                                    d_position,
                                                    true /*Use pretrained positional encoding*/,
                                                    ConvertPolicy::SATURATE),
-                                get_weights_accessor(data_path, "token_embedding.npy", operation_layout),
-                                get_weights_accessor(data_path, "segment_embedding.npy", operation_layout),
-                                get_weights_accessor(data_path, "positional_embedding.npy", operation_layout))
+                                get_weights_accessor("./data/bert-base-uncased_npy/", "token_embedding.npy", operation_layout),
+                                get_weights_accessor("./data/bert-base-uncased_npy/", "segment_embedding.npy", operation_layout),
+                                get_weights_accessor("./data/bert-base-uncased_npy/", "positional_embedding.npy", operation_layout))
                      .set_name("tkemb")
                      .set_target(Target::NEON);
 
