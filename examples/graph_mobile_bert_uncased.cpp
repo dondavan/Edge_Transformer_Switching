@@ -151,10 +151,7 @@ class GraphVanillaTransformerExample : public Example
         auto start_time = std::chrono::high_resolution_clock::now();
 
         // Run graph
-        for(int i = 0; i < 16; i++)
-        {
-            graph.run();
-        }
+        graph.run();
 
         auto   end_time  = std::chrono::high_resolution_clock::now();
         double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
