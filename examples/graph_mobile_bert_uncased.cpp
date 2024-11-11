@@ -170,7 +170,7 @@ class GraphVanillaTransformerExample : public Example
     void add_encoder_block(std::string data_path, std::string layer_path,
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff, unsigned int d_bottle)
     {
-        ARM_COMPUTE_UNUSED(h);
+        ARM_COMPUTE_UNUSED(h,eps);
         SubStream with_all(graph);
         SubStream ori_for_mha(graph);
         SubStream ori_for_post(graph);
