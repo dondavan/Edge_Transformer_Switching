@@ -200,10 +200,12 @@ class GraphVanillaTransformerExample : public Example
                    .set_name("attention_linear")
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_bottle, h)).set_name("mha").set_target(Target::NEON);
 
+        std::cout << "mha with_all tail" << with_all.tail_node() << std::endl;
         // Add & Norm
         with_all << EltwiseLayer(std::move(only_linear), std::move(ori_for_mha), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attention_norm");
 
+        std::cout << "mha with_all tail" << with_all.tail_node() << std::endl;
         SubStream without_ff_1(with_all);
         SubStream with_ff_1(with_all);
         /* Self Intermediate(Feed Forward)*/
@@ -221,8 +223,11 @@ class GraphVanillaTransformerExample : public Example
                          .set_target(Target::CL)
                          .set_name("ff_1_linear_2");
 
+        std::cout << "ff1 with_all tail" << with_all.tail_node() << std::endl;
         with_all << EltwiseLayer(std::move(with_ff_1), std::move(without_ff_1), EltwiseOperation::Add).set_name("ff_1_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_1_norm");
+
+        std::cout << "ff1 with_all tail" << with_all.tail_node() << std::endl;
 
         SubStream without_ff_2(with_all);
         SubStream with_ff_2(with_all);
