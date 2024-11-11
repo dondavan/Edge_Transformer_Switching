@@ -290,7 +290,7 @@ class GraphVanillaTransformerExample : public Example
                         .set_target(Target::CL)
                         .set_name("output_bottleneck");
 
-        graph << EltwiseLayer(std::move(ori_for_post), std::move(with_all), EltwiseOperation::Add).set_name("last_res_add").set_target(Target::NEON)
+        graph << EltwiseLayer(std::move(with_all), std::move(ori_for_post), EltwiseOperation::Add).set_name("last_res_add").set_target(Target::NEON)
               << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("last_norm");
     }
 };
