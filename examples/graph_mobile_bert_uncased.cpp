@@ -201,11 +201,11 @@ class GraphVanillaTransformerExample : public Example
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_bottle, h)).set_name("mha").set_target(Target::NEON);
 
         // Add & Norm
-        graph << EltwiseLayer(std::move(only_linear), std::move(ori_for_mha), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
+        with_all << EltwiseLayer(std::move(only_linear), std::move(ori_for_mha), EltwiseOperation::Add).set_name("attention_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attention_norm");
 
-        SubStream without_ff_1(graph);
-        SubStream with_ff_1(graph);
+        SubStream without_ff_1(with_all);
+        SubStream with_ff_1(with_all);
         /* Self Intermediate(Feed Forward)*/
         with_ff_1 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
                                                  TensorShape(d_model) /*bias*/),
@@ -221,11 +221,11 @@ class GraphVanillaTransformerExample : public Example
                          .set_target(Target::CL)
                          .set_name("ff_1_linear_2");
 
-        graph << EltwiseLayer(std::move(with_ff_1), std::move(without_ff_1), EltwiseOperation::Add).set_name("ff_1_res_add").set_target(Target::NEON)
+        with_all << EltwiseLayer(std::move(with_ff_1), std::move(without_ff_1), EltwiseOperation::Add).set_name("ff_1_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_1_norm");
 
-        SubStream without_ff_2(graph);
-        SubStream with_ff_2(graph);
+        SubStream without_ff_2(with_all);
+        SubStream with_ff_2(with_all);
         /* Self Intermediate(Feed Forward)*/
         with_ff_2 << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_bottle, d_model) /*weight*/,
                                                  TensorShape(d_model) /*bias*/),
@@ -241,7 +241,7 @@ class GraphVanillaTransformerExample : public Example
                          .set_target(Target::CL)
                          .set_name("ff_2_linear_2");
 
-        graph << EltwiseLayer(std::move(with_ff_2), std::move(without_ff_2), EltwiseOperation::Add).set_name("ff_2_res_add").set_target(Target::NEON)
+        with_all << EltwiseLayer(std::move(with_ff_2), std::move(without_ff_2), EltwiseOperation::Add).set_name("ff_2_res_add").set_target(Target::NEON)
                  << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("ff_2_norm");
 
         SubStream without_ff_3(with_all);
