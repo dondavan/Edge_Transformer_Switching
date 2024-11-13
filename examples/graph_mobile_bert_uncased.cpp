@@ -169,7 +169,6 @@ class GraphVanillaTransformerExample : public Example
         {
             graph.run();
         }
-        
         auto   end_time  = std::chrono::high_resolution_clock::now();
         double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
         std::cout << "Run cost: " << cost_time << std::endl;
@@ -222,14 +221,14 @@ class GraphVanillaTransformerExample : public Example
                                                  TensorShape(d_model) /*bias*/),
                                  get_weights_accessor(data_path + layer_path, "ff_1_weight_0.npy"),
                                  get_weights_accessor(data_path + layer_path, "ff_1_bias_0.npy"))
-                         .set_target(Target::NEON)
+                         .set_target(Target::CL)
                          .set_name("ff_1_linear_1")
-                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::NEON).set_name("ff_1_acti")
+                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_1_acti")
                   << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
                                                  TensorShape(d_bottle) /*bias*/),
                                  get_weights_accessor(data_path + layer_path, "ff_1_weight_1.npy"),
                                  get_weights_accessor(data_path + layer_path, "ff_1_bias_1.npy"))
-                         .set_target(Target::NEON)
+                         .set_target(Target::CL)
                          .set_name("ff_1_linear_2");
 
         graph << EltwiseLayer(std::move(without_ff_1), std::move(with_ff_1), EltwiseOperation::Add).set_name("ff_1_res_add").set_target(Target::NEON)
@@ -242,14 +241,14 @@ class GraphVanillaTransformerExample : public Example
                                                  TensorShape(d_model) /*bias*/),
                                  get_weights_accessor(data_path + layer_path, "ff_2_weight_0.npy"),
                                  get_weights_accessor(data_path + layer_path, "ff_2_bias_0.npy"))
-                         .set_target(Target::NEON)
+                         .set_target(Target::CL)
                          .set_name("ff_2_linear_1")
-                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::NEON).set_name("ff_2_acti")
+                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_2_acti")
                   << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
                                                  TensorShape(d_bottle) /*bias*/),
                                  get_weights_accessor(data_path + layer_path, "ff_2_weight_1.npy"),
                                  get_weights_accessor(data_path + layer_path, "ff_2_bias_1.npy"))
-                         .set_target(Target::NEON)
+                         .set_target(Target::CL)
                          .set_name("ff_2_linear_2");
 
         graph << EltwiseLayer(std::move(without_ff_2), std::move(with_ff_2), EltwiseOperation::Add).set_name("ff_2_res_add").set_target(Target::NEON)
@@ -262,14 +261,14 @@ class GraphVanillaTransformerExample : public Example
                                                  TensorShape(d_model) /*bias*/),
                                  get_weights_accessor(data_path + layer_path, "ff_3_weight_0.npy"),
                                  get_weights_accessor(data_path + layer_path, "ff_3_bias_0.npy"))
-                         .set_target(Target::NEON)
+                         .set_target(Target::CL)
                          .set_name("ff_3_linear_1")
-                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::NEON).set_name("ff_3_acti")
+                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_3_acti")
                   << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
                                                  TensorShape(d_bottle) /*bias*/),
                                  get_weights_accessor(data_path + layer_path, "ff_3_weight_1.npy"),
                                  get_weights_accessor(data_path + layer_path, "ff_3_bias_1.npy"))
-                         .set_target(Target::NEON)
+                         .set_target(Target::CL)
                          .set_name("ff_3_linear_2");
 
         graph << EltwiseLayer(std::move(without_ff_3), std::move(with_ff_3), EltwiseOperation::Add).set_name("ff_3_res_add").set_target(Target::NEON)
@@ -282,14 +281,14 @@ class GraphVanillaTransformerExample : public Example
                                                  TensorShape(d_model) /*bias*/),
                                  get_weights_accessor(data_path + layer_path, "ff_4_weight_0.npy"),
                                  get_weights_accessor(data_path + layer_path, "ff_4_bias_0.npy"))
-                         .set_target(Target::NEON)
+                         .set_target(Target::CL)
                          .set_name("ff_4_linear_1")
-                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::NEON).set_name("ff_4_acti")
+                  << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_4_acti")
                   << LinearLayer(LinearLayerInfo(d_bottle, TensorShape(d_model, d_bottle) /*weight*/,
                                                  TensorShape(d_bottle) /*bias*/),
                                  get_weights_accessor(data_path + layer_path, "ff_4_weight_1.npy"),
                                  get_weights_accessor(data_path + layer_path, "ff_4_bias_1.npy"))
-                         .set_target(Target::NEON)
+                         .set_target(Target::CL)
                          .set_name("ff_4_linear_2");
 
         graph << EltwiseLayer(std::move(without_ff_4), std::move(with_ff_4), EltwiseOperation::Add).set_name("ff_4_res_add").set_target(Target::NEON)
