@@ -909,7 +909,7 @@ void find_longest_matching(std::vector<std::basic_string<T>>   &tokens_vec,
     for(const auto &token : tokens_vec)
     {
         token_buffer = token;
-        token_len    = token.size();
+        token_len    = token_buffer.size();
         left         = 0;
     loop:
         while(left < token_len)
@@ -921,9 +921,18 @@ void find_longest_matching(std::vector<std::basic_string<T>>   &tokens_vec,
                 if(it != token2id.end())
                 {
                     text_ids.push_back(it->second);
-                    left         = right;
-                    token_buffer = "##" + token_buffer.substr(left, token_len);
-                    goto loop;
+                    left = right;
+                    if(left < token_buffer.size())
+                    {
+                        token_buffer = "##" + token_buffer.substr(left);
+                        token_len = token_buffer.size();
+                        left = 0;
+                        goto loop;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 right--;
             }
