@@ -66,7 +66,7 @@ class GraphGPTExample : public Example
 
         constexpr unsigned int d_model    = 768U;   // Dim layer output
         constexpr unsigned int d_vocab    = 50257U; // Vocabulary size
-        constexpr unsigned int d_segemnt  = 2U;
+        constexpr unsigned int d_segemnt  = 0U;
         constexpr unsigned int d_position = 1024U;   // Pretrained positional encoding length
         constexpr unsigned int h          = 12U;    // Parallel attention (Heads)
         constexpr float        eps        = 1e-5;  // Layer normalization eplision
@@ -86,7 +86,7 @@ class GraphGPTExample : public Example
         // Text preprocessor
         std::unique_ptr<IPreprocessor> at2_preproccessor = std::make_unique<atoiPreprocessor>();
         // Encode Input
-        // TODO: implement without segmentation
+        // RULE: segment id must all be the same and the segment embedding parameters are all 0
         graph << InputLayer(input_descriptor, get_token_accessor(common_params),
                             get_segment_accessor(common_params.segment, move(at2_preproccessor)))
                      .set_name("in1")
@@ -116,6 +116,7 @@ class GraphGPTExample : public Example
         add_decoder_block(data_path, "layer_11/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
 
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps))
+            // TODO: get correct dimensions and parameters
             << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model),
                                             TensorShape(d_model)),
                              get_weights_accessor(data_path, "pooler_weight.npy"),
@@ -165,7 +166,7 @@ class GraphGPTExample : public Example
 
         with_attention << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps));
 
-        // TODO: multihead MASKED attention WITH dropout
+        // TODO: multihead MASKED attention
         with_attention << AttentionLinearLayer(LinearLayerInfo(d_model),
                                     get_weights_accessor(data_path + layer_path, "query_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "query_bias.npy"),
@@ -174,11 +175,6 @@ class GraphGPTExample : public Example
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy"))
             << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1")
-            << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
-                                                TensorShape(d_ff) /*bias*/),
-                               get_weights_accessor(data_path + layer_path, "attn_weight_0.npy"),
-                               get_weights_accessor(data_path + layer_path, "attn_bias_0.npy"));
-        // TODO: with_attention << dropout
 
         // add and norm
         graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention");
@@ -196,7 +192,6 @@ class GraphGPTExample : public Example
                                                TensorShape(d_model) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_1.npy"));
-        // TODO: with_ff << dropout
 
         graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("add_4_norm_ff");
     }
