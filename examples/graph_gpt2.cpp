@@ -66,7 +66,7 @@ class GraphGPTExample : public Example
 
         constexpr unsigned int d_model    = 768U;   // Dim layer output
         constexpr unsigned int d_vocab    = 50257U; // Vocabulary size
-        constexpr unsigned int d_segemnt  = 1U;     // no segmentation in gpt2
+        constexpr unsigned int d_segment  = 1U;     // no segmentation in gpt2
         constexpr unsigned int d_position = 1024U;   // Pretrained positional encoding length
         constexpr unsigned int h          = 12U;    // Parallel attention (Heads)
         constexpr float        eps        = 1e-5;  // Layer normalization eplision
@@ -93,7 +93,7 @@ class GraphGPTExample : public Example
 
             << EmbeddingLayer(EmbeddingLayerInfo(d_model,
                                                    d_vocab,
-                                                   d_segemnt,
+                                                   d_segment,
                                                    d_position,
                                                    true /*Use pretrained positional encoding*/,
                                                    ConvertPolicy::SATURATE),
@@ -119,7 +119,7 @@ class GraphGPTExample : public Example
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps))
             // TODO: get correct dimensions and parameters
             << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_vocab),
-                                            TensorShape(d_vocab), 1),
+                                            TensorShape(d_vocab)),
                              get_weights_accessor(data_path, "projection_weight.npy"),
                              // just zeroes for gpt2
                              get_weights_accessor(data_path, "projection_bias.npy"))
