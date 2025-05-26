@@ -66,7 +66,7 @@ class GraphGPTExample : public Example
 
         constexpr unsigned int d_model    = 768U;   // Dim layer output
         constexpr unsigned int d_vocab    = 50257U; // Vocabulary size
-        constexpr unsigned int d_segemnt  = 0U;
+        constexpr unsigned int d_segemnt  = 1U;     // no segmentation in gpt2
         constexpr unsigned int d_position = 1024U;   // Pretrained positional encoding length
         constexpr unsigned int h          = 12U;    // Parallel attention (Heads)
         constexpr float        eps        = 1e-5;  // Layer normalization eplision
@@ -98,8 +98,9 @@ class GraphGPTExample : public Example
                                                    true /*Use pretrained positional encoding*/,
                                                    ConvertPolicy::SATURATE),
                                 get_weights_accessor(data_path, "token_embedding.npy", operation_layout),
+                                // all zeroes for gpt2
                                 get_weights_accessor(data_path, "segment_embedding.npy", operation_layout),
-                                get_weights_accessor(data_path, "positional_embedding.npy", operation_layout))
+                                get_weights_accessor(data_path, "position_embedding.npy", operation_layout))
                      .set_name("tkemb1");
 
         add_decoder_block(data_path, "layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
@@ -117,10 +118,11 @@ class GraphGPTExample : public Example
 
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps))
             // TODO: get correct dimensions and parameters
-            << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model),
-                                            TensorShape(d_model)),
-                             get_weights_accessor(data_path, "pooler_weight.npy"),
-                             get_weights_accessor(data_path, "pooler_bias.npy"))
+            << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_vocab),
+                                            TensorShape(d_vocab), 1),
+                             get_weights_accessor(data_path, "projection_weight.npy"),
+                             // just zeroes for gpt2
+                             get_weights_accessor(data_path, "projection_bias.npy"))
 
               << OutputLayer(get_output_accessor(common_params)).set_name("out1");
         
@@ -174,11 +176,11 @@ class GraphGPTExample : public Example
                                     get_weights_accessor(data_path + layer_path, "key_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy"))
-            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1")
+            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1");
 
         // add and norm
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention");
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps));
+        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention")
+            << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps));
 
         SubStream without_ff(graph);
         SubStream with_ff(graph);
