@@ -19,6 +19,7 @@
 #include "src/cpu/operators/CpuPermute.h"
 #include "src/cpu/operators/CpuSoftmax.h"
 #include "src/cpu/operators/CpuGemm.h"
+#include "src/cpu/kernels/CpuAddKernel.h"
 
 #include <memory>
 
@@ -78,13 +79,12 @@ private:
         Softmax,
         GemmedContext,
         ConcatPermute,
-
         QueryCPUBuffer,
         KeyCPUBuffer,
         ValueCPUBuffer,
         OuputCPUBuffer,
-        
-        Count
+        Count,
+        Mask
     };
 
     std::unique_ptr<kernels::CpuGemmInterleave4x4Kernel>    _query_interleave_kernel{nullptr};
@@ -106,6 +106,8 @@ private:
     std::unique_ptr<CpuPermute>                             _concat_permute_func{nullptr};
     std::unique_ptr<CpuTranspose>                           _key_transpose_func{nullptr};
     std::unique_ptr<CpuSoftmaxGeneric>                      _softmax_func{nullptr};
+    std::unique_ptr<kernels::CpuAddKernel>                  _masking_kernel{nullptr};
+    std::unique_ptr<ITensor>                                _mask{nullptr};
 
     
 
@@ -125,6 +127,7 @@ private:
     TensorInfo _scaled_query_key{};
     TensorInfo _softmaxed_product{};
     TensorInfo _gemmed_context{};
+    TensorInfo _masked_scaled_kq{};
 
     TensorInfo _query_cpu_buffer{};
     TensorInfo _key_cpu_buffer{};
@@ -136,6 +139,7 @@ private:
     bool _run_vector_matrix_multiplication{false};
     bool _run_interleave_transpose{
         true}; /**< If we run CpuGemmInterleave4x4Kernel on lhs and CpuGemmTranspose1xWKernel on rhs */
+    bool _is_masked{false};
 
     experimental::MemoryRequirements _aux_mem{Count};
 

@@ -2222,9 +2222,8 @@ class ScaleDotProductionLayerInfo final
      * @param[in] d_model   Model dimesion
      * @param[in] h         Parallel attention dimesion
      */
-    ScaleDotProductionLayerInfo(unsigned int d_model = 512, unsigned int h = 8)
-        : _d_model(d_model),
-          _h(h)
+    ScaleDotProductionLayerInfo(unsigned int d_model = 512, unsigned int h = 8, bool is_masked = false) :
+        _d_model(d_model), _h(h), _is_masked(is_masked)
     {
     }
 
@@ -2250,9 +2249,15 @@ class ScaleDotProductionLayerInfo final
         return _h;
     }
 
-    private:
+    bool is_masked() const
+    {
+        return _is_masked;
+    }
+
+private:
     unsigned int _d_model;
     unsigned int _h;
+    bool _is_masked{false};
 };
 /**< Tensor target types */
 enum class TensorTargetType
