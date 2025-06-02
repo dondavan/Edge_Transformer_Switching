@@ -151,7 +151,13 @@ class GraphGPTExample : public Example
 
     void do_run() override
     {
+        auto start_time = std::chrono::high_resolution_clock::now();
+
         graph.run();
+
+        auto   end_time  = std::chrono::high_resolution_clock::now();
+        double cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+        std::cout << "Run cost: " << cost_time << std::endl;
     }
 
     private:
@@ -176,7 +182,10 @@ class GraphGPTExample : public Example
                                     get_weights_accessor(data_path + layer_path, "key_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy"))
-            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h)).set_name("mha1");
+            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h, true)).set_name("mha1")
+            << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model), TensorShape(d_model)),
+                            get_weights_accessor(data_path + layer_path, "attn_proj_weight.npy"),
+                            get_weights_accessor(data_path + layer_path, "attn_proj_weight.npy"));
 
         // add and norm
         graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention")
