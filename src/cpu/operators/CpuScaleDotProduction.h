@@ -106,8 +106,6 @@ private:
     std::unique_ptr<CpuPermute>                             _concat_permute_func{nullptr};
     std::unique_ptr<CpuTranspose>                           _key_transpose_func{nullptr};
     std::unique_ptr<CpuSoftmaxGeneric>                      _softmax_func{nullptr};
-    std::unique_ptr<kernels::CpuAddKernel>                  _masking_kernel{nullptr};
-    std::unique_ptr<ITensor>                                _mask{nullptr};
 
     
 
@@ -127,7 +125,6 @@ private:
     TensorInfo _scaled_query_key{};
     TensorInfo _softmaxed_product{};
     TensorInfo _gemmed_context{};
-    TensorInfo _masked_scaled_kq{};
 
     TensorInfo _query_cpu_buffer{};
     TensorInfo _key_cpu_buffer{};
