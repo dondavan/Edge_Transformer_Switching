@@ -19,29 +19,6 @@
 
 namespace arm_compute
 {
-std::unique_ptr<ITensor> create_mask(TensorInfo * mask_target)
-{
-    // Create tensor info
-    TensorInfo mask_info = *mask_target->clone();
-    auto mask_tensor = std::make_unique<Tensor>();
-    mask_tensor->allocator()->init(mask_info);
-    mask_tensor->allocator()->allocate();
-
-    // Fill mask manually
-    Window window;
-    window.use_tensor_dimensions(mask_info.tensor_shape());
-
-    Iterator it(mask_tensor.get(), window);
-    execute_window_loop(window, [&](const Coordinates &coords) {
-        const int i = coords.y();
-        const int j = coords.x();
-
-        float *ptr = reinterpret_cast<float *>(it.ptr());
-        *ptr = (j > i) ? -1e9f : 0.0f;
-    }, it);
-
-    return mask_tensor;
-}
 namespace cpu
 {
 
@@ -130,13 +107,6 @@ void CpuScaleDotProduction::configure(const ITensorInfo *query,
 
     // enable and configure masking of the query-key product
     _is_masked = info.is_masked();
-    if (_is_masked)
-    {
-        _mask = create_mask(&_scaled_query_key);
-        _masked_scaled_kq = *_scaled_query_key.clone();
-        _masking_kernel = std::make_unique<kernels::CpuAddKernel>();
-        _masking_kernel->configure(&_scaled_query_key, _mask->info(), &_masked_scaled_kq, ConvertPolicy::WRAP);
-    }
 
     //  Softmax of previous product 
     _softmax_func = std::make_unique<cpu::CpuSoftmaxGeneric>();
@@ -326,10 +296,21 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
 
     if (_is_masked)
     {
-        CpuAuxTensorHandler masked_scaled_kq(offset_int_vec(Mask), _masked_scaled_kq, tensors);
-        ITensorPack masking_pack{{ACL_SRC_0, scaled_query_key.get()}, {ACL_SRC_1, _mask.get()}, {ACL_DST, masked_scaled_kq.get()}};
-        NEScheduler::get().schedule_op(_masking_kernel.get(),Window::DimZ,_masking_kernel->window(),masking_pack);
-        scaled_query_key.get()->copy_from(*masked_scaled_kq.get());
+        // Fill mask manually
+        Window window;
+        window.use_tensor_dimensions(scaled_query_key.get()->info()->tensor_shape());
+
+        Iterator it(scaled_query_key.get(), window);
+        execute_window_loop(window, [&](const Coordinates &coords) {
+            const int i = coords.y();
+            const int j = coords.x();
+
+            float *ptr = reinterpret_cast<float *>(it.ptr());
+            if (j > i)
+            {
+                *ptr = -1e9f;
+            }
+        }, it);
     }
 
     ITensorPack softmax_pack = {{ACL_SRC, scaled_query_key.get()}, {ACL_DST, softmaxed_product.get()}};
