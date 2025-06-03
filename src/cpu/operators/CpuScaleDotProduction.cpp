@@ -17,36 +17,6 @@
 #include <fstream>
 #endif
 
-void print_tensor(const arm_compute::ITensor *tensor)
-{
-    const auto shape = tensor->info()->tensor_shape();
-    const size_t width  = shape[0]; // X dimension
-    const size_t height = shape[1]; // Y dimension
-    const size_t depth  = shape[2]; // Z dimension (stacked layers)
-
-    std::cout << "Tensor shape: [width=" << width << ", height=" << height << ", depth=" << depth << "]\n";
-
-    const float *data = reinterpret_cast<const float *>(tensor->buffer());
-
-    const size_t pitch_x = 1;
-    const size_t pitch_y = width;
-    const size_t pitch_z = width * height;
-
-    for (size_t z = 0; z < depth; ++z)
-    {
-        std::cout << "Layer " << z << ":\n";
-        for (size_t y = 0; y < height; ++y)
-        {
-            for (size_t x = 0; x < width; ++x)
-            {
-                size_t idx = x * pitch_x + y * pitch_y + z * pitch_z;
-                std::cout << data[idx] << " ";
-            }
-            std::cout << "\n";
-        }
-        std::cout << "\n";
-    }
-}
 
 namespace arm_compute
 {

@@ -25,6 +25,21 @@ namespace arm_compute
 {
 namespace opencl
 {
+void fill_mask(ICLTensor * mask)
+{
+    Window window;
+    window.use_tensor_dimensions(mask->info()->tensor_shape());
+    mask->map(CLScheduler::get().queue());
+
+    Iterator it(mask, window);
+    execute_window_loop(window, [&](const Coordinates &coords) {
+        int i = coords.y();
+        int j = coords.x();
+        float *ptr = reinterpret_cast<float *>(it.ptr());
+        *ptr = (j > i) ? -1e9f : 0.0f;
+    }, it);
+    mask->unmap(CLScheduler::get().queue());
+}
 
 void ClScaleDotProduction::configure(const ClCompileContext                     &compile_context,
                                      const ITensorInfo                          *query,
@@ -116,6 +131,15 @@ void ClScaleDotProduction::configure(const ClCompileContext                     
     product_mm_kernel->configure(compile_context, &_permuted_query, &_permuted_key, nullptr, &_scaled_query_key, scale, 0, mm_kernel_info_qk);
     _product_mm_kernel = std::move(product_mm_kernel);
     
+    _is_masked = info.is_masked();
+    if (_is_masked)
+    {
+        // configure mask
+        _mask_info = *_scaled_query_key.clone();
+        _masked_scaled_qk = *_scaled_query_key.clone();
+        _mask_addition_func = std::make_unique<ClAdd>();
+        _mask_addition_func->configure(compile_context, &_scaled_query_key, &_mask_info, &_masked_scaled_qk, ConvertPolicy::WRAP);
+    }
     
     //  Softmax of previous product
     SoftmaxKernelInfo softmax_info{ 1.0f, false, query->data_type(), 0 };
@@ -275,6 +299,21 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
     measure_out << std::scientific << "MMUL QK cost: " << cost_time << std::endl;
 #endif
 
+    if (_is_masked)
+    {
+        CLAuxTensorHandler masked_scaled_qk(offset_int_vec(MaskedResult), _masked_scaled_qk, tensors);
+        CLAuxTensorHandler mask(offset_int_vec(Mask), _masked_scaled_qk, tensors);
+        // fill mask with the correct values
+        fill_mask(mask.get());
+        ITensorPack mask_pack{{ACL_SRC_0, scaled_query_key.get()}, {ACL_SRC_1, mask.get()}, {ACL_DST, masked_scaled_qk.get()}};
+        _mask_addition_func->run(mask_pack);
+        // copy to correct memory
+        masked_scaled_qk.get()->map(CLScheduler::get().queue());
+        scaled_query_key.get()->map(CLScheduler::get().queue());
+        scaled_query_key.get()->copy_from(*masked_scaled_qk.get());
+        masked_scaled_qk.get()->unmap(CLScheduler::get().queue());
+        scaled_query_key.get()->unmap(CLScheduler::get().queue());
+    }
     
     // Softmax scaled product
     ITensorPack softmax_pack = { { ACL_SRC, scaled_query_key.get() }, { ACL_DST, softmaxed_product.get() } };
