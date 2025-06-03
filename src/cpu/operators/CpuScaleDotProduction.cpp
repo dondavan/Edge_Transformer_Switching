@@ -17,6 +17,37 @@
 #include <fstream>
 #endif
 
+void print_tensor(const arm_compute::ITensor *tensor)
+{
+    const auto shape = tensor->info()->tensor_shape();
+    const size_t width  = shape[0]; // X dimension
+    const size_t height = shape[1]; // Y dimension
+    const size_t depth  = shape[2]; // Z dimension (stacked layers)
+
+    std::cout << "Tensor shape: [width=" << width << ", height=" << height << ", depth=" << depth << "]\n";
+
+    const float *data = reinterpret_cast<const float *>(tensor->buffer());
+
+    const size_t pitch_x = 1;
+    const size_t pitch_y = width;
+    const size_t pitch_z = width * height;
+
+    for (size_t z = 0; z < depth; ++z)
+    {
+        std::cout << "Layer " << z << ":\n";
+        for (size_t y = 0; y < height; ++y)
+        {
+            for (size_t x = 0; x < width; ++x)
+            {
+                size_t idx = x * pitch_x + y * pitch_y + z * pitch_z;
+                std::cout << data[idx] << " ";
+            }
+            std::cout << "\n";
+        }
+        std::cout << "\n";
+    }
+}
+
 namespace arm_compute
 {
 std::unique_ptr<ITensor> create_mask(TensorInfo * mask_target)
@@ -132,10 +163,10 @@ void CpuScaleDotProduction::configure(const ITensorInfo *query,
     _is_masked = info.is_masked();
     if (_is_masked)
     {
-        _mask = create_mask(&_scaled_query_key);
         _masked_scaled_kq = *_scaled_query_key.clone();
+        _mask_info = *_scaled_query_key.clone();
         _masking_kernel = std::make_unique<kernels::CpuAddKernel>();
-        _masking_kernel->configure(&_scaled_query_key, _mask->info(), &_masked_scaled_kq, ConvertPolicy::WRAP);
+        _masking_kernel->configure(&_scaled_query_key, &_mask_info, &_masked_scaled_kq, ConvertPolicy::WRAP);
     }
 
     //  Softmax of previous product 
@@ -327,6 +358,7 @@ void CpuScaleDotProduction::run(ITensorPack &tensors)
     if (_is_masked)
     {
         CpuAuxTensorHandler masked_scaled_kq(offset_int_vec(Mask), _masked_scaled_kq, tensors);
+        _mask = create_mask(&_mask_info);
         ITensorPack masking_pack{{ACL_SRC_0, scaled_query_key.get()}, {ACL_SRC_1, _mask.get()}, {ACL_DST, masked_scaled_kq.get()}};
         NEScheduler::get().schedule_op(_masking_kernel.get(),Window::DimZ,_masking_kernel->window(),masking_pack);
         scaled_query_key.get()->copy_from(*masked_scaled_kq.get());

@@ -123,6 +123,7 @@ private:
     TensorInfo _softmaxed_product{};
     TensorInfo _gemmed_context{};
     TensorInfo _masked_scaled_kq{};
+    TensorInfo _mask_info{};
 
     bool _run_pretranspose{false};
     bool _run_scale{false};
