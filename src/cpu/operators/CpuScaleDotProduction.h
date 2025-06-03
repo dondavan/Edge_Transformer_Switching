@@ -128,6 +128,7 @@ private:
     TensorInfo _softmaxed_product{};
     TensorInfo _gemmed_context{};
     TensorInfo _masked_scaled_kq{};
+    TensorInfo _mask_info{};
 
     TensorInfo _query_cpu_buffer{};
     TensorInfo _key_cpu_buffer{};
