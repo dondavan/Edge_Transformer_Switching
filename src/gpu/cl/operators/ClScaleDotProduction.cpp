@@ -334,6 +334,9 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
     {
         CLAuxTensorHandler masked_scaled_qk(offset_int_vec(MaskedResult), _masked_scaled_qk, tensors);
         CLAuxTensorHandler mask(offset_int_vec(Mask), _masked_scaled_qk, tensors);
+#ifdef MEASURE_TIME
+    start_time = std::chrono::high_resolution_clock::now();
+#endif
         // fill mask with the correct values
         fill_mask(mask.get());
         ITensorPack mask_pack{{ACL_SRC_0, scaled_query_key.get()}, {ACL_SRC_1, mask.get()}, {ACL_DST, masked_scaled_qk.get()}};
@@ -344,6 +347,12 @@ void ClScaleDotProduction::run(ITensorPack &tensors)
         scaled_query_key.get()->copy_from(*masked_scaled_qk.get());
         masked_scaled_qk.get()->unmap(CLScheduler::get().queue());
         scaled_query_key.get()->unmap(CLScheduler::get().queue());
+#ifdef MEASURE_TIME
+    end_time  = std::chrono::high_resolution_clock::now();
+    cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+    measure_out.precision(5);
+    measure_out << std::scientific << "GpuMasking cost: " << cost_time << std::endl;
+#endif
     }
     
     // Softmax scaled product
