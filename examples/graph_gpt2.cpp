@@ -117,7 +117,6 @@ class GraphGPTExample : public Example
         add_decoder_block(data_path, "layer_11/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
 
         graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps))
-            // TODO: get correct dimensions and parameters
             << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_vocab),
                                             TensorShape(d_vocab)),
                              get_weights_accessor(data_path, "projection_weight.npy"),
@@ -174,7 +173,6 @@ class GraphGPTExample : public Example
 
         with_attention << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps));
 
-        // TODO: multihead MASKED attention
         with_attention << AttentionLinearLayer(LinearLayerInfo(d_model),
                                     get_weights_accessor(data_path + layer_path, "query_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "query_bias.npy"),
