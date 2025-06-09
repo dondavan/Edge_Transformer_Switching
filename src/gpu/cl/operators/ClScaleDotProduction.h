@@ -13,6 +13,8 @@
 #include "src/gpu/cl/kernels/ClReshapeKernel.h"
 #include "src/gpu/cl/kernels/ClSoftmaxKernel.h"
 #include "src/gpu/cl/kernels/ClTransposeKernel.h"
+#include "src/gpu/cl/operators/ClAdd.h"
+#include "arm_compute/runtime/CL/CLTensor.h"
 
 #include <memory>
 
@@ -77,7 +79,9 @@ class ClScaleDotProduction : public IClOperator
         Softmax,
         GemmedContext,
         ConcatPermute,
-        Count
+        Count,
+        MaskedResult,
+        Mask
     };
 
     TensorInfo _reshaped_query{};
@@ -93,6 +97,9 @@ class ClScaleDotProduction : public IClOperator
     TensorInfo _scaled_query_key{};
     TensorInfo _softmaxed_product{};
     TensorInfo _gemmed_context{};
+
+    TensorInfo _mask_info{};
+    TensorInfo _masked_scaled_qk{};
 
     std::unique_ptr<kernels::ClReshapeKernel> _query_reshape_kernel{ nullptr };
     std::unique_ptr<kernels::ClPermuteKernel>     _query_permute_kernel{ nullptr };
@@ -110,6 +117,9 @@ class ClScaleDotProduction : public IClOperator
     std::unique_ptr<kernels::ClLinearKernel> _product_mm_kernel{ nullptr };
     std::unique_ptr<kernels::ClLinearKernel> _context_mm_kernel{ nullptr };
 
+    std::unique_ptr<ClAdd>                  _mask_addition_func{ nullptr };
+
+    bool _is_masked{ false };
     //std::unique_ptr<kernels::ClSimpleForward1Kernel> _sf_kernel{ nullptr };
 
     experimental::MemoryRequirements _aux_mem{ Count };
