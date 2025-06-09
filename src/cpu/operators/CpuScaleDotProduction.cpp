@@ -465,10 +465,19 @@ if(_recurrence_count ==0){
     if (_is_masked)
     {
         CpuAuxTensorHandler masked_scaled_kq(offset_int_vec(Mask), _masked_scaled_kq, tensors);
+#ifdef MEASURE_TIME
+    start_time = std::chrono::high_resolution_clock::now();
+#endif
         _mask = create_mask(&_mask_info);
         ITensorPack masking_pack{{ACL_SRC_0, scaled_query_key.get()}, {ACL_SRC_1, _mask.get()}, {ACL_DST, masked_scaled_kq.get()}};
         NEScheduler::get().schedule_op(_masking_kernel.get(),Window::DimZ,_masking_kernel->window(),masking_pack);
         scaled_query_key.get()->copy_from(*masked_scaled_kq.get());
+#ifdef MEASURE_TIME
+    end_time  = std::chrono::high_resolution_clock::now();
+    cost_time = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count();
+    measure_out.precision(5);
+    measure_out << std::scientific << "CpuMasking cost: " << cost_time << std::endl;
+#endif
     }
 
     ITensorPack softmax_pack = {{ACL_SRC, scaled_query_key.get()}, {ACL_DST, softmaxed_product.get()}};
