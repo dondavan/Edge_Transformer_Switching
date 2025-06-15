@@ -168,6 +168,7 @@ class GraphGPTExample : public Example
     void add_decoder_block(std::string data_path, std::string layer_path,
                            unsigned int d_model, unsigned int h, float eps, unsigned int d_ff)
     {
+        ScaleDotProductionLayerInfo sdpa_info(d_model, h, true);
         SubStream with_attention(graph);
         SubStream without_attention(graph);
 
@@ -180,13 +181,13 @@ class GraphGPTExample : public Example
                                     get_weights_accessor(data_path + layer_path, "key_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_bias.npy"))
-            << ScaleDotProductionLayer(ScaleDotProductionLayerInfo(d_model, h, true)).set_name("mha1")
+            << ScaleDotProductionLayer(sdpa_info).set_name("mha1")
             << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model), TensorShape(d_model)),
                             get_weights_accessor(data_path + layer_path, "attn_proj_weight.npy"),
                             get_weights_accessor(data_path + layer_path, "attn_proj_weight.npy"));
 
         // add and norm
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add).set_name("add_4_norm_attention")
+        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add, 1).set_name("add_4_norm_attention")
             << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps));
 
         SubStream without_ff(graph);
@@ -202,7 +203,7 @@ class GraphGPTExample : public Example
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
                                get_weights_accessor(data_path + layer_path, "ff_bias_1.npy"));
 
-        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add).set_name("add_4_norm_ff");
+        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add, 0).set_name("add_4_norm_ff");
     }
 };
 
