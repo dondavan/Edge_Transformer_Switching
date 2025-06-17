@@ -89,7 +89,7 @@ class GraphGPTExample : public Example
         // RULE: segment id must all be the same and the segment embedding parameters are all 0
         graph << InputLayer(input_descriptor, get_token_accessor(common_params),
                             get_segment_accessor(common_params.segment, move(at2_preproccessor)))
-                     .set_name("in1")
+                     .set_name("in1").set_target(Target::NEON)
 
             << EmbeddingLayer(EmbeddingLayerInfo(d_model,
                                                    d_vocab,
@@ -101,7 +101,7 @@ class GraphGPTExample : public Example
                                 // all zeroes for gpt2
                                 get_weights_accessor(data_path, "segment_embedding.npy", operation_layout),
                                 get_weights_accessor(data_path, "position_embedding.npy", operation_layout))
-                     .set_name("tkemb1");
+                     .set_name("tkemb1").set_target(Target::NEON);
 
         add_decoder_block(data_path, "layer_0/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
         add_decoder_block(data_path, "layer_1/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
@@ -116,14 +116,14 @@ class GraphGPTExample : public Example
         add_decoder_block(data_path, "layer_10/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
         add_decoder_block(data_path, "layer_11/" /*Layer Parameter Dir*/, d_model, h, eps, d_ff);
 
-        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps))
+        graph << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("final_norm")
             << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_vocab),
                                             TensorShape(d_vocab)),
                              get_weights_accessor(data_path, "projection_weight.npy"),
                              // just zeroes for gpt2
-                             get_weights_accessor(data_path, "projection_bias.npy"))
+                             get_weights_accessor(data_path, "projection_bias.npy")).set_target(Target::CL).set_name("vocab_projection")
 
-              << OutputLayer(get_output_accessor(common_params)).set_name("out1");
+              << OutputLayer(get_output_accessor(common_params)).set_name("out1").set_target(Target::NEON);
         
         // Finalize graph
         GraphConfig config;
@@ -172,7 +172,7 @@ class GraphGPTExample : public Example
         SubStream with_attention(graph);
         SubStream without_attention(graph);
 
-        with_attention << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps));
+        with_attention << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_name("attention_norm").set_target(Target::NEON);
 
         with_attention << AttentionLinearLayer(LinearLayerInfo(d_model),
                                     get_weights_accessor(data_path + layer_path, "query_weight.npy"),
@@ -180,15 +180,15 @@ class GraphGPTExample : public Example
                                     get_weights_accessor(data_path + layer_path, "key_weight.npy"),
                                     get_weights_accessor(data_path + layer_path, "key_bias.npy"),
                                     get_weights_accessor(data_path + layer_path, "value_weight.npy"),
-                                    get_weights_accessor(data_path + layer_path, "value_bias.npy"))
-            << ScaleDotProductionLayer(sdpa_info).set_name("mha1")
+                                    get_weights_accessor(data_path + layer_path, "value_bias.npy")).set_target(Target::CL).set_name("attention_linear")
+            << ScaleDotProductionLayer(sdpa_info).set_name("mha1").set_target(Target::NEON)
             << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_model, d_model), TensorShape(d_model)),
                             get_weights_accessor(data_path + layer_path, "attn_proj_weight.npy"),
-                            get_weights_accessor(data_path + layer_path, "attn_proj_weight.npy"));
+                            get_weights_accessor(data_path + layer_path, "attn_proj_weight.npy")).set_target(Target::CL).set_name("lin_attn");
 
         // add and norm
-        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add, 1).set_name("add_4_norm_attention")
-            << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps));
+        graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add, 1).set_name("add_4_norm_attention").set_target(Target::NEON)
+            << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attn_add_norm");
 
         SubStream without_ff(graph);
         SubStream with_ff(graph);
@@ -196,14 +196,15 @@ class GraphGPTExample : public Example
         with_ff << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
                                                         TensorShape(d_ff) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_0.npy"),
-                               get_weights_accessor(data_path + layer_path, "ff_bias_0.npy"))
-                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU))
+                               get_weights_accessor(data_path + layer_path, "ff_bias_0.npy")).set_target(Target::CL).set_name("ff_0_linear")
+                << ActivationLayer(ActivationLayerInfo(ActivationFunction::GELU)).set_target(Target::CL).set_name("ff_acti")
                 << LinearLayer(LinearLayerInfo(d_model, TensorShape(d_ff, d_model) /*weight*/,
                                                TensorShape(d_model) /*bias*/),
                                get_weights_accessor(data_path + layer_path, "ff_weight_1.npy"),
-                               get_weights_accessor(data_path + layer_path, "ff_bias_1.npy"));
+                               get_weights_accessor(data_path + layer_path, "ff_bias_1.npy")).set_target(Target::CL).set_name("ff_1_linear");
 
-        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add, 0).set_name("add_4_norm_ff");
+        graph << EltwiseLayer(std::move(with_ff), std::move(without_ff), EltwiseOperation::Add, 0)
+            .set_name("add_4_norm_ff").set_target(Target::NEON);
     }
 };
 

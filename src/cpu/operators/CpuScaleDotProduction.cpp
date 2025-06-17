@@ -523,6 +523,12 @@ if(_recurrence_count ==0){
 #endif
 */
 
+    if (output->buffer() == nullptr) 
+    {
+        ICLTensor * output_cl = static_cast<ICLTensor *>(output);
+        output_cl->map(CLScheduler::get().queue());
+    }
+
     ITensorPack concat_reshape_pack{ { ACL_SRC_0, permuted_concat.get() }, { ACL_DST, output} };
     NEScheduler::get().schedule_op(_concat_reshape_kernel.get(), Window::DimY, _concat_reshape_kernel->window(), concat_reshape_pack);
     
