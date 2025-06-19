@@ -188,10 +188,11 @@ class GraphGPTExample : public Example
 
         // add and norm
         graph << EltwiseLayer(std::move(with_attention), std::move(without_attention), EltwiseOperation::Add, 1).set_name("add_4_norm_attention").set_target(Target::NEON)
-            << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attn_add_norm");
 
         SubStream without_ff(graph);
         SubStream with_ff(graph);
+
+        with_ff << LayerNormLayer(LayerNormLayerInfo(0 /*Window::DimX*/, eps)).set_target(Target::NEON).set_name("attn_add_norm");
 
         with_ff << LinearLayer(LinearLayerInfo(d_ff, TensorShape(d_model, d_ff) /*weight*/,
                                                         TensorShape(d_ff) /*bias*/),
